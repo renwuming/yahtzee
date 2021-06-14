@@ -3,7 +3,6 @@ import { View } from "@tarojs/components";
 import { AtButton } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/flex.scss";
-
 import "./index.scss";
 import {
   DEFAULT_DICE_LIST,
@@ -114,32 +113,25 @@ export default function Index() {
       <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
       <View className="btn-box at-row at-row__align--center">
         <AtButton
+          type="secondary"
           className="at-col at-col-5"
           onClick={() => {
             DiceIt();
           }}
           disabled={!canDice}
         >
-          投掷({chances})
+          投掷
+          <View className="dice-chance">{chances}</View>
         </AtButton>
         <AtButton
-          className="at-col at-col-5"
+          type="primary"
+          className="at-col at-col-5 confirm-btn"
           disabled={!confirmFlag}
           onClick={() => {
             updateScores();
           }}
         >
           决定
-        </AtButton>
-      </View>
-      <View className="btn-box at-row at-row__align--center">
-        <AtButton
-          className="at-col at-col-10"
-          onClick={() => {
-            reset();
-          }}
-        >
-          再来一局
         </AtButton>
       </View>
     </View>

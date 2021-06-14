@@ -5,3 +5,13 @@ page {
 .at-row {
   box-sizing: border-box;
 }
+.at-button--primary.at-button--primary {
+  color: #fff;
+  border: 1px solid #e97a29;
+  background: #e97a29;
+}
+.at-button--secondary.at-button--secondary {
+  color: #f2822e;
+  border: 1px solid #f7f7f7;
+  background: #f7f7f7;
+}

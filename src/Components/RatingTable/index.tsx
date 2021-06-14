@@ -1,5 +1,4 @@
 import { View, Text } from "@tarojs/components";
-import { AtIcon } from "taro-ui";
 import "taro-ui/dist/style/components/flex.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";

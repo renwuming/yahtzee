@@ -1,7 +1,7 @@
 # Yahtzee
 
 ### 简介
-快艇骰子小程序，主要使用[Taro](https://nervjs.github.io/taro/docs/README)与[Taro-UI](https://taro-ui.jd.com/#/)框架
+快艇骰子小程序，主要使用 [Taro](https://nervjs.github.io/taro/docs/README) 与 [Taro-UI](https://taro-ui.jd.com/#/) 框架
 
 ### 开始
 ```

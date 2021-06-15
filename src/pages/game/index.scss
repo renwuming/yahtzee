@@ -1,7 +1,8 @@
 .game {
+  box-sizing: border-box;
   min-height: 100%;
   background-color: #46b3ff;
-  padding-bottom: 20px;
+  padding: 20px 0;
   .btn-box {
     margin-top: 20px;
     .at-button {

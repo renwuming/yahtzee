@@ -1,5 +1,3 @@
-import Taro from "@tarojs/taro";
-
 export const DICE_NUM = 5;
 export const DICE_CHANCES_NUM = 3;
 export const DEFAULT_DICE_LIST: DiceData[] = new Array(DICE_NUM).fill({
@@ -20,9 +18,3 @@ export const DEFAULT_SCORES: Scores = {
   straight: null,
   fiveOfKind: null,
 };
-
-export function navigateTo(pageName: string) {
-  Taro.navigateTo({
-    url: `/pages/${pageName}/index`,
-  });
-}

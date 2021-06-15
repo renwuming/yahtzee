@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
 import { View } from "@tarojs/components";
 import { AtButton } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
@@ -9,24 +10,80 @@ import {
   DEFAULT_SCORES,
   DICE_CHANCES_NUM,
 } from "../../const";
-
+import PlayerList from "../../Components/PlayerList";
 import DiceList from "../../Components/DiceList";
 import RatingTable from "../../Components/RatingTable";
 import { gameOver } from "../../Components/RatingTable/scoreRatings";
+import {
+  getUserProfile,
+  initUserInfo,
+  SLEEP,
+  watchDataBase,
+} from "../../utils";
+import {
+  getGameData,
+  handleGameData,
+  joinGame,
+  leaveGame,
+  startGame,
+  updateGame,
+  updateGameScores,
+} from "./gameApi";
 
 export default function Index() {
+  initUserInfo();
+  // 页面参数
+  const { id } = getCurrentInstance().router.params;
+  // 设置分享
+  useShareAppMessage(() => {
+    return {
+      title: "快艇骰子，一决高下！",
+      path: `/pages/game/index?id=${id}`,
+      imageUrl: "http://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
+    };
+  });
+  // 更新游戏数据
+  async function init(data: GameBaseData) {
+    const gameData = handleGameData(data);
+    const { roundScores, start, diceList } = gameData;
+    setGameData(gameData);
+    setScores(roundScores);
+    if (start) {
+      setDiceList(diceList);
+    }
+  }
+  // 监听数据库变动
+  useEffect(() => {
+    getGameData(id).then((data) => {
+      init(data);
+    });
+    const watcher = watchDataBase(id, (data) => {
+      init(data);
+    });
+    return () => {
+      watcher.close();
+    };
+  }, []);
+
+  const [gameData, setGameData] = useState<GameData>(null);
+
+  const { start, own, inGame, players, inRound, chances, roundPlayer } =
+    gameData || {
+      otherScores: DEFAULT_SCORES,
+    };
+
   const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
   const [dicing, setDicing] = useState<boolean>(false);
   const [confirmFlag, setConfirmFlag] = useState<boolean>(false);
   const [newScore, setNewScore] = useState<NewScore>(null);
   const [scores, setScores] = useState<Scores>(DEFAULT_SCORES);
-  const [chances, setChances] = useState<number>(DICE_CHANCES_NUM);
 
+  const canJoin = players?.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
   const isOver = gameOver(scores);
-  const canDice = chances > 0 && !dicing && !isOver;
+  const canDice = inRound && chances > 0 && !dicing && !isOver;
 
-  function DiceIt() {
+  async function DiceIt() {
     // 重置填分表
     selectScore(null, null);
     // 开始摇骰子
@@ -45,12 +102,17 @@ export default function Index() {
     });
     setDiceList(newDiceList);
 
-    setTimeout(() => {
-      const newDiceList = randomDiceList();
-      setDiceList(newDiceList);
-      setDicing(false);
-      setChances((chances) => chances - 1);
-    }, 1000);
+    const finalDiceList = randomDiceList();
+
+    // 更新掷骰子数据
+    await Promise.all([
+      SLEEP(300),
+      updateGame(id, {
+        chances: chances - 1,
+        diceList: finalDiceList,
+      }),
+    ]);
+    setDicing(false);
   }
 
   function randomDiceList(): DiceData[] {
@@ -83,57 +145,112 @@ export default function Index() {
     }
   }
 
-  function updateScores() {
+  async function updateScores() {
     const { type, score } = newScore || {};
     const newScores = {
       ...scores,
       [type]: score,
     };
-    setScores(newScores);
+
+    // 重置填分表
+    selectScore(null, null);
     setConfirmFlag(false);
     setDiceList(DEFAULT_DICE_LIST);
-    setChances(DICE_CHANCES_NUM);
-  }
-
-  function reset() {
-    selectScore(null, null);
-    updateScores();
-    setScores(DEFAULT_SCORES);
+    // 更新玩家分数
+    await updateGameScores(id, newScores);
   }
 
   return (
     <View className="game">
+      <PlayerList players={players}></PlayerList>
       <RatingTable
         diceList={diceList}
         selectScore={selectScore}
-        scores={scores}
         newScore={newScore}
         noDices={noDices}
+        players={players}
+        roundPlayer={roundPlayer}
       ></RatingTable>
       <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
-      <View className="btn-box at-row at-row__align--center">
-        <AtButton
-          type="secondary"
-          className="at-col at-col-5"
-          onClick={() => {
-            DiceIt();
-          }}
-          disabled={!canDice}
-        >
-          投掷
-          <View className="dice-chance">{chances}</View>
-        </AtButton>
-        <AtButton
-          type="primary"
-          className="at-col at-col-5 confirm-btn"
-          disabled={!confirmFlag}
-          onClick={() => {
-            updateScores();
-          }}
-        >
-          决定
-        </AtButton>
-      </View>
+      {gameData && (
+        <View>
+          {start ? (
+            <View className="btn-box at-row at-row__align--center">
+              <AtButton
+                type="secondary"
+                className="at-col at-col-5"
+                onClick={() => {
+                  DiceIt();
+                }}
+                disabled={!canDice}
+              >
+                掷骰子
+                <View className="dice-chance">{chances}</View>
+              </AtButton>
+              {inRound && (
+                <AtButton
+                  type="primary"
+                  className="at-col at-col-5"
+                  disabled={!confirmFlag}
+                  onClick={() => {
+                    updateScores();
+                  }}
+                >
+                  决定
+                </AtButton>
+              )}
+            </View>
+          ) : (
+            <View className="btn-box at-row at-row__align--center">
+              <AtButton
+                openType="share"
+                type="secondary"
+                className="at-col at-col-5"
+              >
+                邀请朋友
+              </AtButton>
+              {own ? (
+                <AtButton
+                  type="primary"
+                  className="at-col at-col-5"
+                  onClick={() => {
+                    getUserProfile(() => {
+                      startGame(id);
+                    });
+                  }}
+                >
+                  开始
+                </AtButton>
+              ) : inGame ? (
+                <AtButton
+                  type="primary"
+                  className="at-col at-col-5"
+                  onClick={() => {
+                    getUserProfile(() => {
+                      leaveGame(id);
+                    });
+                  }}
+                >
+                  取消
+                </AtButton>
+              ) : (
+                <AtButton
+                  type="primary"
+                  className="at-col at-col-5"
+                  onClick={() => {
+                    getUserProfile(() => {
+                      joinGame(id);
+                    });
+                  }}
+                  disabled={!canJoin}
+                >
+                  准备
+                </AtButton>
+              )}
+            </View>
+          )}
+        </View>
+      )}
     </View>
   );
 }

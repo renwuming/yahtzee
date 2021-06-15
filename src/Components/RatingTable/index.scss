@@ -1,7 +1,7 @@
 .rating-table {
   display: flex;
   flex-direction: column;
-  padding: 30px 0;
+  margin-top: 20px;
   .rating-row {
     &:nth-of-type(odd) {
       background-color: #3fa3e9;
@@ -31,15 +31,15 @@
       }
       .detail {
         font-size: 36px;
-        font-weight: bold;
         color: #f4fcfe;
+        font-family: TrebuchetMS;
       }
     }
     .sum-box {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 220px;
+      width: 340px;
       color: #fff;
       background-color: #f39734;
       .title {
@@ -49,9 +49,20 @@
       }
       .detail {
         font-size: 40px;
-        font-weight: bold;
         color: #f4fcfe;
+        font-family: TrebuchetMS;
       }
+    }
+    .other-sum-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      color: #fff;
+      font-family: TrebuchetMS;
+      font-size: 40px;
     }
     .score-row {
       padding: 20px;
@@ -76,6 +87,8 @@
         }
         &.has-score {
           color: #fff;
+        }
+        &.active.has-score {
           background-color: #3a91d4;
         }
       }

@@ -1,5 +1,5 @@
 interface DiceData {
-  value?: number;
+  value: number;
   freezing?: boolean;
   dicing?: boolean;
 }
@@ -22,4 +22,31 @@ interface Scores {
 interface NewScore {
   type: string;
   score: number;
+}
+
+interface GameBaseData {
+  owner: Player;
+  players: Player[];
+  start?: boolean;
+  roundPlayer?: number;
+  chances?: number;
+  diceList?: DiceData[];
+
+  // startAt: Date;
+  // endAt: Date;
+}
+
+interface GameData extends GameBaseData {
+  own: boolean;
+  inGame: boolean;
+  inRound: boolean;
+  roundScores: Scores;
+  otherScores: Scores;
+}
+
+interface Player {
+  nickName: string;
+  avatarUrl: string;
+  openid?: string;
+  scores?: Scores;
 }

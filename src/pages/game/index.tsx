@@ -183,24 +183,26 @@ export default function Index() {
           roundPlayer={roundPlayer}
         ></RatingTable>
       </View>
-      <View className="dice-list-box">
-        {isOver ? (
-          players.length <= 1 ? null : winner === -1 ? (
-            <View className="result-box">双方平局</View>
+      {gameData && (
+        <View className="dice-list-box">
+          {isOver ? (
+            players.length <= 1 ? null : winner === -1 ? (
+              <View className="result-box">双方平局</View>
+            ) : (
+              <View className="result-box">
+                获胜者
+                <Player
+                  data={players[winner]}
+                  showScore={false}
+                  showActive={false}
+                ></Player>
+              </View>
+            )
           ) : (
-            <View className="result-box">
-              获胜者
-              <Player
-                data={players[winner]}
-                showScore={false}
-                showActive={false}
-              ></Player>
-            </View>
-          )
-        ) : (
-          <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
-        )}
-      </View>
+            <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
+          )}
+        </View>
+      )}
       {gameData && (
         <View>
           {start ? (

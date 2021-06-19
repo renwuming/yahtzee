@@ -1,10 +1,19 @@
 .home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   box-sizing: border-box;
   min-height: 100%;
   background-color: #46b3ff;
-  padding-bottom: 20px;
+  padding: 20px 0;
+  .cover {
+    width: 300px;
+    height: 300px;
+  }
   .btn-list {
+    box-sizing: border-box;
     padding: 50px;
+    width: 80%;
     .at-button {
       margin-bottom: 40px;
     }

@@ -23,6 +23,12 @@
           "pathName": "pages/game/index",
           "query": "id=b00064a760cd8ad7212b3ab505ad0e53",
           "scene": null
+        },
+        {
+          "name": "pages/game/index",
+          "pathName": "pages/game/index",
+          "query": "id=28ee4e3e60cd9bc5238888e8799aadb3",
+          "scene": null
         }
       ]
     }

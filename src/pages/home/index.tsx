@@ -1,5 +1,5 @@
 import { useShareAppMessage } from "@tarojs/taro";
-import { View } from "@tarojs/components";
+import { View, Image } from "@tarojs/components";
 import { AtButton } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
@@ -31,6 +31,10 @@ export default function Index() {
 
   return (
     <View className="home">
+      <Image
+        className="cover"
+        src="http://cdn.renwuming.cn/static/yahtzee/imgs/share.png"
+      ></Image>
       <View className="btn-list">
         <AtButton
           type="primary"
@@ -38,7 +42,7 @@ export default function Index() {
             getUserProfile(createGame);
           }}
         >
-          开始游戏
+          开始
         </AtButton>
       </View>
     </View>

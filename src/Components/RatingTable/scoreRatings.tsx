@@ -169,31 +169,8 @@ function isFullHouse(values: number[]): boolean {
 export const BONUS_NEED = 63;
 export const BONUS_SCORE = 35;
 
-function scoresToValues(scores: Scores): number[] {
-  return Object.keys(scores).map((type) => scores[type]);
-}
-
 export function getBonusScore(scores: Scores): number {
   const types = ["ones", "twos", "threes", "fours", "fives", "sixes"];
   const bonusScore = sum(types.map((type) => scores[type]));
   return bonusScore;
-}
-
-export function getSumScore(scores: Scores): number {
-  if (!scores) return 0;
-  const bonusScore = getBonusScore(scores);
-  const hasBonus = bonusScore >= BONUS_NEED;
-
-  let sumScore = sum(scoresToValues(scores));
-  hasBonus && (sumScore += BONUS_SCORE);
-  return sumScore;
-}
-
-export function gameOver(start: boolean, players: Player[]): boolean {
-  if (!start || players.length <= 0) return false;
-  const scoresList = players.reduce((res, item) => {
-    const { scores } = item;
-    return res.concat(scoresToValues(scores));
-  }, []);
-  return scoresList.filter((value) => value === null).length <= 0;
 }

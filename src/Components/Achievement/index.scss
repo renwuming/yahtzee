@@ -1,0 +1,15 @@
+.achievement-box {
+  .detail-row {
+    margin-top: 10px;
+    font-weight: bold;
+    font-family: TrebuchetMS, "Microsoft YaHei", sans-serif;
+    color: #555;
+    .left {
+      display: inline-block;
+      width: 220px;
+    }
+    .win-rate {
+      color: #e6504b;
+    }
+  }
+}

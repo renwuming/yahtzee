@@ -31,6 +31,8 @@ interface GameBaseData {
   roundPlayer?: number;
   chances?: number;
   diceList?: DiceData[];
+  winner?: number;
+  end?: boolean;
 
   // startAt: Date;
   // endAt: Date;
@@ -42,8 +44,6 @@ interface GameData extends GameBaseData {
   inRound: boolean;
   roundScores: Scores;
   otherScores: Scores;
-  isOver: boolean;
-  winner: number;
 }
 
 interface Player {
@@ -55,4 +55,13 @@ interface Player {
   default?: boolean;
   sumScore?: number;
   inRound?: boolean;
+}
+
+interface AchievementData {
+  singleNum: number;
+  maxSingleSum: number;
+  multiNum: number;
+  maxMultiSum: number;
+  multiWinSum: number;
+  multiWinRate: string;
 }

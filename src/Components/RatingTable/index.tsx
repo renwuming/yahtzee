@@ -8,7 +8,6 @@ import {
   getBonusScore,
   BONUS_NEED,
   BONUS_SCORE,
-  getSumScore,
 } from "./scoreRatings";
 
 interface IProps {
@@ -33,10 +32,9 @@ export default function Index({
     .map((item) => item.scores)
     .filter((item) => item)
     .map((scores, index) => {
-      const { lastScoreType } = players[index];
+      const { lastScoreType, sumScore } = players[index];
       const bonus = getBonusScore(scores);
       const hasBonus = bonus >= BONUS_NEED;
-      const sumScore = getSumScore(scores);
       return {
         scores,
         bonus,

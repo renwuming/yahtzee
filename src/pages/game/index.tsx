@@ -14,13 +14,9 @@ import PlayerList from "../../Components/PlayerList";
 import DiceList from "../../Components/DiceList";
 import RatingTable from "../../Components/RatingTable";
 import Player from "../../Components/Player";
+import LoadPage from "../../Components/LoadPage";
 
-import {
-  getUserProfile,
-  initUserInfo,
-  SLEEP,
-  watchDataBase,
-} from "../../utils";
+import { getUserProfile, SLEEP, watchDataBase } from "../../utils";
 import {
   getGameData,
   handleGameData,
@@ -32,7 +28,6 @@ import {
 } from "./gameApi";
 
 export default function Index() {
-  initUserInfo();
   // 页面参数
   const { id } = getCurrentInstance().router.params;
   // 设置分享
@@ -76,7 +71,7 @@ export default function Index() {
     inRound,
     chances,
     roundPlayer,
-    isOver,
+    end,
     winner,
   } = gameData || {
     players: [],
@@ -91,7 +86,7 @@ export default function Index() {
 
   const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
-  const canDice = inRound && chances > 0 && !dicing && !isOver;
+  const canDice = inRound && chances > 0 && !dicing && !end;
 
   async function DiceIt() {
     // 重置填分表
@@ -172,6 +167,7 @@ export default function Index() {
 
   return (
     <View className="game">
+      <LoadPage></LoadPage>
       <PlayerList players={players} start={start}></PlayerList>
       <View className="scroll-box">
         <RatingTable
@@ -185,7 +181,7 @@ export default function Index() {
       </View>
       {gameData && (
         <View className="dice-list-box">
-          {isOver ? (
+          {end ? (
             players.length <= 1 ? null : winner === -1 ? (
               <View className="result-box">双方平局</View>
             ) : (
@@ -206,7 +202,7 @@ export default function Index() {
       {gameData && (
         <View>
           {start ? (
-            isOver ? null : (
+            end ? null : (
               <View className="btn-box at-row at-row__align--center">
                 <AtButton
                   type="secondary"

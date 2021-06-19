@@ -1,8 +1,4 @@
 import Taro from "@tarojs/taro";
-import {
-  gameOver,
-  getSumScore,
-} from "../../Components/RatingTable/scoreRatings";
 import { DEFAULT_SCORES } from "../../const";
 import { CallCloudFunction } from "../../utils";
 
@@ -26,15 +22,11 @@ export function handleGameData(data: GameBaseData): GameData {
   const inGame = openids.includes(openid);
   const inRound = inGame && openids[roundPlayer] === openid;
   players.forEach((item, index) => {
-    const { scores } = item;
-    scores && (item.sumScore = getSumScore(scores));
     item.inRound = index === roundPlayer;
   });
 
   let roundScores = DEFAULT_SCORES;
   let otherScores = DEFAULT_SCORES;
-  let isOver = false;
-  let winner = null;
 
   if (start) {
     roundScores = players[roundPlayer].scores;
@@ -42,9 +34,6 @@ export function handleGameData(data: GameBaseData): GameData {
       const nextRoundPlayer = (roundPlayer + 1) % players.length;
       otherScores = players[nextRoundPlayer].scores;
     }
-
-    isOver = gameOver(start, players);
-    isOver && (winner = getWinner(players));
   }
   return {
     ...data,
@@ -53,8 +42,6 @@ export function handleGameData(data: GameBaseData): GameData {
     inRound,
     roundScores,
     otherScores,
-    isOver,
-    winner,
   };
 }
 

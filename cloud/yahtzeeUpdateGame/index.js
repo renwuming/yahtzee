@@ -50,13 +50,14 @@ exports.main = async (event) => {
 
 async function handleUpdateData(action, oldData, data, env) {
   const { OPENID } = cloud.getWXContext();
-  const { owner, players, roundPlayer } = oldData;
+  const { owner, players, roundPlayer, start } = oldData;
   const openids = players.map((item) => item.openid);
   const own = OPENID === owner.openid;
   // 开始游戏
   if (action === "startGame" && own) {
     players.forEach((player) => {
       player.scores = DEFAULT_SCORES;
+      player.sumScore = 0;
     });
     return {
       start: true,
@@ -102,16 +103,66 @@ async function handleUpdateData(action, oldData, data, env) {
   else if (action === "updateGameScores") {
     const { scores, lastScoreType } = data;
     players[roundPlayer].scores = scores;
+    players[roundPlayer].sumScore = getSumScore(scores);
     players[roundPlayer].lastScoreType = lastScoreType;
     const newRoundPlayer = (roundPlayer + 1) % players.length;
+    const end = gameOver(start, players);
+    const winner = end ? getWinner(players) : null;
 
     return {
       players,
       roundPlayer: newRoundPlayer,
       chances: DICE_CHANCES_NUM,
       diceList: DEFAULT_DICE_LIST,
+      end,
+      winner,
     };
   }
 
   return null;
+}
+
+const BONUS_NEED = 63;
+const BONUS_SCORE = 35;
+
+function scoresToValues(scores) {
+  return Object.keys(scores).map((type) => scores[type]);
+}
+
+function sum(values) {
+  return values.reduce((sum, item) => sum + item);
+}
+
+function getBonusScore(scores) {
+  const types = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+  const bonusScore = sum(types.map((type) => scores[type]));
+  return bonusScore;
+}
+
+function getSumScore(scores) {
+  if (!scores) return 0;
+  const bonusScore = getBonusScore(scores);
+  const hasBonus = bonusScore >= BONUS_NEED;
+
+  let sumScore = sum(scoresToValues(scores));
+  hasBonus && (sumScore += BONUS_SCORE);
+  return sumScore;
+}
+
+function gameOver(start, players) {
+  if (!start || players.length <= 0) return false;
+  const scoresList = players.reduce((res, item) => {
+    const { scores } = item;
+    return res.concat(scoresToValues(scores));
+  }, []);
+  return scoresList.filter((value) => value === null).length <= 0;
+}
+
+function getWinner(players) {
+  if (players.length <= 1) return null;
+  const { sumScore: sum1 } = players[0];
+  const { sumScore: sum2 } = players[1];
+  if (sum1 === sum2) return -1;
+  else if (sum1 > sum2) return 0;
+  else return 1;
 }

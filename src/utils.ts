@@ -48,28 +48,32 @@ export function watchDataBase(id: string, onChange) {
   return watcher;
 }
 
-export async function getUserProfile(callback = () => {}) {
+export function getUserProfile(callback = () => {}) {
   const userInfo = Taro.getStorageSync("userInfo");
   const hasSetUserProfile = userInfo && userInfo.default !== true;
 
   if (!hasSetUserProfile) {
-    Taro.getUserProfile({
-      desc: "用于提高用户体验",
-      async success({ rawData }) {
-        await CallCloudFunction({
-          name: "setPlayer",
-          data: { data: JSON.parse(rawData) },
-        });
-        callback();
-        initUserInfo();
-      },
-      fail() {
-        callback();
-      },
-    });
+    forceGetUserProfile(callback);
   } else {
     callback();
   }
+}
+
+export function forceGetUserProfile(callback = () => {}) {
+  Taro.getUserProfile({
+    desc: "用于提高用户体验",
+    async success({ rawData }) {
+      await CallCloudFunction({
+        name: "setPlayer",
+        data: { data: JSON.parse(rawData) },
+      });
+      callback();
+      initUserInfo();
+    },
+    fail() {
+      callback();
+    },
+  });
 }
 
 export function SLEEP(delay) {

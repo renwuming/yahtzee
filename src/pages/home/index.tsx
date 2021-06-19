@@ -1,17 +1,21 @@
 import { useShareAppMessage } from "@tarojs/taro";
 import { View, Image } from "@tarojs/components";
-import { AtButton } from "taro-ui";
+import { AtButton, AtModal } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
+import "taro-ui/dist/style/components/modal.scss";
 import "./index.scss";
 import {
   CallCloudFunction,
+  forceGetUserProfile,
   getUserProfile,
-  initUserInfo,
   navigateTo,
 } from "../../utils";
+import LoadPage from "../../Components/LoadPage";
+import Achievement from "../../Components/Achievement";
+import { useState } from "react";
 
 export default function Index() {
-  initUserInfo();
+  const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
 
   // 设置分享
   useShareAppMessage(() => {
@@ -29,8 +33,16 @@ export default function Index() {
     navigateTo(`game/index?id=${_id}`);
   }
 
+  function showAchievement() {
+    setAchievementOpened(true);
+  }
+  function hideAchievement() {
+    setAchievementOpened(false);
+  }
+
   return (
     <View className="home">
+      <LoadPage></LoadPage>
       <Image
         className="cover"
         src="http://cdn.renwuming.cn/static/yahtzee/imgs/share.png"
@@ -44,7 +56,26 @@ export default function Index() {
         >
           开始
         </AtButton>
+        <AtButton
+          type="secondary"
+          onClick={() => {
+            showAchievement();
+          }}
+        >
+          成就
+        </AtButton>
+        <AtButton
+          type="secondary"
+          onClick={() => {
+            forceGetUserProfile();
+          }}
+        >
+          更新头像
+        </AtButton>
       </View>
+      <AtModal isOpened={isAchievementOpened} onClose={hideAchievement}>
+        <Achievement></Achievement>
+      </AtModal>
     </View>
   );
 }

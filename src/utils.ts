@@ -49,23 +49,22 @@ export function watchDataBase(id: string, onChange) {
 }
 
 export async function getUserProfile(callback = () => {}) {
-  const hasSetUserProfile = Taro.getStorageSync("setUserProfile");
+  const userInfo = Taro.getStorageSync("userInfo");
+  const hasSetUserProfile = userInfo && userInfo.default !== true;
 
   if (!hasSetUserProfile) {
     Taro.getUserProfile({
       desc: "用于提高用户体验",
-      success({ rawData }) {
-        CallCloudFunction({
+      async success({ rawData }) {
+        await CallCloudFunction({
           name: "setPlayer",
           data: { data: JSON.parse(rawData) },
         });
         callback();
+        initUserInfo();
       },
       fail() {
         callback();
-      },
-      complete() {
-        Taro.setStorageSync("setUserProfile", true);
       },
     });
   } else {

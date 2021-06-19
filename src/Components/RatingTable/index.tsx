@@ -29,11 +29,11 @@ export default function Index({
   roundPlayer,
 }: IProps) {
   const { type } = newScore || {};
-
   const scoresDataList = players
-    ?.map((item) => item.scores)
+    .map((item) => item.scores)
     .filter((item) => item)
-    ?.map((scores) => {
+    .map((scores, index) => {
+      const { lastScoreType } = players[index];
       const bonus = getBonusScore(scores);
       const hasBonus = bonus >= BONUS_NEED;
       const sumScore = getSumScore(scores);
@@ -42,6 +42,7 @@ export default function Index({
         bonus,
         hasBonus,
         sumScore,
+        lastScoreType,
       };
     });
 
@@ -59,7 +60,8 @@ export default function Index({
         <View className="at-row rating-row">
           {scoreRows.map((scoreRating) => {
             const { name, iconComponent, rating } = scoreRating;
-            const rowDataList = scoresDataList?.map((item, index) => {
+            const rowDataList = scoresDataList.map((item, index) => {
+              const { lastScoreType } = item;
               const _score = item.scores[name];
               const hasScore = _score !== null;
               const score = hasScore ? _score : rating(diceList);
@@ -70,6 +72,7 @@ export default function Index({
                 score,
                 hasScore,
                 hideScore,
+                isLastScoreType: lastScoreType === name,
               };
             });
 
@@ -77,20 +80,31 @@ export default function Index({
               <View className="at-row rating-item at-col-6">
                 <View className="icon-box">{iconComponent()}</View>
                 <View className="at-row score-row">
-                  {rowDataList?.map((rowData) => {
-                    const { score, hasScore, hideScore, active } = rowData;
+                  {rowDataList.map((rowData) => {
+                    const {
+                      score,
+                      hasScore,
+                      hideScore,
+                      active,
+                      isLastScoreType,
+                    } = rowData;
                     const selected = active && type === name;
                     return (
                       <View
-                        className={`score-box ${active ? "active" : ""} ${
-                          selected ? "selected" : ""
-                        } ${hasScore ? "has-score" : ""}`}
+                        className={`score-box ${
+                          active ? "active" : "not-active"
+                        } ${selected ? "selected" : ""} ${
+                          hasScore ? "has-score" : ""
+                        }`}
                         onClick={() => {
                           if (hasScore || noDices) return;
                           toggleSelectScore(name, score);
                         }}
                       >
                         {hideScore ? "" : score}
+                        {!active && isLastScoreType && (
+                          <View className="last-dot"></View>
+                        )}
                       </View>
                     );
                   })}
@@ -108,7 +122,7 @@ export default function Index({
             <Text className="detail">+{BONUS_SCORE}</Text>
           </View>
           <View className="at-row score-row">
-            {scoresDataList?.map((item) => {
+            {scoresDataList.map((item) => {
               const { hasBonus, bonus } = item;
               return hasBonus ? (
                 <View className="at-icon at-icon-check has-bonus"></View>
@@ -118,15 +132,6 @@ export default function Index({
                 </View>
               );
             })}
-          </View>
-        </View>
-        <View className="at-row rating-item at-col-6">
-          <View className="icon-box sum-box">
-            <Text className="title">总分</Text>
-            <View className="detail">
-              {scoresDataList?.[0]?.sumScore}
-              {scoresDataList?.[1] && ` / ${scoresDataList?.[1]?.sumScore}`}
-            </View>
           </View>
         </View>
       </View>

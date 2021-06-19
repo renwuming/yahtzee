@@ -67,7 +67,11 @@ async function handleUpdateData(action, oldData, data, env) {
     };
   }
   // 加入游戏
-  else if (action === "joinGame" && !openids.includes(OPENID)) {
+  else if (
+    action === "joinGame" &&
+    !openids.includes(OPENID) &&
+    players.length <= 1 // 最多二人
+  ) {
     // 获取用户数据
     const { result: player } = await cloud.callFunction({
       name: "getPlayers",
@@ -96,7 +100,9 @@ async function handleUpdateData(action, oldData, data, env) {
   // 更新玩家Scores
   // TODO: 验证是否回合中
   else if (action === "updateGameScores") {
-    players[roundPlayer].scores = data;
+    const { scores, lastScoreType } = data;
+    players[roundPlayer].scores = scores;
+    players[roundPlayer].lastScoreType = lastScoreType;
     const newRoundPlayer = (roundPlayer + 1) % players.length;
 
     return {

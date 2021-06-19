@@ -1,4 +1,8 @@
 import Taro from "@tarojs/taro";
+import {
+  gameOver,
+  getSumScore,
+} from "../../Components/RatingTable/scoreRatings";
 import { DEFAULT_SCORES } from "../../const";
 import { CallCloudFunction } from "../../utils";
 
@@ -21,14 +25,26 @@ export function handleGameData(data: GameBaseData): GameData {
   const openids = players.map((item) => item.openid);
   const inGame = openids.includes(openid);
   const inRound = inGame && openids[roundPlayer] === openid;
+  players.forEach((item, index) => {
+    const { scores } = item;
+    scores && (item.sumScore = getSumScore(scores));
+    item.inRound = index === roundPlayer;
+  });
+
   let roundScores = DEFAULT_SCORES;
   let otherScores = DEFAULT_SCORES;
+  let isOver = false;
+  let winner = null;
+
   if (start) {
     roundScores = players[roundPlayer].scores;
     if (players.length > 1) {
       const nextRoundPlayer = (roundPlayer + 1) % players.length;
       otherScores = players[nextRoundPlayer].scores;
     }
+
+    isOver = gameOver(start, players);
+    isOver && (winner = getWinner(players));
   }
   return {
     ...data,
@@ -37,7 +53,18 @@ export function handleGameData(data: GameBaseData): GameData {
     inRound,
     roundScores,
     otherScores,
+    isOver,
+    winner,
   };
+}
+
+function getWinner(players: Player[]): number {
+  if (players.length <= 1) return null;
+  const { sumScore: sum1 } = players[0];
+  const { sumScore: sum2 } = players[1];
+  if (sum1 === sum2) return -1;
+  else if (sum1 > sum2) return 0;
+  else return 1;
 }
 
 export async function startGame(id: string) {
@@ -81,13 +108,16 @@ export async function updateGame(id: string, data) {
   });
 }
 
-export async function updateGameScores(id: string, data) {
+export async function updateGameScores(id: string, scores, lastScoreType) {
   await CallCloudFunction({
     name: "yahtzeeUpdateGame",
     data: {
       id,
       action: "updateGameScores",
-      data,
+      data: {
+        scores,
+        lastScoreType,
+      },
     },
   });
 }

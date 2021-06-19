@@ -42,11 +42,17 @@ interface GameData extends GameBaseData {
   inRound: boolean;
   roundScores: Scores;
   otherScores: Scores;
+  isOver: boolean;
+  winner: number;
 }
 
 interface Player {
   nickName: string;
   avatarUrl: string;
   openid?: string;
+  lastScoreType?: string;
   scores?: Scores;
+  default?: boolean;
+  sumScore?: number;
+  inRound?: boolean;
 }

@@ -52,5 +52,6 @@ function getDefualtPlayer(openid) {
     openid,
     nickName: `玩家-${openid.substr(-4)}`,
     avatarUrl: "https://renwuming.cn/static/jmz/icon.jpg",
+    default: true,
   };
 }

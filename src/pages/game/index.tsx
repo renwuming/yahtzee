@@ -13,7 +13,8 @@ import {
 import PlayerList from "../../Components/PlayerList";
 import DiceList from "../../Components/DiceList";
 import RatingTable from "../../Components/RatingTable";
-import { gameOver } from "../../Components/RatingTable/scoreRatings";
+import Player from "../../Components/Player";
+
 import {
   getUserProfile,
   initUserInfo,
@@ -67,10 +68,20 @@ export default function Index() {
 
   const [gameData, setGameData] = useState<GameData>(null);
 
-  const { start, own, inGame, players, inRound, chances, roundPlayer } =
-    gameData || {
-      otherScores: DEFAULT_SCORES,
-    };
+  const {
+    start,
+    own,
+    inGame,
+    players,
+    inRound,
+    chances,
+    roundPlayer,
+    isOver,
+    winner,
+  } = gameData || {
+    players: [],
+    otherScores: DEFAULT_SCORES,
+  };
 
   const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
   const [dicing, setDicing] = useState<boolean>(false);
@@ -78,9 +89,8 @@ export default function Index() {
   const [newScore, setNewScore] = useState<NewScore>(null);
   const [scores, setScores] = useState<Scores>(DEFAULT_SCORES);
 
-  const canJoin = players?.length <= 1;
+  const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
-  const isOver = gameOver(scores);
   const canDice = inRound && chances > 0 && !dicing && !isOver;
 
   async function DiceIt() {
@@ -157,49 +167,70 @@ export default function Index() {
     setConfirmFlag(false);
     setDiceList(DEFAULT_DICE_LIST);
     // 更新玩家分数
-    await updateGameScores(id, newScores);
+    await updateGameScores(id, newScores, type);
   }
 
   return (
     <View className="game">
-      <PlayerList players={players}></PlayerList>
-      <RatingTable
-        diceList={diceList}
-        selectScore={selectScore}
-        newScore={newScore}
-        noDices={noDices}
-        players={players}
-        roundPlayer={roundPlayer}
-      ></RatingTable>
-      <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
+      <PlayerList players={players} start={start}></PlayerList>
+      <View className="scroll-box">
+        <RatingTable
+          diceList={diceList}
+          selectScore={selectScore}
+          newScore={newScore}
+          noDices={noDices}
+          players={players}
+          roundPlayer={roundPlayer}
+        ></RatingTable>
+      </View>
+      <View className="dice-list-box">
+        {isOver ? (
+          players.length <= 1 ? null : winner === -1 ? (
+            <View className="result-box">双方平局</View>
+          ) : (
+            <View className="result-box">
+              获胜者
+              <Player
+                data={players[winner]}
+                showScore={false}
+                showActive={false}
+              ></Player>
+            </View>
+          )
+        ) : (
+          <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
+        )}
+      </View>
       {gameData && (
         <View>
           {start ? (
-            <View className="btn-box at-row at-row__align--center">
-              <AtButton
-                type="secondary"
-                className="at-col at-col-5"
-                onClick={() => {
-                  DiceIt();
-                }}
-                disabled={!canDice}
-              >
-                掷骰子
-                <View className="dice-chance">{chances}</View>
-              </AtButton>
-              {inRound && (
+            isOver ? null : (
+              <View className="btn-box at-row at-row__align--center">
                 <AtButton
-                  type="primary"
+                  type="secondary"
                   className="at-col at-col-5"
-                  disabled={!confirmFlag}
                   onClick={() => {
-                    updateScores();
+                    DiceIt();
                   }}
+                  disabled={!canDice}
                 >
-                  决定
+                  掷骰子
+                  <View className="dice-chance">{chances}</View>
                 </AtButton>
-              )}
-            </View>
+                {inRound && (
+                  <AtButton
+                    type="primary"
+                    className="at-col at-col-5"
+                    disabled={!confirmFlag}
+                    onClick={() => {
+                      updateScores();
+                    }}
+                  >
+                    决定
+                  </AtButton>
+                )}
+              </View>
+            )
           ) : (
             <View className="btn-box at-row at-row__align--center">
               <AtButton

@@ -5,5 +5,6 @@ export default {
     navigationBarBackgroundColor: "#fff",
     navigationBarTitleText: "WeChat",
     navigationBarTextStyle: "black",
+    backgroundColor: "#46b3ff",
   },
 };

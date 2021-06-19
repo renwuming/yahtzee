@@ -180,6 +180,7 @@ export function getBonusScore(scores: Scores): number {
 }
 
 export function getSumScore(scores: Scores): number {
+  if (!scores) return 0;
   const bonusScore = getBonusScore(scores);
   const hasBonus = bonusScore >= BONUS_NEED;
 
@@ -188,6 +189,11 @@ export function getSumScore(scores: Scores): number {
   return sumScore;
 }
 
-export function gameOver(scores: Scores): boolean {
-  return scoresToValues(scores).filter((value) => value === null).length <= 0;
+export function gameOver(start: boolean, players: Player[]): boolean {
+  if (!start || players.length <= 0) return false;
+  const scoresList = players.reduce((res, item) => {
+    const { scores } = item;
+    return res.concat(scoresToValues(scores));
+  }, []);
+  return scoresList.filter((value) => value === null).length <= 0;
 }

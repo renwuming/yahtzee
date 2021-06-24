@@ -2,7 +2,7 @@
   "miniprogramRoot": "dist/",
   "projectname": "yahtzee",
   "description": "yahtzee!dice!",
-  "appid": "wxfe74b714bde12b3f",
+  "appid": "wx47c8f6c7d0e54303",
   "cloudfunctionRoot": "cloud/",
   "setting": {
     "urlCheck": true,

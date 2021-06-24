@@ -1,7 +1,7 @@
 module.exports = {
   env: {
     NODE_ENV: '"production"',
-    CLOUD_ENV: '"prod-1gnngz5g86e29c9d"',
+    CLOUD_ENV: '"prod-0gjpxr644f6d941d"',
   },
   defineConstants: {},
   mini: {},

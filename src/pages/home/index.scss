@@ -6,6 +6,9 @@
   min-height: 100%;
   background-color: #46b3ff;
   padding: 20px 0;
+  .user-info {
+    margin-top: 60px;
+  }
   .cover {
     width: 300px;
     height: 300px;
@@ -17,8 +20,5 @@
     .at-button {
       margin-bottom: 40px;
     }
-  }
-  .at-modal__container {
-    padding: 30px;
   }
 }

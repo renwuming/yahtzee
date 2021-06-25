@@ -21,13 +21,19 @@
         {
           "name": "staging",
           "pathName": "pages/game/index",
-          "query": "id=b00064a760cde57a213e76dc1bb21970",
+          "query": "id=28ee4e3e60d2fc84247b4b7d2ad956c4",
           "scene": null
         },
         {
           "name": "prod",
           "pathName": "pages/game/index",
-          "query": "id=cbddf0af60cdf4d81156358f78fa39f9",
+          "query": "id=b00064a760d5e36022ab46182ed27ccd",
+          "scene": null
+        },
+        {
+          "name": "ranking",
+          "pathName": "pages/ranking/index",
+          "query": "",
           "scene": null
         }
       ]

@@ -17,6 +17,7 @@ exports.main = async (event) => {
     .collection("yahtzee_games")
     .where({
       "players.openid": openid,
+      end: true,
     })
     .get()
     .then((res) => res.data);
@@ -26,12 +27,12 @@ exports.main = async (event) => {
 
 function handleAchievement(games, openid) {
   const singleGames = games.filter((item) => {
-    const { players, end } = item;
-    return end && players.length === 1;
+    const { players } = item;
+    return players.length === 1;
   });
   const multiGames = games.filter((item) => {
-    const { players, end } = item;
-    return end && players.length > 1;
+    const { players } = item;
+    return players.length > 1;
   });
 
   const singleNum = singleGames.length;

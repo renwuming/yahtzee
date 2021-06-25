@@ -189,8 +189,6 @@ export default function Index() {
                 获胜者
                 <Player
                   data={players[winner]}
-                  showScore={false}
-                  showActive={false}
                 ></Player>
               </View>
             )

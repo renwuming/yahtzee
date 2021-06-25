@@ -11,7 +11,7 @@ export default function Index({ players, start }: IProps) {
   return (
     <View className="player-list">
       {players.map((player) => (
-        <Player data={player} showScore={start}></Player>
+        <Player data={player} showScore={start} showActive={true}></Player>
       ))}
     </View>
   );

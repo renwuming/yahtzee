@@ -1,9 +1,14 @@
 export default {
-  pages: ["pages/home/index", "pages/game/index"],
+  pages: [
+    "pages/home/index",
+    "pages/game/index",
+    "pages/gamelist/index",
+    "pages/ranking/index",
+  ],
   window: {
     backgroundTextStyle: "light",
     navigationBarBackgroundColor: "#fff",
-    navigationBarTitleText: "WeChat",
+    navigationBarTitleText: "骰子桌游大全",
     navigationBarTextStyle: "black",
     backgroundColor: "#46b3ff",
   },

@@ -1,6 +1,7 @@
+import Taro from "@tarojs/taro";
 import { useShareAppMessage } from "@tarojs/taro";
 import { View, Image } from "@tarojs/components";
-import { AtButton, AtModal } from "taro-ui";
+import { AtButton } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/modal.scss";
 import "./index.scss";
@@ -11,11 +12,10 @@ import {
   navigateTo,
 } from "../../utils";
 import LoadPage from "../../Components/LoadPage";
-import Achievement from "../../Components/Achievement";
-import { useState } from "react";
+import Player from "../../Components/Player";
 
 export default function Index() {
-  const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
+  const userInfo = Taro.getStorageSync("userInfo");
 
   // 设置分享
   useShareAppMessage(() => {
@@ -33,13 +33,6 @@ export default function Index() {
     navigateTo(`game/index?id=${_id}`);
   }
 
-  function showAchievement() {
-    setAchievementOpened(true);
-  }
-  function hideAchievement() {
-    setAchievementOpened(false);
-  }
-
   return (
     <View className="home">
       <LoadPage></LoadPage>
@@ -47,6 +40,9 @@ export default function Index() {
         className="cover"
         src="http://cdn.renwuming.cn/static/yahtzee/imgs/share.png"
       ></Image>
+      <View className="user-info">
+        <Player data={userInfo}></Player>
+      </View>
       <View className="btn-list">
         <AtButton
           type="primary"
@@ -56,13 +52,21 @@ export default function Index() {
         >
           开始
         </AtButton>
+        {/* <AtButton
+          type="secondary"
+          onClick={() => {
+            navigateTo(`gamelist/index`);
+          }}
+        >
+          房间列表
+        </AtButton> */}
         <AtButton
           type="secondary"
           onClick={() => {
-            showAchievement();
+            navigateTo(`ranking/index`);
           }}
         >
-          成就
+          排行榜
         </AtButton>
         <AtButton
           type="secondary"
@@ -73,9 +77,6 @@ export default function Index() {
           更新头像
         </AtButton>
       </View>
-      <AtModal isOpened={isAchievementOpened} onClose={hideAchievement}>
-        <Achievement></Achievement>
-      </AtModal>
     </View>
   );
 }

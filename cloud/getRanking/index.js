@@ -19,7 +19,7 @@ exports.main = async (event) => {
     })
     .limit(1000) // TODO 分页查询
     .get()
-    .then((res) => res.data);
+    .then((res) => res.data.reverse());
 
   return handleRanking(list);
 };

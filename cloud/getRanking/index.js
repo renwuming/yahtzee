@@ -17,6 +17,7 @@ exports.main = async (event) => {
       winner: multi ? _.neq(null) : _.eq(null),
       end: true,
     })
+    .limit(1000) // TODO 分页查询
     .get()
     .then((res) => res.data);
 

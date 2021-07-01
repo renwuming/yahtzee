@@ -22,7 +22,7 @@ exports.main = async (event) => {
       })
       .get()
       .then((res) => res.data);
-    return list.length > 0 ? list[0] : getDefualtPlayer(openid);
+    return list.length > 0 ? list[0] : {};
   }
   // 查询集合
   else if (openid instanceof Array) {
@@ -38,20 +38,7 @@ exports.main = async (event) => {
 
     return openid.map((_openid) => {
       const index = idList.indexOf(_openid);
-      if (index >= 0) {
-        return list[index];
-      } else {
-        return getDefualtPlayer(_openid);
-      }
+      return list[index];
     });
   }
 };
-
-function getDefualtPlayer(openid) {
-  return {
-    openid,
-    nickName: `玩家-${openid.substr(-4)}`,
-    avatarUrl: "https://renwuming.cn/static/jmz/icon.jpg",
-    default: true,
-  };
-}

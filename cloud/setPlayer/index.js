@@ -29,9 +29,27 @@ exports.main = async (event) => {
         data,
       });
   } else {
-    data.openid = _openid;
     db.collection("players").add({
-      data,
+      data: {
+        ...getDefualtPlayer(_openid),
+        ...data,
+      },
     });
   }
 };
+
+function getDefualtPlayer(openid) {
+  return {
+    openid,
+    nickName: `玩家-${openid.substr(-4)}`,
+    avatarUrl: "https://renwuming.cn/static/jmz/icon.jpg",
+    singleNum: 0,
+    maxSingleSum: 0,
+    multiNum: 0,
+    maxMultiSum: 0,
+    multiWinSum: 0,
+    multiWinRateValue: 0,
+    multiWinRate: "0%",
+    highScore: 0,
+  };
+}

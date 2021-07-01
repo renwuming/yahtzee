@@ -13,8 +13,14 @@ import {
 } from "../../utils";
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
+import { useEffect, useState } from "react";
 
 export default function Index() {
+  const [refresh, setRefresh] = useState(false);
+  useEffect(() => {
+    refresh && setTimeout(() => setRefresh(false));
+  }, [refresh]);
+
   const userInfo = Taro.getStorageSync("userInfo");
 
   // 设置分享
@@ -48,6 +54,7 @@ export default function Index() {
           type="primary"
           onClick={() => {
             getUserProfile(createGame);
+            setRefresh(true);
           }}
         >
           开始
@@ -56,6 +63,7 @@ export default function Index() {
           type="secondary"
           onClick={() => {
             navigateTo(`gamelist/index`);
+            setRefresh(true);
           }}
         >
           房间列表
@@ -64,6 +72,7 @@ export default function Index() {
           type="secondary"
           onClick={() => {
             navigateTo(`ranking/index`);
+            setRefresh(true);
           }}
         >
           排行榜
@@ -72,6 +81,7 @@ export default function Index() {
           type="secondary"
           onClick={() => {
             forceGetUserProfile();
+            setRefresh(true);
           }}
         >
           更新头像

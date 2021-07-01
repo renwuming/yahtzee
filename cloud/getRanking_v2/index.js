@@ -21,10 +21,11 @@ exports.main = async (event) => {
 
 function handleRanking(players, type) {
   if (type === "score") {
-    players.sort((a, b) => {
-      return b.highScore - a.highScore;
-    });
-    return players.slice(0, 50);
+    return players
+      .sort((a, b) => {
+        return b.highScore - a.highScore;
+      })
+      .slice(0, 50);
   } else if (type === "winRate") {
     return players
       .filter((item) => item.multiNum >= 10)

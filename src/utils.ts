@@ -50,13 +50,19 @@ export function watchDataBase(id: string, onChange) {
 
 export function getUserProfile(callback = () => {}) {
   const userInfo = Taro.getStorageSync("userInfo");
-  const hasSetUserProfile = userInfo && userInfo.default !== true;
+  const hasSetUserProfile = userInfo && !isDefaultInfo(userInfo);
 
   if (!hasSetUserProfile) {
     forceGetUserProfile(callback);
   } else {
     callback();
   }
+}
+
+function isDefaultInfo(data) {
+  const { nickName, openid } = data;
+  const chars = nickName.split("-")[1];
+  return chars && openid.indexOf(chars) >= 0;
 }
 
 export function forceGetUserProfile(callback = () => {}) {
@@ -87,5 +93,13 @@ export async function initUserInfo() {
     name: "getPlayers",
     data: {},
   });
-  Taro.setStorageSync("userInfo", data);
+
+  if (data.nickName) {
+    Taro.setStorageSync("userInfo", data);
+  } else {
+    await CallCloudFunction({
+      name: "setPlayer",
+    });
+    await initUserInfo();
+  }
 }

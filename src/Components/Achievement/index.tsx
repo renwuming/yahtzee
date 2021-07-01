@@ -1,6 +1,6 @@
 import { View, Text, CommonEventFunction } from "@tarojs/components";
 import { AtModal, AtModalHeader, AtModalContent } from "taro-ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { CallCloudFunction } from "../../utils";
 import "./index.scss";
 import "taro-ui/dist/style/components/modal.scss";
@@ -12,14 +12,14 @@ interface IProps {
 }
 
 export default function Index({ data, isOpened, onClose }: IProps) {
-  const [achievementData, setAchievementData] = useState<AchievementData>(null);
+  const [achievementData, setAchievementData] = useState<Player>(null);
 
   const { openid, nickName } = data;
 
   async function initAchievement() {
     const data = await CallCloudFunction({
-      name: "getAchievement",
-      data: { id: openid },
+      name: "getPlayers",
+      data: { openid },
     });
     setAchievementData(data);
   }
@@ -28,14 +28,8 @@ export default function Index({ data, isOpened, onClose }: IProps) {
     if (isOpened) initAchievement();
   }, [isOpened]);
 
-  const {
-    singleNum,
-    maxSingleSum,
-    multiNum,
-    maxMultiSum,
-    // multiWinSum,
-    multiWinRate,
-  } = achievementData || {};
+  const { singleNum, multiNum, multiWinSum, multiWinRate, highScore } =
+    achievementData || {};
 
   return (
     <View className="achievement-box">
@@ -45,24 +39,24 @@ export default function Index({ data, isOpened, onClose }: IProps) {
         </AtModalHeader>
         <AtModalContent>
           <View className="detail-row">
-            <Text className="left">单人局总数</Text>
-            <Text className="info">{singleNum}</Text>
+            <Text className="left red">最高分</Text>
+            <Text className="red">{highScore}</Text>
           </View>
           <View className="detail-row">
-            <Text className="left">单人局最高分</Text>
-            <Text className="info">{maxSingleSum}</Text>
+            <Text className="left red">多人局胜率</Text>
+            <Text className="red">{multiWinRate}</Text>
+          </View>
+          <View className="detail-row">
+            <Text className="left">多人局胜利</Text>
+            <Text className="info">{multiWinSum}</Text>
           </View>
           <View className="detail-row">
             <Text className="left">多人局总数</Text>
             <Text className="info">{multiNum}</Text>
           </View>
           <View className="detail-row">
-            <Text className="left">多人局最高分</Text>
-            <Text className="info">{maxMultiSum}</Text>
-          </View>
-          <View className="detail-row">
-            <Text className="left win-rate">多人局胜率</Text>
-            <Text className="win-rate">{multiWinRate}</Text>
+            <Text className="left">单人局总数</Text>
+            <Text className="info">{singleNum}</Text>
           </View>
         </AtModalContent>
       </AtModal>

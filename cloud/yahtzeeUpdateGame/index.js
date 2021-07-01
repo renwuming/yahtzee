@@ -107,7 +107,12 @@ async function handleUpdateData(action, oldData, data, env) {
     players[roundPlayer].lastScoreType = lastScoreType;
     const newRoundPlayer = (roundPlayer + 1) % players.length;
     const end = gameOver(start, players);
-    const winner = end ? getWinner(players) : null;
+
+    let winner = null;
+    if (end) {
+      winner = getWinner(players);
+      updatePlayer(players, env);
+    }
 
     return {
       players,
@@ -165,4 +170,29 @@ function getWinner(players) {
   if (sum1 === sum2) return -1;
   else if (sum1 > sum2) return 0;
   else return 1;
+}
+
+async function updatePlayer(players, env) {
+  players.forEach(async (item) => {
+    const { openid } = item;
+
+    // 更新胜率等数据
+    const { result: updateData } = await cloud.callFunction({
+      name: "getAchievement",
+      data: {
+        env,
+        id: openid,
+      },
+    });
+
+    // 更新用户信息
+    cloud.callFunction({
+      name: "setPlayer",
+      data: {
+        env,
+        openid,
+        data: updateData,
+      },
+    });
+  });
 }

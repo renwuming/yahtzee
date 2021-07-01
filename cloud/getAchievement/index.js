@@ -19,10 +19,13 @@ exports.main = async (event) => {
       "players.openid": openid,
       end: true,
     })
+    .limit(1000)
     .get()
     .then((res) => res.data);
 
-  return handleAchievement(list, openid);
+  const data = handleAchievement(list, openid);
+
+  return data;
 };
 
 function handleAchievement(games, openid) {
@@ -56,9 +59,11 @@ function handleAchievement(games, openid) {
     if (winner === index) multiWinSum++;
   });
 
-  const multiWinRate = `${
-    multiWinSum === 0 ? 0 : ((multiWinSum / multiNum) * 100).toFixed(0)
-  }%`;
+  const highScore = Math.max(maxMultiSum, maxSingleSum);
+
+  const multiWinRateValue =
+    multiWinSum === 0 ? 0 : +((multiWinSum / multiNum) * 100).toFixed(0);
+  const multiWinRate = `${multiWinRateValue}%`;
 
   return {
     singleNum,
@@ -66,6 +71,8 @@ function handleAchievement(games, openid) {
     multiNum,
     maxMultiSum,
     multiWinSum,
+    multiWinRateValue,
     multiWinRate,
+    highScore,
   };
 }

@@ -55,13 +55,12 @@ interface Player {
   default?: boolean;
   sumScore?: number;
   inRound?: boolean;
-}
-
-interface AchievementData {
   singleNum: number;
   maxSingleSum: number;
   multiNum: number;
   maxMultiSum: number;
   multiWinSum: number;
+  multiWinRateValue: number;
   multiWinRate: string;
+  highScore: number;
 }

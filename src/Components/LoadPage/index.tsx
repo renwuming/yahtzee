@@ -1,3 +1,4 @@
+import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";
 import { AtToast } from "taro-ui";
 import "taro-ui/dist/style/components/toast.scss";
@@ -12,6 +13,21 @@ export default function Index() {
   useEffect(() => {
     Promise.all([SLEEP(300), initUserInfo()]).then((_) => {
       setOpened(false);
+    });
+    // 请求最新版本小程序
+    const updateManager = Taro.getUpdateManager();
+    updateManager.onUpdateReady(() => {
+      Taro.showModal({
+        title: "更新提示",
+        content: "新版本已经准备好，是否重启应用？",
+        showCancel: false,
+        success(res) {
+          if (res.confirm) {
+            // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+            updateManager.applyUpdate();
+          }
+        },
+      });
     });
   }, []);
 

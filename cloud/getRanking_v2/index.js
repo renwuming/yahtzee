@@ -37,5 +37,11 @@ function handleRanking(players, type) {
         }
       })
       .slice(0, 50);
+  } else if (type === "sum") {
+    return players
+      .sort((a, b) => {
+        return b.multiNum + b.singleNum - (a.multiNum + a.singleNum);
+      })
+      .slice(0, 50);
   }
 }

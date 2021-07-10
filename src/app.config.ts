@@ -12,4 +12,5 @@ export default {
     navigationBarTextStyle: "black",
     backgroundColor: "#46b3ff",
   },
+  navigateToMiniProgramAppIdList: ["wxfe74b714bde12b3f"],
 };

@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
 import { useShareAppMessage } from "@tarojs/taro";
-import { View, Image } from "@tarojs/components";
+import { View, Image, Text } from "@tarojs/components";
 import { AtButton } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/modal.scss";
@@ -10,6 +10,7 @@ import {
   forceGetUserProfile,
   getUserProfile,
   navigateTo,
+  VERSION,
 } from "../../utils";
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
@@ -39,6 +40,12 @@ export default function Index() {
     navigateTo(`game/index?id=${_id}`);
   }
 
+  function gotoJmz() {
+    Taro.navigateToMiniProgram({
+      appId: "wxfe74b714bde12b3f",
+    });
+  }
+
   return (
     <View className="home">
       <LoadPage></LoadPage>
@@ -46,6 +53,7 @@ export default function Index() {
         className="cover"
         src="http://cdn.renwuming.cn/static/yahtzee/imgs/share.png"
       ></Image>
+      <Text className="version">{VERSION}</Text>
       <View className="user-info">
         <Player data={userInfo}></Player>
       </View>
@@ -85,6 +93,16 @@ export default function Index() {
           }}
         >
           更新头像
+        </AtButton>
+        <AtButton
+          circle
+          type="secondary"
+          onClick={() => {
+            gotoJmz();
+          }}
+        >
+          <Image src="https://cdn.renwuming.cn/static/jmz/icon.jpg"></Image>
+          截码战
         </AtButton>
       </View>
     </View>

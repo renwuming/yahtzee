@@ -6,6 +6,10 @@
   min-height: 100%;
   background-color: #46b3ff;
   padding: 20px 0;
+  .version {
+    margin-top: 30px;
+    color: #eee;
+  }
   .user-info {
     margin-top: 60px;
   }
@@ -19,6 +23,15 @@
     width: 80%;
     .at-button {
       margin-bottom: 40px;
+      image {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 88px;
+        height: 88px;
+        border-radius: 88px;
+        vertical-align: middle;
+      }
     }
   }
 }

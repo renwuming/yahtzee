@@ -40,7 +40,7 @@ function handleRanking(players, type) {
   } else if (type === "sum") {
     return players
       .sort((a, b) => {
-        return b.multiNum + b.singleNum - (a.multiNum + a.singleNum);
+        return b.multiWinSum - a.multiWinSum;
       })
       .slice(0, 50);
   }

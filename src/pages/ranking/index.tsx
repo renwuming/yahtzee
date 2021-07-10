@@ -76,7 +76,7 @@ export default function Index() {
         <View className={tabIndex === 1 ? "" : "hide"}>
           {winRateRanking.length > 0 ? (
             winRateRanking.map((item, index) => {
-              const { multiNum, singleNum } = item;
+              const { multiWinSum } = item;
               return (
                 <View key="rank" className="rank-row">
                   <Text className={"index " + (index < 3 ? "top" : "")}>
@@ -86,8 +86,8 @@ export default function Index() {
                     <PlayerItem data={item}></PlayerItem>
                   </View>
                   <View className="column-right">
-                    <Text className="score-title">总局数</Text>
-                    <Text className="score">{multiNum + singleNum}</Text>
+                    <Text className="score-title">获胜局数</Text>
+                    <Text className="score">{multiWinSum}</Text>
                   </View>
                 </View>
               );

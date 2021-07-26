@@ -5,9 +5,10 @@ import "./index.scss";
 interface IProps {
   diceList: DiceData[];
   setDiceList: (diceList: DiceData[]) => void;
+  inRound: boolean;
 }
 
-export default function Index({ diceList, setDiceList }: IProps) {
+export default function Index({ diceList, setDiceList, inRound }: IProps) {
   function freezeDice(index) {
     const { value, freezing } = diceList[index];
 
@@ -28,6 +29,7 @@ export default function Index({ diceList, setDiceList }: IProps) {
           freezeDice={() => {
             freezeDice(index);
           }}
+          inRound={inRound}
         ></Dice>
       ))}
     </View>

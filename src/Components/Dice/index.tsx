@@ -4,9 +4,10 @@ import "./index.scss";
 interface IProps {
   diceData: DiceData;
   freezeDice: () => void;
+  inRound: boolean;
 }
 
-export default function Index({ diceData, freezeDice }: IProps) {
+export default function Index({ diceData, freezeDice, inRound }: IProps) {
   const { value, freezing, dicing } = diceData;
 
   return (
@@ -15,7 +16,9 @@ export default function Index({ diceData, freezeDice }: IProps) {
         className={`item ${freezing ? "freezing" : ""} ${
           dicing ? "dicing" : `dice${value}`
         }`}
-        onClick={freezeDice}
+        onClick={() => {
+          if (inRound) freezeDice();
+        }}
       ></View>
     </View>
   );

@@ -44,7 +44,9 @@ export function watchDataBase(id: string, onChange) {
       onChange({ docs }: any) {
         onChange(docs[0]);
       },
-      onError(err) {},
+      onError(err) {
+        console.error(err);
+      },
     });
 
   return watcher;

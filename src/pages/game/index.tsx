@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
-import { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
+import {
+  getCurrentInstance,
+  useDidHide,
+  useDidShow,
+  useShareAppMessage,
+} from "@tarojs/taro";
 import { View } from "@tarojs/components";
-import { AtButton } from "taro-ui";
+import { AtButton, AtModal } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/flex.scss";
+import "taro-ui/dist/style/components/modal.scss";
+
 import "./index.scss";
 import {
   DEFAULT_DICE_LIST,
   DEFAULT_SCORES,
   DICE_CHANCES_NUM,
+  DICE_NUM,
 } from "../../const";
 import PlayerList from "../../Components/PlayerList";
 import DiceList from "../../Components/DiceList";
@@ -25,11 +33,13 @@ import {
   startGame,
   updateGame,
   updateGameScores,
+  updatePlayerOnline,
 } from "./gameApi";
 
 export default function Index() {
   // 页面参数
-  const { id } = getCurrentInstance().router.params;
+  const id = getCurrentInstance()?.router?.params?.id;
+
   // 设置分享
   useShareAppMessage(() => {
     return {
@@ -48,20 +58,9 @@ export default function Index() {
       setDiceList(diceList);
     }
   }
-  // 监听数据库变动
-  useEffect(() => {
-    getGameData(id).then((data) => {
-      init(data);
-    });
-    const watcher = watchDataBase(id, (data) => {
-      init(data);
-    });
-    return () => {
-      watcher.close();
-    };
-  }, []);
 
   const [gameData, setGameData] = useState<GameData>(null);
+  const [pageShow, setPageShow] = useState<boolean>(true);
 
   const {
     start,
@@ -78,15 +77,51 @@ export default function Index() {
     otherScores: DEFAULT_SCORES,
   };
 
+  useDidHide(() => {
+    setPageShow(false);
+  });
+  useDidShow(() => {
+    setPageShow(true);
+  });
+  // 监听数据库变动
+  useEffect(() => {
+    getGameData(id).then((data) => {
+      init(data);
+    });
+    const watcher = watchDataBase(id, (data) => {
+      init(data);
+    });
+
+    return () => {
+      watcher.close();
+    };
+  }, []);
+
+  // 游戏未结束时，一直更新在线状态
+  useEffect(() => {
+    if (end || !pageShow) return;
+    updatePlayerOnline(id);
+    const timer = setInterval(() => {
+      updatePlayerOnline(id);
+    }, 2000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [end, pageShow]);
+
   const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
   const [dicing, setDicing] = useState<boolean>(false);
   const [confirmFlag, setConfirmFlag] = useState<boolean>(false);
   const [newScore, setNewScore] = useState<NewScore>(null);
   const [scores, setScores] = useState<Scores>(DEFAULT_SCORES);
+  const [showConfirmStartModal, setShowConfirmStartModal] =
+    useState<boolean>(false);
 
   const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
-  const canDice = inRound && chances > 0 && !dicing && !end;
+  const allFreezing = diceList.filter((e) => e.freezing).length === DICE_NUM;
+  const canDice = inRound && chances > 0 && !dicing && !end && !allFreezing;
 
   async function DiceIt() {
     // 重置填分表
@@ -165,10 +200,27 @@ export default function Index() {
     await updateGameScores(id, newScores, type);
   }
 
+  function clickStartBtn() {
+    if (players.length === 1) {
+      setShowConfirmStartModal(true);
+    } else {
+      confirmStartGame();
+    }
+  }
+  function confirmStartGame() {
+    getUserProfile(() => {
+      startGame(id);
+    });
+  }
+
   return (
     <View className="game">
       <LoadPage></LoadPage>
-      <PlayerList players={players} start={start}></PlayerList>
+      <PlayerList
+        players={players}
+        start={start}
+        showOffline={!end}
+      ></PlayerList>
       <View className="scroll-box">
         <RatingTable
           diceList={diceList}
@@ -177,6 +229,7 @@ export default function Index() {
           noDices={noDices}
           players={players}
           roundPlayer={roundPlayer}
+          inRound={inRound}
         ></RatingTable>
       </View>
       {gameData && (
@@ -187,13 +240,15 @@ export default function Index() {
             ) : (
               <View className="result-box">
                 获胜者
-                <Player
-                  data={players[winner]}
-                ></Player>
+                <Player data={players[winner]}></Player>
               </View>
             )
           ) : (
-            <DiceList diceList={diceList} setDiceList={setDiceList}></DiceList>
+            <DiceList
+              diceList={diceList}
+              setDiceList={setDiceList}
+              inRound={inRound}
+            ></DiceList>
           )}
         </View>
       )}
@@ -241,9 +296,7 @@ export default function Index() {
                   type="primary"
                   className="at-col at-col-5"
                   onClick={() => {
-                    getUserProfile(() => {
-                      startGame(id);
-                    });
+                    clickStartBtn();
                   }}
                 >
                   开始
@@ -278,6 +331,22 @@ export default function Index() {
           )}
         </View>
       )}
+      <AtModal
+        isOpened={showConfirmStartModal}
+        title="开始单人模式？"
+        confirmText="确认"
+        cancelText="取消"
+        onClose={() => {
+          setShowConfirmStartModal(false);
+        }}
+        onCancel={() => {
+          setShowConfirmStartModal(false);
+        }}
+        onConfirm={() => {
+          confirmStartGame();
+          setShowConfirmStartModal(false);
+        }}
+      />
     </View>
   );
 }

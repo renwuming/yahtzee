@@ -15,6 +15,7 @@ interface IProps {
   selectScore: (type: string, score: number) => void;
   newScore: NewScore;
   noDices: boolean;
+  inRound: boolean;
   players: Player[];
   roundPlayer: number;
 }
@@ -24,6 +25,7 @@ export default function Index({
   selectScore,
   newScore,
   noDices,
+  inRound,
   players,
   roundPlayer,
 }: IProps) {
@@ -95,7 +97,7 @@ export default function Index({
                           hasScore ? "has-score" : ""
                         }`}
                         onClick={() => {
-                          if (hasScore || noDices) return;
+                          if (!inRound || hasScore || noDices) return;
                           toggleSelectScore(name, score);
                         }}
                       >

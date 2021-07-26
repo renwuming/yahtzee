@@ -63,4 +63,5 @@ interface Player {
   multiWinRateValue: number;
   multiWinRate: string;
   highScore: number;
+  timeStamp: number;
 }

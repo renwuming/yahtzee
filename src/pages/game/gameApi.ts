@@ -108,3 +108,13 @@ export async function updateGameScores(id: string, scores, lastScoreType) {
     },
   });
 }
+
+export async function updatePlayerOnline(id: string) {
+  await CallCloudFunction({
+    name: "yahtzeeUpdateGame",
+    data: {
+      id,
+      action: "updatePlayerOnline",
+    },
+  });
+}

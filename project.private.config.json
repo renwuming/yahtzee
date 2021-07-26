@@ -19,15 +19,15 @@
           "scene": null
         },
         {
-          "name": "staging",
+          "name": "prod2",
           "pathName": "pages/game/index",
-          "query": "id=28ee4e3e60d2fc84247b4b7d2ad956c4",
+          "query": "id=28ee4e3e60d3cfe424a3ecab50edd45e",
           "scene": null
         },
         {
           "name": "prod",
           "pathName": "pages/game/index",
-          "query": "id=b00064a760d5e36022ab46182ed27ccd",
+          "query": "id=79550af260fd4f2f297ad98c40e70d41",
           "scene": null
         },
         {

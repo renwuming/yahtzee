@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "npm run dev:weapp",
-    "staging": "NODE_ENV=production taro build --type weapp --watch",
+    "preview": "NODE_ENV=production taro build --type weapp --watch",
     "build": "npm run build:weapp",
     "build:weapp": "NODE_ENV=production taro build --type weapp",
     "build:swan": "taro build --type swan",

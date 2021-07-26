@@ -123,6 +123,18 @@ async function handleUpdateData(action, oldData, data, env) {
       winner,
     };
   }
+  // 更新玩家在线状态
+  else if (action === "updatePlayerOnline") {
+    players.forEach((item) => {
+      if (item.openid === OPENID) {
+        item.timeStamp = Date.now();
+      }
+    });
+
+    return {
+      players,
+    };
+  }
 
   return null;
 }

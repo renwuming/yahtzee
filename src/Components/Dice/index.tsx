@@ -5,19 +5,25 @@ interface IProps {
   diceData: DiceData;
   freezeDice: () => void;
   inRound: boolean;
+  dicing: boolean;
 }
 
-export default function Index({ diceData, freezeDice, inRound }: IProps) {
-  const { value, freezing, dicing } = diceData;
+export default function Index({
+  diceData,
+  freezeDice,
+  inRound,
+  dicing,
+}: IProps) {
+  const { value, freezing } = diceData;
 
   return (
     <View className="dice">
       <View
         className={`item ${freezing ? "freezing" : ""} ${
-          dicing ? "dicing" : `dice${value}`
+          dicing && !freezing ? "dicing" : `dice${value}`
         }`}
         onClick={() => {
-          if (inRound) freezeDice();
+          if (inRound && !dicing) freezeDice();
         }}
       ></View>
     </View>

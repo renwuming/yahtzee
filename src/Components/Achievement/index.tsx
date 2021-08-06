@@ -1,4 +1,4 @@
-import { View, Text, CommonEventFunction } from "@tarojs/components";
+import { View, Text, CommonEventFunction, Image } from "@tarojs/components";
 import { AtModal, AtModalHeader, AtModalContent } from "taro-ui";
 import { useEffect, useState } from "react";
 import { CallCloudFunction } from "../../utils";
@@ -14,7 +14,7 @@ interface IProps {
 export default function Index({ data, isOpened, onClose }: IProps) {
   const [achievementData, setAchievementData] = useState<Player>(null);
 
-  const { openid, nickName } = data;
+  const { openid, nickName, avatarUrl } = data;
 
   async function initAchievement() {
     const data = await CallCloudFunction({
@@ -35,7 +35,10 @@ export default function Index({ data, isOpened, onClose }: IProps) {
     <View className="achievement-box">
       <AtModal isOpened={isOpened} onClose={onClose}>
         <AtModalHeader>
-          <Text>{nickName}</Text>
+          <View className="player-info-big">
+            <Image className={`avatar`} src={avatarUrl}></Image>
+            <Text>{nickName}</Text>
+          </View>
         </AtModalHeader>
         <AtModalContent>
           <View className="detail-row">

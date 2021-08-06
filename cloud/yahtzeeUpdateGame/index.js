@@ -39,10 +39,17 @@ exports.main = async (event) => {
   const newData = await handleUpdateData(action, oldData, data, env);
 
   if (newData) {
+    const date = new Date();
     // 增量更新数据
-    await db.collection("yahtzee_games").doc(id).update({
-      data: newData,
-    });
+    await db
+      .collection("yahtzee_games")
+      .doc(id)
+      .update({
+        data: {
+          ...newData,
+          _updateTime: date,
+        },
+      });
   }
 
   return null;
@@ -97,6 +104,14 @@ async function handleUpdateData(action, oldData, data, env) {
   // TODO: 验证是否回合中
   else if (action === "updateGame") {
     return data;
+  }
+  // 更新游戏数据-冻结骰子
+  // TODO: 验证是否回合中
+  else if (action === "freezeDice") {
+    const { index, freezing } = data;
+    return {
+      [`diceList.${index}.freezing`]: freezing,
+    };
   }
   // 更新玩家Scores
   // TODO: 验证是否回合中

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "ES2015",
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["./src/components/*"],
+      "@/*": ["./src/*"]
+    }
+  }
+}

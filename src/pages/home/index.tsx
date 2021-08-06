@@ -26,8 +26,12 @@ export default function Index() {
 
   // 设置分享
   useShareAppMessage(() => {
+    const { nickName } = userInfo;
+    const title = nickName
+      ? `${nickName}邀请你来快艇骰子！`
+      : "快艇骰子，一决高下！";
     return {
-      title: "快艇骰子，一决高下！",
+      title,
       path: `/pages/home/index`,
       imageUrl: "http://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
     };

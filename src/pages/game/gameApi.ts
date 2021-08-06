@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import { DEFAULT_SCORES } from "../../const";
+import { DEFAULT_DICE_LIST, DEFAULT_SCORES } from "../../const";
 import { CallCloudFunction } from "../../utils";
 
 export async function getGameData(id: string): Promise<GameBaseData> {
@@ -90,6 +90,17 @@ export async function updateGame(id: string, data) {
     data: {
       id,
       action: "updateGame",
+      data,
+    },
+  });
+}
+
+export async function changeFreezeDice(id: string, data) {
+  await CallCloudFunction({
+    name: "yahtzeeUpdateGame",
+    data: {
+      id,
+      action: "freezeDice",
       data,
     },
   });

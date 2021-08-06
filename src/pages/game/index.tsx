@@ -1,3 +1,4 @@
+import Taro from "@tarojs/taro";
 import { useEffect, useState } from "react";
 import {
   getCurrentInstance,
@@ -39,41 +40,45 @@ import {
 export default function Index() {
   // 页面参数
   const id = getCurrentInstance()?.router?.params?.id;
-
+  const { nickName } = Taro.getStorageSync("userInfo");
   // 设置分享
   useShareAppMessage(() => {
+    const title = nickName
+      ? `${nickName}邀请你来快艇骰子！`
+      : "快艇骰子，一决高下！";
     return {
-      title: "快艇骰子，一决高下！",
+      title,
       path: `/pages/game/index?id=${id}`,
       imageUrl: "http://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
     };
   });
-  // 更新游戏数据
-  async function init(data: GameBaseData) {
-    const gameData = handleGameData(data);
-    const { roundScores, start, diceList } = gameData;
-    setGameData(gameData);
-    setScores(roundScores);
-    if (start) {
-      setDiceList(diceList);
-    }
-  }
 
+  const [refresh, setRefresh] = useState(false);
+  useEffect(() => {
+    refresh && setTimeout(() => setRefresh(false));
+  }, [refresh]);
   const [gameData, setGameData] = useState<GameData>(null);
   const [pageShow, setPageShow] = useState<boolean>(true);
+  const [dicing, setDicing] = useState<boolean>(false);
+  const [showDicing, setShowDicing] = useState<boolean>(false);
+  const [confirmFlag, setConfirmFlag] = useState<boolean>(false);
+  const [newScore, setNewScore] = useState<NewScore>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
+  const [showConfirmStartModal, setShowConfirmStartModal] =
+    useState<boolean>(false);
 
   const {
     start,
     own,
     inGame,
-    players,
     inRound,
     chances,
     roundPlayer,
     end,
     winner,
+    roundScores: scores,
   } = gameData || {
-    players: [],
     otherScores: DEFAULT_SCORES,
   };
 
@@ -83,19 +88,31 @@ export default function Index() {
   useDidShow(() => {
     setPageShow(true);
   });
-  // 监听数据库变动
+
+  // 监听数据库变化
   useEffect(() => {
-    getGameData(id).then((data) => {
-      init(data);
-    });
-    const watcher = watchDataBase(id, (data) => {
-      init(data);
-    });
+    if (dicing || !pageShow) return;
+
+    const cb = (data, updatedFields = []) => {
+      const gameDataInit = updatedFields.length === 0;
+      const gameDataChange =
+        updatedFields.filter((key) => !["_updateTime", "players"].includes(key))
+          .length > 0;
+      if (gameDataInit || gameDataChange) {
+        init(data);
+      } else {
+        const gameData = handleGameData(data);
+        const { players } = gameData;
+        setPlayers(players);
+      }
+    };
+    getGameData(id).then(cb);
+    const watcher = watchDataBase(id, cb);
 
     return () => {
       watcher.close();
     };
-  }, []);
+  }, [dicing, pageShow]);
 
   // 游戏未结束时，一直更新在线状态
   useEffect(() => {
@@ -110,46 +127,36 @@ export default function Index() {
     };
   }, [end, pageShow]);
 
-  const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
-  const [dicing, setDicing] = useState<boolean>(false);
-  const [confirmFlag, setConfirmFlag] = useState<boolean>(false);
-  const [newScore, setNewScore] = useState<NewScore>(null);
-  const [scores, setScores] = useState<Scores>(DEFAULT_SCORES);
-  const [showConfirmStartModal, setShowConfirmStartModal] =
-    useState<boolean>(false);
-
   const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
   const allFreezing = diceList.filter((e) => e.freezing).length === DICE_NUM;
   const canDice = inRound && chances > 0 && !dicing && !end && !allFreezing;
+
+  // 更新游戏数据
+  const init = async (data: GameBaseData) => {
+    const gameData = handleGameData(data);
+    const { players, diceList } = gameData;
+    setGameData(gameData);
+    setPlayers(players);
+    diceList && setDiceList(diceList);
+    setShowDicing(false);
+  };
 
   async function DiceIt() {
     // 重置填分表
     selectScore(null, null);
     // 开始摇骰子
     setDicing(true);
-    const newDiceList = [];
-    diceList.forEach((dice) => {
-      const { freezing } = dice;
-      if (freezing) {
-        newDiceList.push(dice);
-      } else {
-        newDiceList.push({
-          ...dice,
-          dicing: true,
-        });
-      }
-    });
-    setDiceList(newDiceList);
+    setShowDicing(true);
 
-    const finalDiceList = randomDiceList();
+    const newDiceList = randomDiceList();
 
     // 更新掷骰子数据
     await Promise.all([
-      SLEEP(300),
+      SLEEP(500),
       updateGame(id, {
         chances: chances - 1,
-        diceList: finalDiceList,
+        diceList: newDiceList,
       }),
     ]);
     setDicing(false);
@@ -159,8 +166,6 @@ export default function Index() {
     const newDiceList = [];
     diceList.forEach((dice) => {
       const { freezing } = dice;
-      // 停止摇骰子
-      dice.dicing = false;
       if (freezing) {
         newDiceList.push(dice);
       } else {
@@ -195,7 +200,6 @@ export default function Index() {
     // 重置填分表
     selectScore(null, null);
     setConfirmFlag(false);
-    setDiceList(DEFAULT_DICE_LIST);
     // 更新玩家分数
     await updateGameScores(id, newScores, type);
   }
@@ -211,6 +215,18 @@ export default function Index() {
     getUserProfile(() => {
       startGame(id);
     });
+  }
+
+  // 冻结骰子
+  function freezeDice(index) {
+    const dice = diceList[index];
+    const { value, freezing } = dice;
+
+    if (!value) return;
+
+    diceList[index].freezing = !freezing;
+
+    setDiceList([...diceList]);
   }
 
   return (
@@ -246,7 +262,8 @@ export default function Index() {
           ) : (
             <DiceList
               diceList={diceList}
-              setDiceList={setDiceList}
+              dicing={showDicing}
+              freezeDice={freezeDice}
               inRound={inRound}
             ></DiceList>
           )}

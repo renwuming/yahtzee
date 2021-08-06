@@ -10,38 +10,25 @@ exports.main = async (event) => {
   const db = cloud.database();
 
   // 查找所有满足筛选条件的游戏
-  const list = await db
-    .collection("players")
-    .limit(1000) // TODO 分页查询
-    .get()
-    .then((res) => res.data);
-
-  return handleRanking(list, type);
-};
-
-function handleRanking(players, type) {
   if (type === "score") {
-    return players
-      .sort((a, b) => {
-        return b.highScore - a.highScore;
-      })
-      .slice(0, 50);
-  } else if (type === "winRate") {
-    return players
-      .filter((item) => item.multiNum >= 10)
-      .sort((a, b) => {
-        if (a.multiWinRateValue !== b.multiWinRateValue) {
-          return b.multiWinRateValue - a.multiWinRateValue;
-        } else {
-          return b.multiNum - a.multiNum;
-        }
-      })
-      .slice(0, 50);
+    const list = await db
+      .collection("players")
+      .orderBy("highScore", "desc")
+      .limit(50)
+      .get()
+      .then((res) => res.data);
+
+    return list;
   } else if (type === "sum") {
-    return players
-      .sort((a, b) => {
-        return b.multiWinSum - a.multiWinSum;
-      })
-      .slice(0, 50);
+    const list = await db
+      .collection("players")
+      .orderBy("multiWinSum", "desc")
+      .limit(50)
+      .get()
+      .then((res) => res.data);
+
+    return list;
   }
-}
+
+  return [];
+};

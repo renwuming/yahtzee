@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useEffect } from "react";
 
-export const VERSION = "v1.0.7";
+export const VERSION = "v1.0.8";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -41,8 +41,10 @@ export function watchDataBase(id: string, onChange) {
     .doc(id)
     /* @ts-ignore */
     .watch({
-      onChange({ docs }: any) {
-        onChange(docs[0]);
+      onChange(data: any) {
+        const { docs, docChanges } = data;
+        const updatedFields = docChanges?.[0]?.updatedFields || {};
+        onChange(docs[0], Object.keys(updatedFields));
       },
       onError(err) {
         console.error(err);

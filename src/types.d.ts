@@ -1,7 +1,6 @@
 interface DiceData {
   value: number;
   freezing?: boolean;
-  dicing?: boolean;
 }
 
 interface Scores {

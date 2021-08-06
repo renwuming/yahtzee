@@ -18,11 +18,14 @@ exports.main = async (event) => {
     },
   });
 
+  const date = new Date();
   const res = await db.collection("yahtzee_games").add({
     data: {
       start: false,
       owner: player,
       players: [player],
+      _createTime: date,
+      _updateTime: date,
     },
   });
 

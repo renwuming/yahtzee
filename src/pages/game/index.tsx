@@ -128,14 +128,15 @@ export default function Index() {
     }, 2000);
 
     const roundTimer = setInterval(() => {
+      const timeStamp = Date.now();
       const roundCountDown = Math.floor(
-        ROUND_TIME_LIMIT - (Date.now() - (roundTimeStamp || 0)) / 1000
+        ROUND_TIME_LIMIT - (timeStamp - (roundTimeStamp || timeStamp)) / 1000
       );
       const showRoundCountDown = (roundCountDown >= 0 ? roundCountDown : 0)
         .toString()
         .padStart(2, "0");
       setRoundCountDown(showRoundCountDown);
-    }, 1000);
+    }, 500);
 
     return () => {
       clearInterval(timer);

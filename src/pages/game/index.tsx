@@ -192,6 +192,7 @@ export default function Index() {
 
   async function updateScores() {
     const { type, score } = newScore || {};
+    if (!type) return;
     const newScores = {
       ...scores,
       [type]: score,

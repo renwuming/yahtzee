@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useEffect } from "react";
 
-export const VERSION = "v1.0.8";
+export const VERSION = "v1.0.9";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -79,8 +79,8 @@ export function forceGetUserProfile(callback = () => {}) {
         name: "setPlayer",
         data: { data: JSON.parse(rawData) },
       });
+      await initUserInfo();
       callback();
-      initUserInfo();
     },
     fail() {
       callback();

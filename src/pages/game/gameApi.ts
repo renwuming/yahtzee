@@ -45,15 +45,6 @@ export function handleGameData(data: GameBaseData): GameData {
   };
 }
 
-function getWinner(players: Player[]): number {
-  if (players.length <= 1) return null;
-  const { sumScore: sum1 } = players[0];
-  const { sumScore: sum2 } = players[1];
-  if (sum1 === sum2) return -1;
-  else if (sum1 > sum2) return 0;
-  else return 1;
-}
-
 export async function startGame(id: string) {
   await CallCloudFunction({
     name: "yahtzeeUpdateGame",

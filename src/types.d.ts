@@ -32,9 +32,10 @@ interface GameBaseData {
   diceList?: DiceData[];
   winner?: number;
   end?: boolean;
+  roundTimeStamp: number;
 
-  // startAt: Date;
-  // endAt: Date;
+  _createTime: Date;
+  _updateTime: Date;
 }
 
 interface GameData extends GameBaseData {

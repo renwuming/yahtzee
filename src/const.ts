@@ -1,3 +1,5 @@
+export const ROUND_TIME_LIMIT = 65;
+export const SHOW_ROUND_TIME_LIMIT = 60;
 export const DICE_NUM = 5;
 export const DICE_CHANCES_NUM = 3;
 export const DEFAULT_DICE_LIST: DiceData[] = new Array(DICE_NUM).fill({

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [
+    {
+      "name": "roundTimer",
+      "type": "timer",
+      "config": "*/2 * * * * * *"
+    }
+  ]
+}

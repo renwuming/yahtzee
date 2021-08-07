@@ -72,6 +72,7 @@ async function handleUpdateData(action, oldData, data, env) {
       chances: DICE_CHANCES_NUM,
       diceList: DEFAULT_DICE_LIST,
       roundPlayer: 0,
+      roundTimeStamp: Date.now(),
     };
   }
   // 加入游戏
@@ -132,6 +133,7 @@ async function handleUpdateData(action, oldData, data, env) {
     return {
       players,
       roundPlayer: newRoundPlayer,
+      roundTimeStamp: Date.now(),
       chances: DICE_CHANCES_NUM,
       diceList: DEFAULT_DICE_LIST,
       end,
@@ -140,14 +142,11 @@ async function handleUpdateData(action, oldData, data, env) {
   }
   // 更新玩家在线状态
   else if (action === "updatePlayerOnline") {
-    players.forEach((item) => {
-      if (item.openid === OPENID) {
-        item.timeStamp = Date.now();
-      }
-    });
+    const index = players.map((item) => item.openid).indexOf(OPENID);
+    const timesStamp = Date.now();
 
     return {
-      players,
+      [`players.${index}.timeStamp`]: timesStamp,
     };
   }
 

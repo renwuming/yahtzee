@@ -18,6 +18,8 @@ import {
   DEFAULT_SCORES,
   DICE_CHANCES_NUM,
   DICE_NUM,
+  ROUND_TIME_LIMIT,
+  SHOW_ROUND_TIME_LIMIT,
 } from "../../const";
 import PlayerList from "../../Components/PlayerList";
 import DiceList from "../../Components/DiceList";
@@ -67,6 +69,7 @@ export default function Index() {
   const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
   const [showConfirmStartModal, setShowConfirmStartModal] =
     useState<boolean>(false);
+  const [roundCountDown, setRoundCountDown] = useState<number | string>(100);
 
   const {
     start,
@@ -77,6 +80,7 @@ export default function Index() {
     roundPlayer,
     end,
     winner,
+    roundTimeStamp,
     roundScores: scores,
   } = gameData || {
     otherScores: DEFAULT_SCORES,
@@ -96,8 +100,9 @@ export default function Index() {
     const cb = (data, updatedFields = []) => {
       const gameDataInit = updatedFields.length === 0;
       const gameDataChange =
-        updatedFields.filter((key) => !["_updateTime", "players"].includes(key))
-          .length > 0;
+        updatedFields.filter(
+          (key) => !(key === "_updateTime" || /^players\.?/.test(key))
+        ).length > 0;
       if (gameDataInit || gameDataChange) {
         init(data);
       } else {
@@ -114,7 +119,7 @@ export default function Index() {
     };
   }, [dicing, pageShow]);
 
-  // 游戏未结束时，一直更新在线状态
+  // 游戏未结束时，一直更新在线状态和回合倒计时
   useEffect(() => {
     if (end || !pageShow) return;
     updatePlayerOnline(id);
@@ -122,10 +127,21 @@ export default function Index() {
       updatePlayerOnline(id);
     }, 2000);
 
+    const roundTimer = setInterval(() => {
+      const roundCountDown = Math.floor(
+        ROUND_TIME_LIMIT - (Date.now() - (roundTimeStamp || 0)) / 1000
+      );
+      const showRoundCountDown = (roundCountDown >= 0 ? roundCountDown : 0)
+        .toString()
+        .padStart(2, "0");
+      setRoundCountDown(showRoundCountDown);
+    }, 1000);
+
     return () => {
       clearInterval(timer);
+      clearInterval(roundTimer);
     };
-  }, [end, pageShow]);
+  }, [end, pageShow, roundTimeStamp]);
 
   const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
@@ -200,7 +216,6 @@ export default function Index() {
 
     // 重置填分表
     selectScore(null, null);
-    setConfirmFlag(false);
     // 更新玩家分数
     await updateGameScores(id, newScores, type);
   }
@@ -249,6 +264,14 @@ export default function Index() {
           inRound={inRound}
         ></RatingTable>
       </View>
+      {gameData && start && !end && players.length > 1 && (
+        <View className="at-row at-row__align--center count-down-box">
+          {/* 倒计时小于一定时间再显示，避免回合切换时的突兀 */}
+          {roundCountDown <= SHOW_ROUND_TIME_LIMIT && (
+            <View className="count-down">{roundCountDown}</View>
+          )}
+        </View>
+      )}
       {gameData && (
         <View className="dice-list-box">
           {end ? (

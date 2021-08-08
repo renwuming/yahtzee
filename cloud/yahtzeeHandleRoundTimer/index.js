@@ -16,7 +16,7 @@ exports.main = async (event) => {
     .where({
       start: true,
       end: _.neq(true),
-      players: _.size(2),
+      "players.1": _.exists(1),
     })
     .limit(1000) // TODO 分页查询
     .get()

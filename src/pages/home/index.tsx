@@ -80,14 +80,14 @@ export default function Index() {
         >
           开始
         </AtButton>
-        {/* <AtButton
-          type="secondary"
+        <AtButton
+          type="primary"
           onClick={() => {
-            navigateTo(`gamelist/index`);
+            navigateTo(`hall/index`);
           }}
         >
-          房间列表
-        </AtButton> */}
+          房间大厅
+        </AtButton>
         <AtButton
           type="secondary"
           onClick={() => {

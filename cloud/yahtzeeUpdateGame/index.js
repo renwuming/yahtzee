@@ -69,6 +69,7 @@ async function handleUpdateData(action, oldData, data, env) {
       player.sumScore = 0;
     });
     return {
+      startTime: new Date(),
       start: true,
       players,
       chances: DICE_CHANCES_NUM,
@@ -127,9 +128,11 @@ async function handleUpdateData(action, oldData, data, env) {
     const end = gameOver(start, players);
 
     let winner = null;
+    let endTime = null;
     if (end) {
       winner = getWinner(players);
       updatePlayer(players, env);
+      endTime = new Date();
     }
 
     return {
@@ -140,6 +143,7 @@ async function handleUpdateData(action, oldData, data, env) {
       diceList: DEFAULT_DICE_LIST,
       end,
       winner,
+      endTime,
     };
   }
   // 更新玩家在线状态

@@ -4,10 +4,10 @@
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/components/*": ["./src/components/*"],
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["/*"]
+    },
+    "exclude": ["node_modules", "dist"]
   }
 }

@@ -2,8 +2,9 @@ export default {
   pages: [
     "pages/home/index",
     "pages/game/index",
-    "pages/gamelist/index",
     "pages/ranking/index",
+    "pages/hall/index",
+    "pages/history/index",
   ],
   window: {
     backgroundTextStyle: "light",

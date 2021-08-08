@@ -9,6 +9,7 @@ interface IProps {
   showScore?: boolean;
   showActive?: boolean;
   showOffline?: boolean;
+  showAchievement?: boolean;
 }
 
 export default function Index({
@@ -16,13 +17,14 @@ export default function Index({
   showScore = false,
   showActive = false,
   showOffline = false,
+  showAchievement = true,
 }: IProps) {
   const { avatarUrl, nickName, sumScore, inRound, timeStamp } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
 
   const offline = showOffline && Date.now() - (timeStamp || 0) > 5000;
-  function showAchievement() {
-    setAchievementOpened(true);
+  function doShowAchievement() {
+    showAchievement && setAchievementOpened(true);
   }
   function hideAchievement() {
     setAchievementOpened(false);
@@ -32,7 +34,7 @@ export default function Index({
     <View
       className={`player ${showActive && inRound ? "active" : ""}`}
       onClick={() => {
-        showAchievement();
+        doShowAchievement();
       }}
     >
       <View className={`player-info ${offline ? "offline" : ""}`}>

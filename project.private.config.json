@@ -35,6 +35,12 @@
           "pathName": "pages/ranking/index",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "大厅",
+          "pathName": "pages/hall/index",
+          "query": "",
+          "scene": null
         }
       ]
     }

@@ -5,6 +5,8 @@ export const DICE_CHANCES_NUM = 3;
 export const DEFAULT_DICE_LIST: DiceData[] = new Array(DICE_NUM).fill({
   value: 0,
 });
+export const PAGE_LEN = 10;
+export const RANKING_LEN = 50;
 
 export const DEFAULT_SCORES: Scores = {
   ones: null,

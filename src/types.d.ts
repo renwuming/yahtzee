@@ -24,6 +24,7 @@ interface NewScore {
 }
 
 interface GameBaseData {
+  _id: string;
   owner: Player;
   players: Player[];
   start?: boolean;

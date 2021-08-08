@@ -101,7 +101,7 @@ export default function Index() {
       const gameDataInit = updatedFields.length === 0;
       const gameDataChange =
         updatedFields.filter(
-          (key) => !(key === "_updateTime" || /^players\.?/.test(key))
+          (key) => !(key === "_updateTime" || /^players\.\d/.test(key))
         ).length > 0;
       if (gameDataInit || gameDataChange) {
         init(data);
@@ -269,7 +269,11 @@ export default function Index() {
         <View className="at-row at-row__align--center count-down-box">
           {/* 倒计时小于一定时间再显示，避免回合切换时的突兀 */}
           {roundCountDown <= SHOW_ROUND_TIME_LIMIT && (
-            <View className="count-down">{roundCountDown}</View>
+            <View
+              className={`count-down ${roundCountDown < 10 ? "error" : ""}`}
+            >
+              {roundCountDown}
+            </View>
           )}
         </View>
       )}

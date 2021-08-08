@@ -11,7 +11,13 @@
     color: #eee;
   }
   .user-info {
+    position: relative;
     margin-top: 60px;
+    .setting {
+      position: absolute;
+      right: -20px;
+      bottom: 0;
+    }
   }
   .cover {
     width: 300px;

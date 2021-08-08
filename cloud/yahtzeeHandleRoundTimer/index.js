@@ -47,7 +47,7 @@ function handleRoundTimer(game) {
       data: {
         env: ENV,
         id: _id,
-        action: "updateGameScores",
+        action: "updateGameScoresByTimer",
         data: {
           scores,
           lastScoreType: type,

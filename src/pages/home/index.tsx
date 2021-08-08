@@ -1,9 +1,10 @@
 import Taro from "@tarojs/taro";
 import { useShareAppMessage } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
-import { AtButton } from "taro-ui";
+import { AtButton, AtIcon } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/modal.scss";
+import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 import {
   CallCloudFunction,
@@ -57,6 +58,18 @@ export default function Index() {
       <Text className="version">{VERSION}</Text>
       <View className="user-info">
         <Player data={userInfo}></Player>
+        <AtIcon
+          className="setting"
+          value="settings"
+          size="18"
+          color="#176999"
+          onClick={() => {
+            forceGetUserProfile(() => {
+              const userInfo = Taro.getStorageSync("userInfo");
+              setUserInfo(userInfo);
+            });
+          }}
+        ></AtIcon>
       </View>
       <View className="btn-list">
         <AtButton
@@ -82,17 +95,6 @@ export default function Index() {
           }}
         >
           排行榜
-        </AtButton>
-        <AtButton
-          type="secondary"
-          onClick={() => {
-            forceGetUserProfile(() => {
-              const userInfo = Taro.getStorageSync("userInfo");
-              setUserInfo(userInfo);
-            });
-          }}
-        >
-          更新头像
         </AtButton>
         <AtButton
           circle

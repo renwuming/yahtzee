@@ -59,6 +59,8 @@ async function handleUpdateData(action, oldData, data, env) {
   const { OPENID } = cloud.getWXContext();
   const { owner, players, roundPlayer, start } = oldData;
   const openids = players.map((item) => item.openid);
+  const playerIndex = openids.indexOf(OPENID);
+  const inRound = openids[roundPlayer] === OPENID;
   const own = OPENID === owner.openid;
   // 开始游戏
   if (action === "startGame" && own) {
@@ -102,21 +104,21 @@ async function handleUpdateData(action, oldData, data, env) {
     };
   }
   // 更新游戏数据
-  // TODO: 验证是否回合中
-  else if (action === "updateGame") {
+  else if (action === "updateGame" && inRound) {
     return data;
   }
   // 更新游戏数据-冻结骰子
-  // TODO: 验证是否回合中
-  else if (action === "freezeDice") {
+  else if (action === "freezeDice" && inRound) {
     const { index, freezing } = data;
     return {
       [`diceList.${index}.freezing`]: freezing,
     };
   }
   // 更新玩家Scores
-  // TODO: 验证是否回合中
-  else if (action === "updateGameScores") {
+  else if (
+    action === "updateGameScoresByTimer" ||
+    (action === "updateGameScores" && inRound)
+  ) {
     const { scores, lastScoreType } = data;
     players[roundPlayer].scores = scores;
     players[roundPlayer].sumScore = getSumScore(scores);
@@ -142,11 +144,10 @@ async function handleUpdateData(action, oldData, data, env) {
   }
   // 更新玩家在线状态
   else if (action === "updatePlayerOnline") {
-    const index = players.map((item) => item.openid).indexOf(OPENID);
+    if (playerIndex < 0) return;
     const timesStamp = Date.now();
-
     return {
-      [`players.${index}.timeStamp`]: timesStamp,
+      [`players.${playerIndex}.timeStamp`]: timesStamp,
     };
   }
 

@@ -21,13 +21,13 @@
         {
           "name": "prod2",
           "pathName": "pages/game/index",
-          "query": "id=cd045e75610d70150394357f39babeaf",
+          "query": "id=2d44d6c2610f4d620398522569952a0b",
           "scene": null
         },
         {
           "name": "prod",
           "pathName": "pages/game/index",
-          "query": "id=cd045e75610e919d03e0ef1105db20f6",
+          "query": "id=cd045e75610f6bdf040c38ff518afc31",
           "scene": null
         },
         {

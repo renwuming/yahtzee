@@ -6,7 +6,7 @@ import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
-import { PAGE_LEN, RANKING_LEN } from "../../const";
+import { PAGE_LEN } from "../../const";
 import { CallCloudFunction } from "../../utils";
 import GameItem from "../../Components/GameItem";
 
@@ -27,7 +27,7 @@ export default function Index() {
     const newList = list1.concat(list);
     setList1(newList);
     setPageNum1(pageNum1 + 1);
-    if (newList.length >= RANKING_LEN || list.length < PAGE_LEN) {
+    if (list.length < PAGE_LEN) {
       setPage1End(true);
     }
   }

@@ -1,5 +1,5 @@
 export default {
-  navigationBarTitleText: "排行榜",
+  navigationBarTitleText: "快艇骰子",
   navigationBarTextStyle: "black",
   navigationBarBackgroundColor: "#fff",
 };

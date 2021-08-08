@@ -1,3 +1,4 @@
+import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
@@ -8,10 +9,17 @@ import { navigateTo } from "../../utils";
 interface IProps {
   index: number;
   game: GameData;
+  type?: "history" | "hall";
 }
 
-export default function Index({ index, game }: IProps) {
-  const { _id, players, start } = game;
+export default function Index({ index, game, type = "hall" }: IProps) {
+  const { openid } = Taro.getStorageSync("userInfo");
+  const { _id, players, start, winner } = game;
+  const historyType = type === "history";
+
+  const openids = players.map((item) => item.openid);
+  const singleGame = players.length === 1;
+  const win = !singleGame && openids.indexOf(openid) === winner;
 
   function gotoGame() {
     navigateTo(`game/index?id=${_id}`);
@@ -29,13 +37,21 @@ export default function Index({ index, game }: IProps) {
         {players.map((item) => (
           <PlayerItem
             data={item}
-            showOffline
+            showOffline={!historyType}
             showAchievement={false}
           ></PlayerItem>
         ))}
       </View>
       <View className="column-right">
-        {start && <Text className="title">进行中</Text>}
+        {historyType ? (
+          singleGame ? null : win ? (
+            <Text className="title">胜利</Text>
+          ) : (
+            <Text className="title fail">失败</Text>
+          )
+        ) : (
+          start && <Text className="title">进行中</Text>
+        )}
       </View>
     </View>
   );

@@ -40,6 +40,9 @@
     .title {
       font-family: yansong;
       color: #fff;
+      &.fail {
+        color: #555;
+      }
     }
   }
 }

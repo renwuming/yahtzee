@@ -97,6 +97,14 @@ export default function Index() {
           排行榜
         </AtButton>
         <AtButton
+          type="secondary"
+          onClick={() => {
+            navigateTo(`history/index`);
+          }}
+        >
+          历史记录
+        </AtButton>
+        <AtButton
           circle
           type="secondary"
           onClick={() => {

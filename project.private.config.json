@@ -41,6 +41,12 @@
           "pathName": "pages/hall/index",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "历史记录",
+          "pathName": "pages/history/index",
+          "query": "",
+          "scene": null
         }
       ]
     }

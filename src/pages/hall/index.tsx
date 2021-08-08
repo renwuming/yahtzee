@@ -33,7 +33,7 @@ export default function Index() {
     if (myPageEnd) return;
     const list = await getMyGames(myPageNum);
     setMyGameList(myGameList.concat(list));
-    setMyPageNum(hallPageNum + 1);
+    setMyPageNum(myPageNum + 1);
     if (list.length < PAGE_LEN) {
       setMyPageEnd(true);
     }

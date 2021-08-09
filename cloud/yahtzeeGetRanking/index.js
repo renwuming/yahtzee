@@ -19,6 +19,7 @@ exports.main = async (event) => {
         avatarUrl: 1,
         nickName: 1,
         highScore: 1,
+        openid: 1,
       })
       .skip(_skip)
       .limit(_pageLength)
@@ -34,6 +35,7 @@ exports.main = async (event) => {
         avatarUrl: 1,
         nickName: 1,
         multiWinSum: 1,
+        openid: 1,
       })
       .skip(_skip)
       .limit(_pageLength)

@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
-import { DEFAULT_DICE_LIST, DEFAULT_SCORES } from "../../const";
-import { CallCloudFunction } from "../../utils";
+import { DEFAULT_SCORES } from "../../const";
+import { CallCloudFunction, navigateTo } from "../../utils";
 
 export async function getGameData(id: string): Promise<GameBaseData> {
   const data = await CallCloudFunction({
@@ -45,12 +45,32 @@ export function handleGameData(data: GameBaseData): GameData {
   };
 }
 
+export async function createGame() {
+  const { _id } = await CallCloudFunction({
+    name: "yahtzeeCreateGame",
+  });
+  navigateTo(`game/index?id=${_id}`);
+}
+
 export async function startGame(id: string) {
   await CallCloudFunction({
     name: "yahtzeeUpdateGame",
     data: {
       id,
       action: "startGame",
+    },
+  });
+}
+
+export async function kickFromGame(id: string, openid: string) {
+  await CallCloudFunction({
+    name: "yahtzeeUpdateGame",
+    data: {
+      id,
+      action: "kickPlayer",
+      data: {
+        openid,
+      },
     },
   });
 }

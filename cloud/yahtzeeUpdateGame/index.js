@@ -61,6 +61,7 @@ async function handleUpdateData(action, oldData, data, env) {
   const openids = players.map((item) => item.openid);
   const playerIndex = openids.indexOf(OPENID);
   const inRound = openids[roundPlayer] === OPENID;
+  const inGame = playerIndex >= 0;
   const own = OPENID === owner.openid;
   // 开始游戏
   if (action === "startGame" && own) {
@@ -68,20 +69,21 @@ async function handleUpdateData(action, oldData, data, env) {
       player.scores = DEFAULT_SCORES;
       player.sumScore = 0;
     });
+    const startIndex = Math.floor(Math.random() * players.length);
     return {
       startTime: new Date(),
       start: true,
       players,
       chances: DICE_CHANCES_NUM,
       diceList: DEFAULT_DICE_LIST,
-      roundPlayer: 0,
+      roundPlayer: startIndex,
       roundTimeStamp: Date.now(),
     };
   }
   // 加入游戏
   else if (
     action === "joinGame" &&
-    !openids.includes(OPENID) &&
+    !inGame &&
     players.length <= 1 // 最多二人
   ) {
     // 获取用户数据
@@ -97,8 +99,16 @@ async function handleUpdateData(action, oldData, data, env) {
       players,
     };
   }
+  // 踢出某人
+  else if (action === "kickPlayer" && own && !start) {
+    const { openid } = data;
+    const newPlayers = players.filter((item) => item.openid !== openid);
+    return {
+      players: newPlayers,
+    };
+  }
   // 离开游戏
-  else if (action === "leaveGame" && openids.includes(OPENID)) {
+  else if (action === "leaveGame" && inGame) {
     const newPlayers = players.filter((item) => item.openid !== OPENID);
     return {
       players: newPlayers,

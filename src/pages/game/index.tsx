@@ -32,6 +32,7 @@ import {
   getGameData,
   handleGameData,
   joinGame,
+  kickFromGame,
   leaveGame,
   startGame,
   updateGame,
@@ -55,10 +56,6 @@ export default function Index() {
     };
   });
 
-  const [refresh, setRefresh] = useState(false);
-  useEffect(() => {
-    refresh && setTimeout(() => setRefresh(false));
-  }, [refresh]);
   const [gameData, setGameData] = useState<GameData>(null);
   const [pageShow, setPageShow] = useState<boolean>(true);
   const [dicing, setDicing] = useState<boolean>(false);
@@ -246,6 +243,11 @@ export default function Index() {
     setDiceList([...diceList]);
   }
 
+  // 踢出玩家
+  function kickPlayer(openid) {
+    kickFromGame(id, openid);
+  }
+
   return (
     <View className="game">
       <LoadPage></LoadPage>
@@ -253,6 +255,8 @@ export default function Index() {
         players={players}
         start={start}
         showOffline={!end}
+        showSetting={own && !start}
+        kickPlayer={kickPlayer}
       ></PlayerList>
       <View className="scroll-box">
         <RatingTable

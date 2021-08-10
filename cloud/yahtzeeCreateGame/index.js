@@ -9,6 +9,20 @@ exports.main = async (event) => {
     env,
   });
   const db = cloud.database();
+  const _ = db.command;
+
+  // 先查询是否有未结束的游戏
+  const [game] = await db
+    .collection("yahtzee_games")
+    .where({
+      "owner.openid": OPENID,
+      start: _.neq(true),
+    })
+    .limit(1)
+    .get()
+    .then((res) => res.data);
+
+  if (game) return game;
 
   const { result: player } = await cloud.callFunction({
     name: "getPlayers",

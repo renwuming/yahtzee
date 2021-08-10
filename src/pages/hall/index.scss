@@ -30,4 +30,27 @@
   .loading {
     margin: 30px 0;
   }
+
+  // 浮动按钮
+  .fab-btn {
+    position: fixed;
+    right: 50px;
+    bottom: 100px;
+    z-index: 900;
+    &.reload {
+      bottom: 100px;
+    }
+    &.create-room {
+      bottom: 240px;
+      .at-badge__num {
+        padding: 8px;
+        top: -84px;
+        right: -22px;
+        width: 80px;
+      }
+      .shake.at-badge {
+        animation: shake 1.5s linear infinite;
+      }
+    }
+  }
 }

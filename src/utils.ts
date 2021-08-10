@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useEffect } from "react";
 
-export const VERSION = "v2.1.0";
+export const VERSION = "v2.2.0";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({

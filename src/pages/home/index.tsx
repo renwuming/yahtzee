@@ -7,7 +7,6 @@ import "taro-ui/dist/style/components/modal.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 import {
-  CallCloudFunction,
   forceGetUserProfile,
   getUserProfile,
   navigateTo,
@@ -16,6 +15,7 @@ import {
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
 import { useState } from "react";
+import { createGame } from "../game/gameApi";
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<any>(
@@ -34,13 +34,6 @@ export default function Index() {
       imageUrl: "http://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
     };
   });
-
-  async function createGame() {
-    const { _id } = await CallCloudFunction({
-      name: "yahtzeeCreateGame",
-    });
-    navigateTo(`game/index?id=${_id}`);
-  }
 
   function gotoJmz() {
     Taro.navigateToMiniProgram({

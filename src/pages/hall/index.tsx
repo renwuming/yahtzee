@@ -1,14 +1,17 @@
-import { ScrollView, View } from "@tarojs/components";
+import { ScrollView, View, Text } from "@tarojs/components";
 import { useEffect, useState } from "react";
-import { AtDivider, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
+import { AtBadge, AtDivider, AtFab, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
+import "taro-ui/dist/style/components/fab.scss";
+import "taro-ui/dist/style/components/badge.scss";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
 import GameItem from "../../Components/GameItem";
 import { PAGE_LEN } from "../../const";
+import { createGame } from "../game/gameApi";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -19,6 +22,21 @@ export default function Index() {
   const [myPageNum, setMyPageNum] = useState<number>(0);
   const [hallPageEnd, setHallPageEnd] = useState<boolean>(false);
   const [myPageEnd, setMyPageEnd] = useState<boolean>(false);
+
+  const [refresh, setRefresh] = useState(false);
+  useEffect(() => {
+    if (refresh) {
+      updateHallGameList();
+      updateMyGameList();
+    }
+    refresh && setTimeout(() => setRefresh(false));
+  }, [refresh]);
+
+  // 首次加载
+  useEffect(() => {
+    updateHallGameList();
+    updateMyGameList();
+  }, []);
 
   async function updateHallGameList() {
     if (hallPageEnd) return;
@@ -39,10 +57,16 @@ export default function Index() {
     }
   }
 
-  useEffect(() => {
-    updateHallGameList();
-    updateMyGameList();
-  }, []);
+  function reloadPage() {
+    setHallGameList([]);
+    setMyGameList([]);
+    setHallPageNum(0);
+    setMyPageNum(0);
+    setHallPageEnd(false);
+    setMyPageEnd(false);
+    // 刷新页面，重新加载
+    setRefresh(true);
+  }
 
   return (
     <View className="hall">
@@ -106,6 +130,28 @@ export default function Index() {
           </ScrollView>
         </AtTabsPane>
       </AtTabs>
+
+      {/* 悬浮按钮 */}
+      <View className="fab-btn create-room">
+        <AtFab
+          onClick={() => {
+            createGame();
+          }}
+        >
+          <AtBadge className="shake" value={"点我开始"}>
+            <Text className="at-fab__icon at-icon at-icon-add"></Text>
+          </AtBadge>
+        </AtFab>
+      </View>
+      <View className="fab-btn reload">
+        <AtFab
+          onClick={() => {
+            reloadPage();
+          }}
+        >
+          <Text className="at-fab__icon at-icon at-icon-reload"></Text>
+        </AtFab>
+      </View>
     </View>
   );
 }

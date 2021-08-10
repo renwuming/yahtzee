@@ -6,8 +6,9 @@ exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   const { env, data, openid } = event;
   cloud.init({
-    env,
+    env: env || "prod-0gjpxr644f6d941d",
   });
+
   const db = cloud.database();
 
   const _openid = openid || OPENID;

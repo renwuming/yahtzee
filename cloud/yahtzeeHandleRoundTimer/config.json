@@ -4,7 +4,7 @@
   },
   "triggers": [
     {
-      "name": "roundTimer",
+      "name": "timer1",
       "type": "timer",
       "config": "*/2 * * * * * *"
     }

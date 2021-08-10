@@ -1,13 +1,12 @@
 // 云函数入口文件
 const cloud = require("wx-server-sdk");
 
-// 使用prod环境
-const ENV = "prod-0gjpxr644f6d941d";
 // 云函数入口函数
 exports.main = async (event) => {
   cloud.init({
-    env: ENV,
+    env: env || "prod-0gjpxr644f6d941d",
   });
+
   const db = cloud.database();
   const _ = db.command;
 

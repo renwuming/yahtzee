@@ -6,8 +6,11 @@ exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   const { env } = event;
   cloud.init({
-    env,
+    env: env || "prod-0gjpxr644f6d941d",
   });
+
+  if (!OPENID) return;
+
   const db = cloud.database();
   const _ = db.command;
 

@@ -19,6 +19,7 @@ export default function Index({ index, game, type = "hall" }: IProps) {
 
   const openids = players.map((item) => item.openid);
   const singleGame = players.length === 1;
+  const draw = winner < 0;
   const win = !singleGame && openids.indexOf(openid) === winner;
 
   function gotoGame() {
@@ -44,7 +45,9 @@ export default function Index({ index, game, type = "hall" }: IProps) {
       </View>
       <View className="column-right">
         {historyType ? (
-          singleGame ? null : win ? (
+          singleGame ? null : draw ? (
+            <Text className="title">平局</Text>
+          ) : win ? (
             <Text className="title">胜利</Text>
           ) : (
             <Text className="title fail">失败</Text>

@@ -5,13 +5,14 @@ const cloud = require("wx-server-sdk");
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   let { env, openid } = event;
+  cloud.init({
+    env: env || "prod-0gjpxr644f6d941d",
+  });
+
+  const db = cloud.database();
+
   // 不存在openid参数则是查询自己的用户信息
   openid = openid || OPENID;
-
-  cloud.init({
-    env,
-  });
-  const db = cloud.database();
 
   // 查询单个
   if (typeof openid === "string") {

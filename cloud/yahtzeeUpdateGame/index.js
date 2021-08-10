@@ -25,8 +25,9 @@ const DEFAULT_SCORES = {
 exports.main = async (event) => {
   const { env, id, action, data } = event;
   cloud.init({
-    env,
+    env: env || "prod-0gjpxr644f6d941d",
   });
+
   const db = cloud.database();
 
   // 先读旧数据

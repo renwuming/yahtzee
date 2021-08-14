@@ -135,9 +135,8 @@ async function handleUpdateData(action, oldData, data, env) {
     players[roundPlayer].scores = scores;
     players[roundPlayer].sumScore = getSumScore(scores);
     players[roundPlayer].lastScoreType = lastScoreType;
-    const newRoundPlayer = (roundPlayer + 1) % players.length;
     const end = gameOver(start, players);
-
+    const newRoundPlayer = end ? roundPlayer : getNewRoundPlayerIndex(oldData);
     let winner = null;
     let endTime = null;
     if (end) {
@@ -194,6 +193,26 @@ function getSumScore(scores) {
   let sumScore = sum(scoresToValues(scores));
   hasBonus && (sumScore += BONUS_SCORE);
   return sumScore;
+}
+
+function getNewRoundPlayerIndex(game) {
+  const { roundPlayer, players } = game;
+  const L = players.length;
+  let newRoundPlayer = roundPlayer + 1;
+  let loopTimes = 0;
+
+  while (loopTimes < L) {
+    const index = newRoundPlayer % L;
+    // 下一个玩家，还有分数没有填
+    const scoresList = scoresToValues(players[index].scores);
+    if (scoresList.filter((value) => value === null).length > 0) {
+      return index;
+    }
+    newRoundPlayer++;
+    loopTimes++;
+  }
+
+  return roundPlayer;
 }
 
 function gameOver(start, players) {

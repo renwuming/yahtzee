@@ -5,6 +5,7 @@ export default {
     "pages/ranking/index",
     "pages/hall/index",
     "pages/history/index",
+    "pages/guide/index",
   ],
   window: {
     backgroundTextStyle: "light",

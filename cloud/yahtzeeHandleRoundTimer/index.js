@@ -1,10 +1,11 @@
 // 云函数入口文件
 const cloud = require("wx-server-sdk");
 
+const ENV = "prod-0gjpxr644f6d941d";
 // 云函数入口函数
 exports.main = async (event) => {
   cloud.init({
-    env: env || "prod-0gjpxr644f6d941d",
+    env: ENV,
   });
 
   const db = cloud.database();
@@ -21,7 +22,13 @@ exports.main = async (event) => {
     .get()
     .then((res) => res.data);
 
-  list.forEach(handleRoundTimer);
+  list.forEach((item) => {
+    try {
+      handleRoundTimer(item);
+    } catch (e) {
+      console.error(e);
+    }
+  });
 };
 
 const ROUND_TIME_LIMIT = 65 * 1000;

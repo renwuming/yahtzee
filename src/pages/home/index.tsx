@@ -51,18 +51,29 @@ export default function Index() {
       <Text className="version">{VERSION}</Text>
       <View className="user-info">
         <Player data={userInfo}></Player>
-        <AtIcon
-          className="setting"
-          value="settings"
-          size="18"
-          color="#176999"
-          onClick={() => {
-            forceGetUserProfile(() => {
-              const userInfo = Taro.getStorageSync("userInfo");
-              setUserInfo(userInfo);
-            });
-          }}
-        ></AtIcon>
+        <View className="at-row icon-row">
+          <AtIcon
+            className="setting"
+            value="settings"
+            size="30"
+            color="#176999"
+            onClick={() => {
+              forceGetUserProfile(() => {
+                const userInfo = Taro.getStorageSync("userInfo");
+                setUserInfo(userInfo);
+              });
+            }}
+          ></AtIcon>
+          <AtIcon
+            className="help"
+            value="help"
+            size="30"
+            color="#176999"
+            onClick={() => {
+              navigateTo(`guide/index`);
+            }}
+          ></AtIcon>
+        </View>
       </View>
       <View className="btn-list">
         <AtButton

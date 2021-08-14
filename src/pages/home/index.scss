@@ -11,12 +11,16 @@
     color: #eee;
   }
   .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: relative;
     margin-top: 60px;
-    .setting {
-      position: absolute;
-      right: -20px;
-      bottom: 0;
+    .icon-row {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      width: 150px;
     }
   }
   .cover {

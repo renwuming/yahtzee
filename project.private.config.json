@@ -21,13 +21,13 @@
         {
           "name": "prod2",
           "pathName": "pages/game/index",
-          "query": "id=2d44d6c2610f4d620398522569952a0b",
+          "query": "id=8937eaa961174d4304a1bff3618c98c0",
           "scene": null
         },
         {
           "name": "prod",
           "pathName": "pages/game/index",
-          "query": "id=2d44d6c261114e0b041b34de40c76b5e",
+          "query": "id=cbddf0af60d3e726122f2eb25b84e349",
           "scene": null
         },
         {
@@ -46,6 +46,12 @@
           "name": "历史记录",
           "pathName": "pages/history/index",
           "query": "",
+          "scene": null
+        },
+        {
+          "name": "游戏指导",
+          "pathName": "pages/guide/index",
+          "query": "id=2d44d6c26110f22f040229aa4422ad8b",
           "scene": null
         }
       ]

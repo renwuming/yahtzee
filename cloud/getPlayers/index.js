@@ -13,6 +13,7 @@ exports.main = async (event) => {
 
   // 不存在openid参数则是查询自己的用户信息
   openid = openid || OPENID;
+  if (!openid) return;
 
   // 查询单个
   if (typeof openid === "string") {

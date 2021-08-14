@@ -6,11 +6,12 @@ import {
   useDidShow,
   useShareAppMessage,
 } from "@tarojs/taro";
-import { View } from "@tarojs/components";
-import { AtButton, AtModal } from "taro-ui";
+import { View, Text } from "@tarojs/components";
+import { AtButton, AtFab, AtModal } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/flex.scss";
 import "taro-ui/dist/style/components/modal.scss";
+import "taro-ui/dist/style/components/fab.scss";
 
 import "./index.scss";
 import {
@@ -27,7 +28,7 @@ import RatingTable from "../../Components/RatingTable";
 import Player from "../../Components/Player";
 import LoadPage from "../../Components/LoadPage";
 
-import { getUserProfile, SLEEP, watchDataBase } from "../../utils";
+import { getUserProfile, navigateTo, SLEEP, watchDataBase } from "../../utils";
 import {
   getGameData,
   handleGameData,
@@ -285,10 +286,12 @@ export default function Index() {
         <View className="dice-list-box">
           {end ? (
             players.length <= 1 ? null : winner === -1 ? (
-              <View className="result-box">双方平局</View>
+              <View className="result-box">
+                <Text className="text">双方平局</Text>
+              </View>
             ) : (
               <View className="result-box">
-                获胜者
+                <Text className="text">获胜者</Text>
                 <Player data={players[winner]}></Player>
               </View>
             )
@@ -361,7 +364,7 @@ export default function Index() {
                     });
                   }}
                 >
-                  取消
+                  离开
                 </AtButton>
               ) : (
                 <AtButton
@@ -374,7 +377,7 @@ export default function Index() {
                   }}
                   disabled={!canJoin}
                 >
-                  准备
+                  加入
                 </AtButton>
               )}
             </View>
@@ -397,6 +400,15 @@ export default function Index() {
           setShowConfirmStartModal(false);
         }}
       />
+      {/* 悬浮按钮 */}
+      <View
+        className="guide-btn"
+        onClick={() => {
+          navigateTo("guide/index");
+        }}
+      >
+        <AtFab size="small">帮助</AtFab>
+      </View>
     </View>
   );
 }

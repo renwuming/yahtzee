@@ -159,9 +159,9 @@ async function handleUpdateData(action, oldData, data, env) {
   // 更新玩家在线状态
   else if (action === "updatePlayerOnline") {
     if (playerIndex < 0) return;
-    const timesStamp = Date.now();
+    const timeStamp = Date.now();
     return {
-      [`players.${playerIndex}.timeStamp`]: timesStamp,
+      [`players.${playerIndex}.timeStamp`]: timeStamp,
     };
   }
 

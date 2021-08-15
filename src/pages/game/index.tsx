@@ -38,7 +38,7 @@ import {
   startGame,
   updateGame,
   updateGameScores,
-  updatePlayerOnline,
+  updatePlayerOnline_Database,
 } from "./gameApi";
 
 export default function Index() {
@@ -120,9 +120,9 @@ export default function Index() {
   // 游戏未结束时，一直更新在线状态和回合倒计时
   useEffect(() => {
     if (end || !pageShow) return;
-    updatePlayerOnline(id);
+    updatePlayerOnline_Database(gameData);
     const timer = setInterval(() => {
-      updatePlayerOnline(id);
+      updatePlayerOnline_Database(gameData);
     }, 2000);
 
     const roundTimer = setInterval(() => {
@@ -140,7 +140,7 @@ export default function Index() {
       clearInterval(timer);
       clearInterval(roundTimer);
     };
-  }, [end, pageShow, roundTimeStamp]);
+  }, [end, pageShow, roundTimeStamp, gameData]);
 
   const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;

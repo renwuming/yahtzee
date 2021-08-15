@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
 import { DEFAULT_SCORES } from "../../const";
-import { CallCloudFunction, navigateTo } from "../../utils";
+import { CallCloudFunction, DB, navigateTo } from "../../utils";
 
 export async function getGameData(id: string): Promise<GameBaseData> {
   const data = await CallCloudFunction({
@@ -19,7 +19,8 @@ export function handleGameData(data: GameBaseData): GameData {
 
   const own = owner.openid === openid;
   const openids = players.map((item) => item.openid);
-  const inGame = openids.includes(openid);
+  const playerIndex = openids.indexOf(openid);
+  const inGame = playerIndex >= 0;
   const inRound = inGame && openids[roundPlayer] === openid;
   players.forEach((item, index) => {
     item.inRound = index === roundPlayer;
@@ -42,6 +43,7 @@ export function handleGameData(data: GameBaseData): GameData {
     inRound,
     roundScores,
     otherScores,
+    playerIndex,
   };
 }
 
@@ -139,4 +141,20 @@ export async function updatePlayerOnline(id: string) {
       action: "updatePlayerOnline",
     },
   });
+}
+
+export async function updatePlayerOnline_Database(game: GameData) {
+  if (!game) return;
+  const { _id, playerIndex, inGame } = game;
+  if (!inGame) return;
+  const date = new Date();
+  const timeStamp = Date.now();
+  DB.collection("yahtzee_games")
+    .doc(_id)
+    .update({
+      data: {
+        [`players.${playerIndex}.timeStamp`]: timeStamp,
+        _updateTime: date,
+      },
+    });
 }

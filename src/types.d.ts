@@ -45,6 +45,7 @@ interface GameData extends GameBaseData {
   inRound: boolean;
   roundScores: Scores;
   otherScores: Scores;
+  playerIndex: number;
 }
 
 interface Player {

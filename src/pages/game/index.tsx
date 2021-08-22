@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getCurrentInstance,
   useDidHide,
@@ -91,31 +91,40 @@ export default function Index() {
     setPageShow(true);
   });
 
+  const cb = useRef(null);
+  cb.current = (data, updatedFields = []) => {
+    if (dicing) return;
+    const gameDataChange =
+      updatedFields.filter(
+        (key) => !(key === "_updateTime" || /^players\.\d/.test(key))
+      ).length > 0;
+    if (gameDataChange) {
+      init(data);
+    } else {
+      const gameData = handleGameData(data);
+      const { players } = gameData;
+      setPlayers(players);
+    }
+  };
+
+  // 监听dicing状态变化
+  useEffect(() => {
+    if (dicing) return;
+    getGameData(id).then((data) => {
+      init(data);
+    });
+  }, [dicing]);
+
   // 监听数据库变化
   useEffect(() => {
-    if (dicing || !pageShow) return;
+    if (!pageShow) return;
 
-    const cb = (data, updatedFields = []) => {
-      const gameDataInit = updatedFields.length === 0;
-      const gameDataChange =
-        updatedFields.filter(
-          (key) => !(key === "_updateTime" || /^players\.\d/.test(key))
-        ).length > 0;
-      if (gameDataInit || gameDataChange) {
-        init(data);
-      } else {
-        const gameData = handleGameData(data);
-        const { players } = gameData;
-        setPlayers(players);
-      }
-    };
-    getGameData(id).then(cb);
     const watcher = watchDataBase(id, cb);
 
     return () => {
       watcher.close();
     };
-  }, [dicing, pageShow]);
+  }, [pageShow]);
 
   // 游戏未结束时，一直更新在线状态和回合倒计时
   useEffect(() => {
@@ -145,7 +154,7 @@ export default function Index() {
   const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
   const allFreezing = diceList.filter((e) => e.freezing).length === DICE_NUM;
-  const canDice = inRound && chances > 0 && !dicing && !end && !allFreezing;
+  const canDice = inRound && chances > 0 && !showDicing && !end && !allFreezing;
 
   // 更新游戏数据
   const init = async (data: GameBaseData) => {

@@ -109,7 +109,7 @@ async function handleUpdateData(action, oldData, data, env) {
     };
   }
   // 离开游戏
-  else if (action === "leaveGame" && inGame) {
+  else if (action === "leaveGame" && inGame && !start) {
     const newPlayers = players.filter((item) => item.openid !== OPENID);
     return {
       players: newPlayers,
@@ -157,8 +157,7 @@ async function handleUpdateData(action, oldData, data, env) {
     };
   }
   // 更新玩家在线状态
-  else if (action === "updatePlayerOnline") {
-    if (playerIndex < 0) return;
+  else if (action === "updatePlayerOnline" && inGame) {
     const timeStamp = Date.now();
     return {
       [`players.${playerIndex}.timeStamp`]: timeStamp,

@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useEffect } from "react";
 
-export const VERSION = "v2.4.0";
+export const VERSION = "v2.4.1";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -39,16 +39,14 @@ export function useAsyncEffect(
 }
 
 export function watchDataBase(id: string, onChange) {
-  const db = Taro.cloud.database();
-  const watcher = db
-    .collection("yahtzee_games")
+  const watcher = DB.collection("yahtzee_games")
     .doc(id)
     /* @ts-ignore */
     .watch({
       onChange(data: any) {
         const { docs, docChanges } = data;
         const updatedFields = docChanges?.[0]?.updatedFields || {};
-        onChange(docs[0], Object.keys(updatedFields));
+        onChange.current(docs[0], Object.keys(updatedFields));
       },
       onError(err) {
         console.error(err);

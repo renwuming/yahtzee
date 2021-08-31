@@ -6,9 +6,9 @@ import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
-import { PAGE_LEN } from "../../const";
-import { CallCloudFunction } from "../../utils";
-import GameItem from "../../Components/GameItem";
+import { PAGE_LEN } from "../../../const";
+import { CallCloudFunction } from "../../../utils";
+import GameItem from "../../../Components/GameItem";
 
 export default function Index() {
   const [list1, setList1] = useState<GameData[]>([]);

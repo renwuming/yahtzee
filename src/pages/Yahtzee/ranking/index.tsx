@@ -35,9 +35,9 @@ import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
-import PlayerItem from "../../Components/Player";
-import { PAGE_LEN, RANKING_LEN } from "../../const";
-import { CallCloudFunction } from "../../utils";
+import PlayerItem from "../../../Components/Player";
+import { PAGE_LEN, RANKING_LEN } from "../../../const";
+import { CallCloudFunction } from "../../../utils";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);

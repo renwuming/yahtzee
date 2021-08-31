@@ -15,6 +15,7 @@ interface IProps {
   showAchievement?: boolean;
   showSetting?: boolean;
   kickPlayer?: (openid: string) => void;
+  colorType?: string;
 }
 
 export default function Index({
@@ -25,6 +26,7 @@ export default function Index({
   showAchievement = true,
   showSetting = false,
   kickPlayer = () => {},
+  colorType = "white",
 }: IProps) {
   const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
@@ -50,7 +52,7 @@ export default function Index({
         }}
       >
         <Image className={`avatar`} src={avatarUrl}></Image>
-        <Text>{nickName}</Text>
+        <Text className={colorType}>{nickName}</Text>
       </View>
       {showScore && (
         <View className="score">

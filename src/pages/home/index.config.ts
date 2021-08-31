@@ -1,5 +1,5 @@
 export default {
-  navigationBarTitleText: "快艇骰子",
-  navigationBarTextStyle: "white",
-  navigationBarBackgroundColor: "#46b3ff",
+  navigationBarTitleText: "骰子桌游大全",
+  navigationBarTextStyle: "black",
+  navigationBarBackgroundColor: "#eef5ff",
 };

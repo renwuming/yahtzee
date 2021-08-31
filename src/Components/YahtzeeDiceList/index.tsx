@@ -1,5 +1,5 @@
 import { View } from "@tarojs/components";
-import Dice from "../Dice";
+import Dice from "../YahtzeeDice";
 import "./index.scss";
 
 interface IProps {

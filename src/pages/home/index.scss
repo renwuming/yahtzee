@@ -4,11 +4,11 @@
   align-items: center;
   box-sizing: border-box;
   min-height: 100%;
-  background-color: #46b3ff;
+  background-color: #eef5ff;
   padding: 20px 0;
   .version {
     margin-top: 30px;
-    color: #eee;
+    color: #999;
   }
   .user-info {
     display: flex;
@@ -19,7 +19,7 @@
     .icon-row {
       margin-top: 20px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       width: 150px;
     }
   }
@@ -37,9 +37,9 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 88px;
-        height: 88px;
-        border-radius: 88px;
+        width: 90px;
+        height: 90px;
+        border-radius: 90px;
         vertical-align: middle;
       }
     }

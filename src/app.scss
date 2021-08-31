@@ -1,7 +1,6 @@
 page {
   min-height: 100%;
   height: 100%;
-  background-color: #46b3ff;
 }
 .at-row {
   box-sizing: border-box;
@@ -13,7 +12,7 @@ page {
 }
 .at-button--secondary.at-button--secondary {
   color: #f1b53d;
-  border: 1px solid #f7f7f7;
+  border: 1px solid #f1b53d;
   background: #f7f7f7;
 }
 .loading {
@@ -59,5 +58,5 @@ page {
 }
 @font-face {
   font-family: "LCDAT";
-  src: url("https://cdn.renwuming.cn/static/fonts/LCDAT.ttf") format("truetype");
+  src: url("./assets/fonts/LCDAT.ttf") format("truetype");
 }

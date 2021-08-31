@@ -22,15 +22,15 @@ export default function Index({ index, game, type = "hall" }: IProps) {
   const draw = winner < 0;
   const win = !singleGame && openids.indexOf(openid) === winner;
 
-  function gotoGame() {
-    navigateTo(`game/index?id=${_id}`);
+  function gotoGame(gameType: string) {
+    navigateTo(gameType, `game/index?id=${_id}`);
   }
 
   return (
     <View
       className="game-item"
       onClick={() => {
-        gotoGame();
+        gotoGame("Yahtzee");
       }}
     >
       <Text className="index">{index + 1}</Text>

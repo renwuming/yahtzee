@@ -1,0 +1,45 @@
+.dice {
+  .item {
+    box-sizing: border-box;
+    width: 80px;
+    height: 80px;
+    background-image: url(../../assets/imgs/martian-dices.jpg);
+    background-size: 600% 100%;
+    background-repeat: no-repeat;
+    background-position: 120% 0;
+    &.disabled {
+      opacity: 0.6;
+    }
+    &.dice4 {
+      background-position: 60% 0;
+    }
+    &.dice1 {
+      background-position: 0 0;
+    }
+    &.dice3 {
+      background-position: 40% 0;
+    }
+    &.dice6 {
+      background-position: 100% 0;
+    }
+    &.dice2 {
+      background-position: 20% 0;
+    }
+    &.dice5 {
+      background-position: 80% 0;
+    }
+    &.dicing {
+      background-position: 0 0;
+      animation: 0.5s steps(5, start) random infinite;
+    }
+  }
+  .freezing {
+    border: 10px solid #c6a36b;
+  }
+
+  @keyframes random {
+    to {
+      background-position: 100% 0;
+    }
+  }
+}

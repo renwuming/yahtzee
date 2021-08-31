@@ -38,7 +38,7 @@
         },
         {
           "name": "大厅",
-          "pathName": "pages/hall/index",
+          "pathName": "pages/Yahtzee/hall/index",
           "query": "",
           "scene": null
         },
@@ -52,6 +52,12 @@
           "name": "游戏指导",
           "pathName": "pages/guide/index",
           "query": "id=2d44d6c26110f22f040229aa4422ad8b",
+          "scene": null
+        },
+        {
+          "name": "火星骰",
+          "pathName": "pages/MartianDice/game/index",
+          "query": "",
           "scene": null
         }
       ]

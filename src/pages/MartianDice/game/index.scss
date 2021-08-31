@@ -1,0 +1,53 @@
+page {
+  min-height: 100%;
+  height: 100%;
+  background-color: #06050a;
+  z-index: -1;
+}
+
+.martian-game {
+  .bk-img {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.7;
+    z-index: -1;
+  }
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 20px;
+  .dice-list-box {
+    flex: 1;
+    box-sizing: border-box;
+    padding: 0 20px;
+    .dice-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  .btn-box {
+    .at-button {
+      width: 300px;
+      height: 90px;
+    }
+    .dice-num {
+      position: absolute;
+      display: inline-block;
+      top: 22px;
+      right: 14px;
+      width: 46px;
+      height: 46px;
+      line-height: 46px;
+      border-radius: 46px;
+      background-color: #e97a29;
+      color: #fff;
+      font-size: 32px;
+      font-weight: bold;
+    }
+  }
+}

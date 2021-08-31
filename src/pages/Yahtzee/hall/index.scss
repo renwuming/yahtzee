@@ -40,6 +40,21 @@
     &.reload {
       bottom: 100px;
     }
+    &.guide {
+      left: 50px;
+      right: initial;
+      bottom: 380px;
+    }
+    &.ranking {
+      left: 50px;
+      right: initial;
+      bottom: 240px;
+    }
+    &.history {
+      left: 50px;
+      right: initial;
+      bottom: 100px;
+    }
     &.create-room {
       bottom: 240px;
       .at-badge__num {

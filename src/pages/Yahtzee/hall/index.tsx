@@ -9,9 +9,10 @@ import "taro-ui/dist/style/components/fab.scss";
 import "taro-ui/dist/style/components/badge.scss";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
-import GameItem from "../../Components/GameItem";
-import { PAGE_LEN } from "../../const";
+import GameItem from "../../../Components/GameItem";
+import { PAGE_LEN } from "../../../const";
 import { createGame } from "../game/gameApi";
+import { navigateTo } from "../../../utils";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -150,6 +151,33 @@ export default function Index() {
           }}
         >
           <Text className="at-fab__icon at-icon at-icon-reload"></Text>
+        </AtFab>
+      </View>
+      <View className="fab-btn guide">
+        <AtFab
+          onClick={() => {
+            navigateTo("Yahtzee", `guide/index`);
+          }}
+        >
+          <Text className="at-fab__icon at-icon at-icon-help"></Text>
+        </AtFab>
+      </View>
+      <View className="fab-btn ranking">
+        <AtFab
+          onClick={() => {
+            navigateTo("Yahtzee", `ranking/index`);
+          }}
+        >
+          <Text className="at-fab__icon at-icon at-icon-numbered-list"></Text>
+        </AtFab>
+      </View>
+      <View className="fab-btn history">
+        <AtFab
+          onClick={() => {
+            navigateTo("Yahtzee", `history/index`);
+          }}
+        >
+          <Text className="at-fab__icon at-icon at-icon-clock"></Text>
         </AtFab>
       </View>
     </View>

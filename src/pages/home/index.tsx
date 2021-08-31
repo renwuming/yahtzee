@@ -6,16 +6,12 @@ import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/modal.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
-import {
-  forceGetUserProfile,
-  getUserProfile,
-  navigateTo,
-  VERSION,
-} from "../../utils";
+// @ts-ignore
+import LogoImg from "../../assets/imgs/share.png";
+import { forceGetUserProfile, navigateTo, VERSION } from "../../utils";
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
 import { useState } from "react";
-import { createGame } from "../game/gameApi";
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<any>(
@@ -26,12 +22,12 @@ export default function Index() {
   useShareAppMessage(() => {
     const { nickName } = userInfo;
     const title = nickName
-      ? `${nickName}邀请你来快艇骰子！`
-      : "快艇骰子，一决高下！";
+      ? `${nickName}邀请你来玩骰子桌游大全！`
+      : "骰子桌游大全，一决高下！";
     return {
       title,
       path: `/pages/home/index`,
-      imageUrl: "http://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
+      imageUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
     };
   });
 
@@ -44,19 +40,16 @@ export default function Index() {
   return (
     <View className="home">
       <LoadPage></LoadPage>
-      <Image
-        className="cover"
-        src="http://cdn.renwuming.cn/static/yahtzee/imgs/share.png"
-      ></Image>
+      <Image className="cover" src={LogoImg}></Image>
       <Text className="version">{VERSION}</Text>
       <View className="user-info">
-        <Player data={userInfo}></Player>
+        <Player data={userInfo} colorType="black"></Player>
         <View className="at-row icon-row">
           <AtIcon
             className="setting"
             value="settings"
             size="30"
-            color="#176999"
+            color="#666"
             onClick={() => {
               forceGetUserProfile(() => {
                 const userInfo = Taro.getStorageSync("userInfo");
@@ -64,53 +57,31 @@ export default function Index() {
               });
             }}
           ></AtIcon>
-          <AtIcon
-            className="help"
-            value="help"
-            size="30"
-            color="#176999"
-            onClick={() => {
-              navigateTo(`guide/index`);
-            }}
-          ></AtIcon>
         </View>
       </View>
       <View className="btn-list">
         <AtButton
-          type="primary"
-          onClick={() => {
-            getUserProfile(createGame);
-          }}
-        >
-          开始
-        </AtButton>
-        <AtButton
-          type="primary"
-          onClick={() => {
-            navigateTo(`hall/index`);
-          }}
-        >
-          房间大厅
-        </AtButton>
-        <AtButton
+          circle
           type="secondary"
           onClick={() => {
-            navigateTo(`ranking/index`);
+            navigateTo("MartianDice", `hall/index`);
           }}
         >
-          排行榜
-        </AtButton>
-        <AtButton
-          type="secondary"
-          onClick={() => {
-            navigateTo(`history/index`);
-          }}
-        >
-          历史记录
+          火星骰
         </AtButton>
         <AtButton
           circle
-          type="secondary"
+          type="primary"
+          onClick={() => {
+            navigateTo("Yahtzee", `hall/index`);
+          }}
+        >
+          <Image src="https://cdn.renwuming.cn/static/yahtzee/imgs/share.png"></Image>
+          快艇骰子
+        </AtButton>
+        <AtButton
+          circle
+          type="primary"
           onClick={() => {
             gotoJmz();
           }}

@@ -1,4 +1,6 @@
 import { View, Text, Image } from "@tarojs/components";
+/* @ts-ignore */
+import yahtzeeImg from "../../assets/imgs/yahtzee.png";
 import "./icons.scss";
 
 export function Dice1() {
@@ -121,7 +123,7 @@ export function Straight() {
 export function FiveOfKind() {
   return (
     <View className="box text-box">
-      <Image src="https://cdn.renwuming.cn/static/yahtzee/imgs/yahtzee.png" />
+      <Image src={yahtzeeImg} />
     </View>
   );
 }

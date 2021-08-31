@@ -1,11 +1,14 @@
 export default {
   pages: [
     "pages/home/index",
-    "pages/game/index",
-    "pages/ranking/index",
-    "pages/hall/index",
-    "pages/history/index",
-    "pages/guide/index",
+    // 快艇骰子
+    "pages/Yahtzee/game/index",
+    "pages/Yahtzee/ranking/index",
+    "pages/Yahtzee/hall/index",
+    "pages/Yahtzee/history/index",
+    "pages/Yahtzee/guide/index",
+    // 火星骰
+    "pages/MartianDice/game/index",
   ],
   window: {
     backgroundTextStyle: "light",

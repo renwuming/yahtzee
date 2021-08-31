@@ -21,14 +21,19 @@ import {
   DICE_NUM,
   ROUND_TIME_LIMIT,
   SHOW_ROUND_TIME_LIMIT,
-} from "../../const";
-import PlayerList from "../../Components/PlayerList";
-import DiceList from "../../Components/DiceList";
-import RatingTable from "../../Components/RatingTable";
-import Player from "../../Components/Player";
-import LoadPage from "../../Components/LoadPage";
+} from "../../../const";
+import PlayerList from "../../../Components/PlayerList";
+import DiceList from "../../../Components/YahtzeeDiceList";
+import RatingTable from "../../../Components/YahtzeeRatingTable";
+import Player from "../../../Components/Player";
+import LoadPage from "../../../Components/LoadPage";
 
-import { getUserProfile, navigateTo, SLEEP, watchDataBase } from "../../utils";
+import {
+  getUserProfile,
+  navigateTo,
+  SLEEP,
+  watchDataBase,
+} from "../../../utils";
 import {
   getGameData,
   handleGameData,
@@ -53,7 +58,7 @@ export default function Index() {
     return {
       title,
       path: `/pages/game/index?id=${id}`,
-      imageUrl: "http://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
+      imageUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
     };
   });
 
@@ -84,13 +89,6 @@ export default function Index() {
     otherScores: DEFAULT_SCORES,
   };
 
-  useDidHide(() => {
-    setPageShow(false);
-  });
-  useDidShow(() => {
-    setPageShow(true);
-  });
-
   const cb = useRef(null);
   cb.current = (data, updatedFields = []) => {
     if (dicing) return;
@@ -107,6 +105,18 @@ export default function Index() {
     }
   };
 
+  useDidHide(() => {
+    setPageShow(false);
+  });
+  useDidShow(() => {
+    // 进入页面时初始化数据
+    const id = getCurrentInstance()?.router?.params?.id;
+    getGameData(id).then((data) => {
+      init(data);
+    });
+    setPageShow(true);
+  });
+
   // 监听dicing状态变化
   useEffect(() => {
     if (dicing) return;
@@ -120,7 +130,6 @@ export default function Index() {
     if (!pageShow) return;
 
     const watcher = watchDataBase(id, cb);
-
     return () => {
       watcher.close();
     };
@@ -413,7 +422,7 @@ export default function Index() {
       <View
         className="guide-btn"
         onClick={() => {
-          navigateTo("guide/index");
+          navigateTo("Yahtzee", "guide/index");
         }}
       >
         <AtFab size="small">帮助</AtFab>

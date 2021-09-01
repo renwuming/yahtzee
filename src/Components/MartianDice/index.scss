@@ -3,12 +3,17 @@
     box-sizing: border-box;
     width: 80px;
     height: 80px;
+    box-sizing: border-box;
     background-image: url(../../assets/imgs/martian-dices.jpg);
     background-size: 600% 100%;
     background-repeat: no-repeat;
     background-position: 120% 0;
     &.disabled {
       opacity: 0.6;
+    }
+    &.can-select {
+      border: 3px solid #49b548;
+      border-radius: 6px;
     }
     &.dice4 {
       background-position: 60% 0;

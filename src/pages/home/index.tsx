@@ -7,11 +7,19 @@ import "taro-ui/dist/style/components/modal.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 // @ts-ignore
-import LogoImg from "../../assets/imgs/share.png";
-import { forceGetUserProfile, navigateTo, VERSION } from "../../utils";
+import YahtzeeLogoImg from "../../assets/imgs/yahtzee-share.png";
+// @ts-ignore
+import MartianLogoImg from "../../assets/imgs/martian-share.jpg";
+import {
+  forceGetUserProfile,
+  getUserProfile,
+  navigateTo,
+  VERSION,
+} from "../../utils";
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
 import { useState } from "react";
+import { createGame } from "../Martian/game/gameApi";
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<any>(
@@ -40,7 +48,7 @@ export default function Index() {
   return (
     <View className="home">
       <LoadPage></LoadPage>
-      <Image className="cover" src={LogoImg}></Image>
+      <Image className="cover" src={YahtzeeLogoImg}></Image>
       <Text className="version">{VERSION}</Text>
       <View className="user-info">
         <Player data={userInfo} colorType="black"></Player>
@@ -62,21 +70,27 @@ export default function Index() {
       <View className="btn-list">
         <AtButton
           circle
-          type="secondary"
+          type="primary"
           onClick={() => {
-            navigateTo("MartianDice", `hall/index`);
+            getUserProfile(() => {
+              // navigateTo("Martian", `hall/index`);
+              createGame();
+            });
           }}
         >
+          <Image src={MartianLogoImg}></Image>
           火星骰
         </AtButton>
         <AtButton
           circle
           type="primary"
           onClick={() => {
-            navigateTo("Yahtzee", `hall/index`);
+            getUserProfile(() => {
+              navigateTo("Yahtzee", `hall/index`);
+            });
           }}
         >
-          <Image src="https://cdn.renwuming.cn/static/yahtzee/imgs/share.png"></Image>
+          <Image src={YahtzeeLogoImg}></Image>
           快艇骰子
         </AtButton>
         <AtButton

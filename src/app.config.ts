@@ -8,13 +8,14 @@ export default {
     "pages/Yahtzee/history/index",
     "pages/Yahtzee/guide/index",
     // 火星骰
-    "pages/MartianDice/game/index",
+    "pages/Martian/game/index",
+    "pages/Martian/hall/index",
   ],
   window: {
     backgroundTextStyle: "light",
     navigationBarBackgroundColor: "#fff",
     navigationBarTitleText: "骰子桌游大全",
     navigationBarTextStyle: "black",
-    backgroundColor: "#46b3ff",
+    backgroundColor: "#eef5ff",
   },
 };

@@ -1,0 +1,45 @@
+.player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  padding: 0 10px;
+  &.active {
+    background-color: #999;
+  }
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    &.offline {
+      opacity: 0.4;
+    }
+    .avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 70px;
+    }
+    text {
+      color: #fff;
+      font-size: 26px;
+      width: 110px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      &.black {
+        color: #666;
+      }
+    }
+  }
+  .score {
+    width: 50px;
+    text-align: center;
+    text {
+      font-size: 40px;
+      color: #f4fcfe;
+      font-family: TrebuchetMS;
+    }
+  }
+}

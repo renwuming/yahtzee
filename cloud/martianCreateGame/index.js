@@ -16,7 +16,7 @@ exports.main = async (event) => {
 
   // 先查询是否有未开始的游戏
   const [game] = await db
-    .collection("yahtzee_games")
+    .collection("martian_games")
     .where({
       "owner.openid": OPENID,
       start: _.neq(true),
@@ -36,7 +36,7 @@ exports.main = async (event) => {
   });
 
   const date = new Date();
-  const res = await db.collection("yahtzee_games").add({
+  const res = await db.collection("martian_games").add({
     data: {
       start: false,
       owner: player,

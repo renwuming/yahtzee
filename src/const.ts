@@ -25,16 +25,8 @@ export const DEFAULT_SCORES: Scores = {
 
 // 火星骰
 export enum MartianStage {
-  Dice,
+  Dice = 1,
   Select,
-}
-export enum MartianDice {
-  ufo = 1,
-  chook,
-  cow,
-  man,
-  ufo2,
-  tank,
 }
 export const MartianDiceMap = [
   null,
@@ -45,8 +37,3 @@ export const MartianDiceMap = [
   "ufo",
   "tank",
 ];
-export const MARTIAN_DICE_NUM = 13;
-export const MARTIAN_DEFAULT_DICE_LIST: DiceData[] = [];
-export function sortMartianDiceList(a, b) {
-  return a.value - b.value;
-}

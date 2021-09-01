@@ -1,12 +1,12 @@
 import { View } from "@tarojs/components";
-import { MartianDice } from "../../const";
+import { MartianDiceMap } from "../../const";
 import "./index.scss";
 
 interface IProps {
-  diceData: DiceData;
-  selectDice?: (dice: DiceData) => void;
+  diceData: Martian.DiceData;
+  selectDice?: (dice: Martian.DiceData) => void;
   canSelect?: boolean;
-  diceResultData?: DiceData[];
+  awardList?: Martian.DiceData[];
   onlyShow?: boolean;
 }
 
@@ -14,7 +14,7 @@ export default function Index({
   diceData,
   selectDice = () => {},
   canSelect = false,
-  diceResultData = [],
+  awardList = [],
   onlyShow = true,
 }: IProps) {
   const { value } = diceData;
@@ -22,14 +22,14 @@ export default function Index({
   // 已选过的战利品，不可再次选择
   const realCanSelect =
     canSelect &&
-    (value === MartianDice.ufo ||
-      !diceResultData.map((item) => item.value).includes(value));
+    (MartianDiceMap[value] === "ufo" ||
+      !awardList.map((item) => item.value).includes(value));
 
   return (
     <View className="dice">
       <View
         className={`item dice${value} ${
-          !onlyShow && !realCanSelect && "disabled"
+          !onlyShow && (realCanSelect ? "can-select" : "disabled")
         }`}
         onClick={() => {
           if (!realCanSelect) return;

@@ -19,39 +19,15 @@
           "scene": null
         },
         {
-          "name": "prod2",
-          "pathName": "pages/game/index",
-          "query": "id=2d44d6c2611a664e05854ac126adb4e8",
-          "scene": null
-        },
-        {
           "name": "快艇骰子",
           "pathName": "pages/Yahtzee/game/index",
           "query": "id=2d44d6c261133a83046596a246600bfb",
           "scene": null
         },
         {
-          "name": "ranking",
-          "pathName": "pages/ranking/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "大厅",
+          "name": "快艇大厅",
           "pathName": "pages/Yahtzee/hall/index",
           "query": "",
-          "scene": null
-        },
-        {
-          "name": "历史记录",
-          "pathName": "pages/history/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "游戏指导",
-          "pathName": "pages/guide/index",
-          "query": "id=2d44d6c26110f22f040229aa4422ad8b",
           "scene": null
         },
         {
@@ -64,6 +40,30 @@
           "name": "火星骰多人",
           "pathName": "pages/Martian/game/index",
           "query": "id=cd045e75612e6db40956624d5d7f5981",
+          "scene": null
+        },
+        {
+          "name": "火星骰多人2",
+          "pathName": "pages/Martian/game/index",
+          "query": "id=cd045e756134735d0ae37b2709efb77a",
+          "scene": null
+        },
+        {
+          "name": "快艇排行榜",
+          "pathName": "pages/Yahtzee/ranking/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "火星骰大厅",
+          "pathName": "pages/Martian/hall/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "快艇骰子2",
+          "pathName": "pages/Yahtzee/game/index",
+          "query": "id=14139e126114aef404aeaf213538207e",
           "scene": null
         }
       ]

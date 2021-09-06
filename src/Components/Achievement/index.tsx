@@ -1,35 +1,54 @@
 import { View, Text, CommonEventFunction, Image } from "@tarojs/components";
-import { AtModal, AtModalHeader, AtModalContent } from "taro-ui";
+import {
+  AtModal,
+  AtModalHeader,
+  AtModalContent,
+  AtTabs,
+  AtTabsPane,
+} from "taro-ui";
+import "taro-ui/dist/style/components/tabs.scss";
 import { useEffect, useState } from "react";
 import { CallCloudFunction } from "../../utils";
 import "./index.scss";
 import "taro-ui/dist/style/components/modal.scss";
+import { AchievementGameIndex } from "../../const";
 
 interface IProps {
   data: Player;
   isOpened: boolean;
   onClose: CommonEventFunction<any>;
+  initGameIndex?: number;
 }
 
-export default function Index({ data, isOpened, onClose }: IProps) {
-  const [achievementData, setAchievementData] = useState<Player>(null);
+export default function Index({
+  data,
+  isOpened,
+  onClose,
+  initGameIndex = AchievementGameIndex.yahtzee,
+}: IProps) {
+  const tabList = [{ title: "快艇骰子" }, { title: "火星骰" }];
+  const [tabIndex, setTabIndex] = useState<number>(initGameIndex);
+  const [achievementData, setAchievementData] = useState<any>(null);
 
   const { openid, nickName, avatarUrl } = data;
 
   async function initAchievement() {
-    const data = await CallCloudFunction({
+    const { achievement } = await CallCloudFunction({
       name: "getPlayers",
       data: { openid },
     });
-    setAchievementData(data);
+    setAchievementData(achievement);
   }
 
   useEffect(() => {
     if (isOpened) initAchievement();
   }, [isOpened]);
 
-  const { singleNum, multiNum, multiWinSum, multiWinRate, highScore } =
-    achievementData || {};
+  const { yahtzee, martian } = achievementData || {};
+
+  function handleAchievementValue(value) {
+    return value === undefined || value === null ? "-" : value;
+  }
 
   return (
     <View className="achievement-box">
@@ -41,26 +60,78 @@ export default function Index({ data, isOpened, onClose }: IProps) {
           </View>
         </AtModalHeader>
         <AtModalContent>
-          <View className="detail-row">
-            <Text className="left red">最高分</Text>
-            <Text className="red">{highScore}</Text>
-          </View>
-          <View className="detail-row">
-            <Text className="left red">多人局胜率</Text>
-            <Text className="red">{multiWinRate}</Text>
-          </View>
-          <View className="detail-row">
-            <Text className="left">多人局胜利</Text>
-            <Text className="info">{multiWinSum}</Text>
-          </View>
-          <View className="detail-row">
-            <Text className="left">多人局总数</Text>
-            <Text className="info">{multiNum}</Text>
-          </View>
-          <View className="detail-row">
-            <Text className="left">单人局总数</Text>
-            <Text className="info">{singleNum}</Text>
-          </View>
+          <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
+            <AtTabsPane current={tabIndex} index={0}>
+              <View className="detail-row">
+                <Text className="left red">最高分</Text>
+                <Text className="red">
+                  {handleAchievementValue(yahtzee?.highScore)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局胜率</Text>
+                <Text className="info">
+                  {handleAchievementValue(yahtzee?.multiWinRate)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局胜利</Text>
+                <Text className="info">
+                  {handleAchievementValue(yahtzee?.multiWinSum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局总数</Text>
+                <Text className="info">
+                  {handleAchievementValue(yahtzee?.multiNum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">单人局总数</Text>
+                <Text className="info">
+                  {handleAchievementValue(yahtzee?.singleNum)}
+                </Text>
+              </View>
+            </AtTabsPane>
+            <AtTabsPane current={tabIndex} index={1}>
+              <View className="detail-row">
+                <Text className="left red">最高分</Text>
+                <Text className="red">
+                  {handleAchievementValue(martian?.highScore)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left red">单人局最少回合</Text>
+                <Text className="red">
+                  {handleAchievementValue(martian?.minRoundSum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局胜率</Text>
+                <Text className="info">
+                  {handleAchievementValue(martian?.multiWinRate)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局胜利</Text>
+                <Text className="info">
+                  {handleAchievementValue(martian?.multiWinSum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局总数</Text>
+                <Text className="info">
+                  {handleAchievementValue(martian?.multiNum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">单人局总数</Text>
+                <Text className="info">
+                  {handleAchievementValue(martian?.singleNum)}
+                </Text>
+              </View>
+            </AtTabsPane>
+          </AtTabs>
         </AtModalContent>
       </AtModal>
     </View>

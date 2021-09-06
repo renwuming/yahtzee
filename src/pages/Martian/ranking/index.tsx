@@ -15,12 +15,12 @@ function RankItem({ index, data, type }: RankItemProps) {
       {type === "score" ? (
         <View className="column-right">
           <Text className="score-title">分数</Text>
-          <Text className="score">{achievement?.yahtzee?.highScore}</Text>
+          <Text className="score">{achievement?.martian?.highScore}</Text>
         </View>
       ) : (
         <View className="column-right">
           <Text className="score-title">获胜局数</Text>
-          <Text className="score">{achievement?.yahtzee?.multiWinSum}</Text>
+          <Text className="score">{achievement?.martian?.multiWinSum}</Text>
         </View>
       )}
     </View>
@@ -35,7 +35,7 @@ import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
-import PlayerItem from "../../../Components/Player";
+import PlayerItem from "../../../Components/MartianPlayer";
 import { PAGE_LEN, RANKING_LEN } from "../../../const";
 import { CallCloudFunction } from "../../../utils";
 
@@ -52,7 +52,7 @@ export default function Index() {
   async function updateList1() {
     if (page1End) return;
     const list = await CallCloudFunction({
-      name: "yahtzeeGetRanking",
+      name: "martianGetRanking",
       data: {
         type: "score",
         skip: pageNum1 * PAGE_LEN,
@@ -72,7 +72,7 @@ export default function Index() {
     }
     if (page2End) return;
     const list = await CallCloudFunction({
-      name: "yahtzeeGetRanking",
+      name: "martianGetRanking",
       data: {
         type: "sum",
         skip: pageNum2 * PAGE_LEN,
@@ -92,7 +92,7 @@ export default function Index() {
   }, []);
 
   return (
-    <View className="ranking">
+    <View className="martian-ranking">
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
           <ScrollView
@@ -112,15 +112,15 @@ export default function Index() {
               <AtDivider
                 className="divider"
                 content={`只显示前${RANKING_LEN}名`}
-                fontColor="#fff"
-                lineColor="#fff"
+                fontColor="#666"
+                lineColor="#666"
               />
             ) : (
               <AtIcon
                 className="loading"
                 value="loading-3"
                 size="36"
-                color="#fff"
+                color="#666"
               ></AtIcon>
             )}
           </ScrollView>
@@ -143,15 +143,15 @@ export default function Index() {
               <AtDivider
                 className="divider"
                 content={`只显示前${RANKING_LEN}名`}
-                fontColor="#fff"
-                lineColor="#fff"
+                fontColor="#666"
+                lineColor="#666"
               />
             ) : (
               <AtIcon
                 className="loading"
                 value="loading-3"
                 size="36"
-                color="#fff"
+                color="#666"
               ></AtIcon>
             )}
           </ScrollView>

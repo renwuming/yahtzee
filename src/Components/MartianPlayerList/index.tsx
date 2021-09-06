@@ -20,7 +20,7 @@ export default function Index({
   kickPlayer = () => {},
 }: IProps) {
   return (
-    <View className="player-list">
+    <View className="martian-player-list">
       {players.map((player, index) => (
         <Player
           data={player}

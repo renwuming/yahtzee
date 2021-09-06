@@ -1,3 +1,9 @@
+export enum AchievementGameIndex {
+  yahtzee,
+  martian,
+}
+
+// 快艇骰子
 export const ROUND_TIME_LIMIT = 65;
 export const SHOW_ROUND_TIME_LIMIT = 60;
 export const DICE_NUM = 5;
@@ -24,6 +30,9 @@ export const DEFAULT_SCORES: Scores = {
 };
 
 // 火星骰
+export const MARTIAN_ROUND_TIME_LIMIT = 65;
+export const MARTIAN_SHOW_ROUND_TIME_LIMIT = 60;
+export const MAX_PLAYERS = 4;
 export enum MartianStage {
   Dice = 1,
   Select,

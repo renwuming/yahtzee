@@ -15,7 +15,7 @@ exports.main = async (event) => {
   if (type === "score") {
     const list = await db
       .collection("players")
-      .orderBy("achievement.yahtzee.highScore", "desc")
+      .orderBy("achievement.martian.highScore", "desc")
       .field({
         avatarUrl: 1,
         nickName: 1,
@@ -31,7 +31,7 @@ exports.main = async (event) => {
   } else if (type === "sum") {
     const list = await db
       .collection("players")
-      .orderBy("achievement.yahtzee.multiWinSum", "desc")
+      .orderBy("achievement.martian.multiWinSum", "desc")
       .field({
         avatarUrl: 1,
         nickName: 1,

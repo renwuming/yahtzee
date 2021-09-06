@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import { MartianStage } from "../../../const";
+import { MartianDiceMap, MartianStage, MAX_PLAYERS } from "../../../const";
 import { CallCloudFunction, DB, navigateTo } from "../../../utils";
 
 export async function getGameData(id: string): Promise<Martian.GameBaseData> {
@@ -35,6 +35,7 @@ export function handleGameData(data: Martian.GameBaseData): Martian.GameData {
   const { owner, players, roundPlayer, round } = data;
 
   const own = owner.openid === openid;
+  const canJoin = players.length < MAX_PLAYERS;
   const openids = players.map((item) => item.openid);
   const playerIndex = openids.indexOf(openid);
   const inGame = playerIndex >= 0;
@@ -50,6 +51,7 @@ export function handleGameData(data: Martian.GameBaseData): Martian.GameData {
     inGame,
     inRound,
     playerIndex,
+    canJoin,
   };
 }
 
@@ -113,16 +115,24 @@ function handleRound(round: Martian.Round): Martian.Round {
   const awardKindsNum = getKindsNum(awardList);
   const ufoWin = ufoList.length >= tankList.length;
   const shouldRetreat = awardKindsNum === 3 && ufoWin;
-  const canSelect =
-    judgeSelect(diceList, awardList) && stage === MartianStage.Select;
+  const canSelectList = getCanSelectList(diceList, awardList);
+  const canSelectUfoList = canSelectList.filter(
+    ({ value }) => MartianDiceMap[value] === "ufo"
+  );
+  const canSelectUfo = canSelectUfoList.length > 0;
+  const allUfoToSelect = canSelectUfoList.length === canSelectList.length;
+  const canSelect = canSelectList.length > 0 && stage === MartianStage.Select;
   const roundScore = calculateScore(round);
 
   return {
     ...round,
+    roundScore,
     ufoCanWin,
     shouldRetreat,
     canSelect,
-    roundScore,
+    canSelectUfo,
+    allUfoToSelect,
+    ufoWin,
   };
 }
 
@@ -134,15 +144,13 @@ function calculateScore(round: Martian.Round): number {
   return basicScores + bonus;
 }
 
-function judgeSelect(
+function getCanSelectList(
   diceList: Martian.DiceData[],
   awardList: Martian.DiceData[]
-): boolean {
+): Martian.DiceData[] {
   const awardValueList = awardList.map((item) => item.value);
 
-  return (
-    diceList.filter(({ value }) => !awardValueList.includes(value)).length > 0
-  );
+  return diceList.filter(({ value }) => !awardValueList.includes(value));
 }
 
 function getKindsNum(list: Martian.DiceData[]): number {
@@ -182,7 +190,6 @@ export async function kickFromGame(id: string, openid: string) {
   });
 }
 
-
 export async function updatePlayerOnline_Database(game: Martian.GameData) {
   if (!game) return;
   const { _id, playerIndex, inGame } = game;
@@ -198,4 +205,3 @@ export async function updatePlayerOnline_Database(game: Martian.GameData) {
       },
     });
 }
-

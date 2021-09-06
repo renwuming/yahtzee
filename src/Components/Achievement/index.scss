@@ -6,7 +6,7 @@
     color: #555;
     .left {
       display: inline-block;
-      width: 220px;
+      width: 240px;
     }
     .red {
       color: #e6504b;
@@ -31,5 +31,14 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+  }
+  .at-tabs__body {
+    padding-top: 10px;
+  }
+  .at-modal__content {
+    min-height: 400px;
+  }
+  .at-modal__header::after {
+    border: 0;
   }
 }

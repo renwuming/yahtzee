@@ -9,7 +9,9 @@ export default {
     "pages/Yahtzee/guide/index",
     // 火星骰
     "pages/Martian/game/index",
+    "pages/Martian/ranking/index",
     "pages/Martian/hall/index",
+    "pages/Martian/history/index",
   ],
   window: {
     backgroundTextStyle: "light",

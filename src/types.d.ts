@@ -66,6 +66,7 @@ interface Player {
   multiWinRate: string;
   highScore: number;
   timeStamp: number;
+  achievement: any;
 }
 
 declare namespace Martian {
@@ -93,18 +94,23 @@ declare namespace Martian {
     inGame: boolean;
     inRound: boolean;
     playerIndex: number;
+    canJoin: boolean;
   }
 
   interface Round {
+    roundTimeStamp: number;
     stage: number;
     diceNum: number;
     diceList: DiceData[];
     tankList: DiceData[];
     ufoList: DiceData[];
     awardList: DiceData[];
+    roundScore: number;
     ufoCanWin: boolean;
     shouldRetreat: boolean;
     canSelect: boolean;
-    roundScore: number;
+    canSelectUfo: boolean;
+    allUfoToSelect: boolean;
+    ufoWin: boolean;
   }
 }

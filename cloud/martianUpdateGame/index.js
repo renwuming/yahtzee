@@ -111,9 +111,12 @@ async function handleUpdateData(action, oldData, data, env) {
     };
   }
   // 结束回合
-  else if (action === "endRound" && inRound) {
+  else if (action === "endRoundByTimer" || (action === "endRound" && inRound)) {
     const newData = endRound(round, players, roundPlayer, roundSum);
     const endData = judgeEnd(newData.players, roundPlayer, startPlayer);
+    if (endData.end) {
+      updatePlayer(players, env);
+    }
     return {
       ...newData,
       ...endData,
@@ -152,6 +155,7 @@ function newRound() {
     tankList: [],
     ufoList: [],
     awardList: [],
+    roundTimeStamp: Date.now(),
   };
 }
 function diceIt(round) {
@@ -271,27 +275,32 @@ function getNewRoundPlayerIndex(roundPlayer, players) {
   return newRoundPlayer;
 }
 
-// async function updatePlayer(players, env) {
-//   players.forEach(async (item) => {
-//     const { openid } = item;
+async function updatePlayer(players, env) {
+  players.forEach(async (item) => {
+    const { openid } = item;
 
-//     // 更新胜率等数据
-//     const { result: updateData } = await cloud.callFunction({
-//       name: "getAchievement",
-//       data: {
-//         env,
-//         id: openid,
-//       },
-//     });
+    // 更新胜率等数据
+    const { result: updateData } = await cloud.callFunction({
+      name: "updateAchievement",
+      data: {
+        env,
+        id: openid,
+        game: "martian",
+      },
+    });
 
-//     // 更新用户信息
-//     cloud.callFunction({
-//       name: "setPlayer",
-//       data: {
-//         env,
-//         openid,
-//         data: updateData,
-//       },
-//     });
-//   });
-// }
+    // 更新用户信息
+    cloud.callFunction({
+      name: "setPlayer",
+      data: {
+        env,
+        openid,
+        data: {
+          achievement: {
+            martian: updateData,
+          },
+        },
+      },
+    });
+  });
+}

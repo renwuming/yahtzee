@@ -5,7 +5,7 @@ export async function getHallGames(pageNum) {
   const skip = PAGE_LEN * pageNum;
 
   return await CallCloudFunction({
-    name: "yahtzeeGetHallGames",
+    name: "martianGetHallGames",
     data: {
       skip,
     },
@@ -16,7 +16,7 @@ export async function getMyGames(pageNum) {
   const skip = PAGE_LEN * pageNum;
 
   return await CallCloudFunction({
-    name: "yahtzeeGetMyGames",
+    name: "martianGetMyGames",
     data: {
       skip,
       type: "hall",

@@ -10,6 +10,8 @@ import "./index.scss";
 import YahtzeeLogoImg from "../../assets/imgs/yahtzee-share.png";
 // @ts-ignore
 import MartianLogoImg from "../../assets/imgs/martian-share.jpg";
+// @ts-ignore
+import CoverImg from "../../assets/imgs/cover.jpg";
 import {
   forceGetUserProfile,
   getUserProfile,
@@ -19,7 +21,6 @@ import {
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
 import { useState } from "react";
-import { createGame } from "../Martian/game/gameApi";
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<any>(
@@ -28,14 +29,11 @@ export default function Index() {
 
   // 设置分享
   useShareAppMessage(() => {
-    const { nickName } = userInfo;
-    const title = nickName
-      ? `${nickName}邀请你来玩骰子桌游大全！`
-      : "骰子桌游大全，一决高下！";
+    const title = "骰子桌游大全，各种骰子游戏，快来玩吧！";
     return {
       title,
       path: `/pages/home/index`,
-      imageUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
+      imageUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/cover.jpg",
     };
   });
 
@@ -48,7 +46,7 @@ export default function Index() {
   return (
     <View className="home">
       <LoadPage></LoadPage>
-      <Image className="cover" src={YahtzeeLogoImg}></Image>
+      <Image className="cover" src={CoverImg}></Image>
       <Text className="version">{VERSION}</Text>
       <View className="user-info">
         <Player data={userInfo} colorType="black"></Player>
@@ -73,8 +71,7 @@ export default function Index() {
           type="primary"
           onClick={() => {
             getUserProfile(() => {
-              // navigateTo("Martian", `hall/index`);
-              createGame();
+              navigateTo("Martian", `hall/index`);
             });
           }}
         >

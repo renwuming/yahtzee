@@ -26,7 +26,7 @@ export default function Index({
       !awardList.map((item) => item.value).includes(value));
 
   return (
-    <View className="dice">
+    <View className="martian-dice">
       <View
         className={`item dice${value} ${
           !onlyShow && (realCanSelect ? "can-select" : "disabled")

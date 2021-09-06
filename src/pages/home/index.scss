@@ -7,7 +7,7 @@
   background-color: #eef5ff;
   padding: 20px 0;
   .version {
-    margin-top: 30px;
+    margin-top: 10px;
     color: #999;
   }
   .user-info {
@@ -15,21 +15,23 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    margin-top: 60px;
+    margin-top: 20px;
     .icon-row {
-      margin-top: 20px;
+      margin-top: 10px;
       display: flex;
       justify-content: center;
       width: 150px;
     }
   }
   .cover {
-    width: 300px;
-    height: 300px;
+    width: 500px;
+    height: 500px;
+    border-radius: 20px;
   }
   .btn-list {
     box-sizing: border-box;
-    padding: 50px;
+    margin-top: 30px;
+    padding: 0 50px;
     width: 80%;
     .at-button {
       margin-bottom: 40px;

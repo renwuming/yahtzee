@@ -6,12 +6,14 @@ import Taro, {
 } from "@tarojs/taro";
 import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtModal } from "taro-ui";
-// @ts-ignore
-import BkImg from "../../../assets/imgs/martian-bk.jpg";
 import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
 import Dice from "../../../Components/MartianDice";
-import { MartianStage } from "../../../const";
+import {
+  MartianStage,
+  MARTIAN_ROUND_TIME_LIMIT,
+  MARTIAN_SHOW_ROUND_TIME_LIMIT,
+} from "../../../const";
 import { useEffect, useRef, useState } from "react";
 import {
   diceIt,
@@ -53,7 +55,8 @@ export default function Index() {
     useState<boolean>(false);
   const [showConfirmEndModal, setShowConfirmEndModal] =
     useState<boolean>(false);
-  const [dicing, setDicing] = useState<boolean>(false);
+  const [waiting, setWaiting] = useState<boolean>(false);
+  const [roundCountDown, setRoundCountDown] = useState<number | string>(100);
 
   useDidHide(() => {
     setPageShow(false);
@@ -97,8 +100,17 @@ export default function Index() {
     };
   }, [pageShow]);
 
-  const { round, own, start, end, inRound, inGame, winners, roundSum } =
-    gameData || {};
+  const {
+    round,
+    own,
+    start,
+    end,
+    inRound,
+    inGame,
+    winners,
+    roundSum,
+    canJoin,
+  } = gameData || {};
   const {
     stage,
     diceNum,
@@ -106,10 +118,14 @@ export default function Index() {
     tankList,
     ufoList,
     awardList,
+    roundScore,
     ufoCanWin,
     shouldRetreat,
     canSelect,
-    roundScore,
+    canSelectUfo,
+    allUfoToSelect,
+    ufoWin,
+    roundTimeStamp,
   } = round || {};
 
   const canDice =
@@ -129,35 +145,34 @@ export default function Index() {
       updatePlayerOnline_Database(gameData);
     }, 2000);
 
-    // const roundTimer = setInterval(() => {
-    //   const timeStamp = Date.now();
-    //   const roundCountDown = Math.floor(
-    //     ROUND_TIME_LIMIT - (timeStamp - (roundTimeStamp || timeStamp)) / 1000
-    //   );
-    //   const showRoundCountDown = (roundCountDown >= 0 ? roundCountDown : 0)
-    //     .toString()
-    //     .padStart(2, "0");
-    //   setRoundCountDown(showRoundCountDown);
-    // }, 500);
+    const roundTimer = setInterval(() => {
+      const timeStamp = Date.now();
+      const roundCountDown = Math.floor(
+        MARTIAN_ROUND_TIME_LIMIT -
+          (timeStamp - (roundTimeStamp || timeStamp)) / 1000
+      );
+      const showRoundCountDown = (roundCountDown >= 0 ? roundCountDown : 0)
+        .toString()
+        .padStart(2, "0");
+      setRoundCountDown(showRoundCountDown);
+    }, 500);
 
     return () => {
       clearInterval(timer);
-      // clearInterval(roundTimer);
+      clearInterval(roundTimer);
     };
-  }, [
-    end,
-    pageShow,
-    gameData,
-    // roundTimeStamp
-  ]);
+  }, [end, pageShow, gameData, roundTimeStamp]);
 
   function selectTheDice({ value }) {
     if (!inRound) return;
     selectDice(id, value);
   }
 
-  function endTheRound() {
-    endRound(id);
+  async function endTheRound() {
+    if (waiting) return;
+    setWaiting(true);
+    await endRound(id);
+    setWaiting(false);
   }
 
   function clickStartBtn() {
@@ -180,7 +195,15 @@ export default function Index() {
   function clickEndRoundBtn() {
     if (stage === MartianStage.Dice && !canDice) {
       endTheRound();
-    } else if (stage === MartianStage.Select && !canSelect) {
+    } else if (
+      stage === MartianStage.Select &&
+      (!canSelect ||
+        !ufoCanWin ||
+        // 无法选择飞碟，并且坦克多于飞碟
+        (!canSelectUfo && !ufoWin) ||
+        // 掷骰子结果全是飞碟，并且坦克少于飞碟或者战利品为0
+        (allUfoToSelect && (ufoWin || awardList.length === 0)))
+    ) {
       endTheRound();
     } else {
       setShowConfirmEndModal(true);
@@ -188,14 +211,18 @@ export default function Index() {
   }
   // 掷骰子
   async function clickDiceIt() {
-    if (dicing) return;
-    setDicing(true);
+    if (waiting) return;
+    setWaiting(true);
     await diceIt(id);
-    setDicing(false);
+    setWaiting(false);
   }
   return (
     <View className="martian-game">
-      <Image className="bk-img" src={BkImg} mode="aspectFill" />
+      <Image
+        className="bk-img"
+        src="https://cdn.renwuming.cn/static/martian/imgs/martian-bk.jpg"
+        mode="aspectFill"
+      />
       <PlayerList
         players={players}
         start={start}
@@ -204,6 +231,18 @@ export default function Index() {
         kickPlayer={kickPlayer}
         showOffline={!end}
       ></PlayerList>
+      {start && !end && !singlePlayer && (
+        <View className="at-row at-row__align--center count-down-box">
+          {/* 倒计时小于一定时间再显示，避免回合切换时的突兀 */}
+          {roundCountDown <= MARTIAN_SHOW_ROUND_TIME_LIMIT && (
+            <View
+              className={`count-down ${roundCountDown < 10 ? "error" : ""}`}
+            >
+              {roundCountDown}
+            </View>
+          )}
+        </View>
+      )}
       {end ? (
         <View className="dice-list-box no-padding at-row at-row__align--center">
           {singlePlayer ? (
@@ -330,6 +369,7 @@ export default function Index() {
                     joinGame(id);
                   });
                 }}
+                disabled={!canJoin}
               >
                 加入
               </AtButton>

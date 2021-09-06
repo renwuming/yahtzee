@@ -57,7 +57,7 @@ export default function Index() {
       : "快艇骰子，一决高下！";
     return {
       title,
-      path: `/pages/game/index?id=${id}`,
+      path: `/pages/Yahtzee/game/index?id=${id}`,
       imageUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
     };
   });

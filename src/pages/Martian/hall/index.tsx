@@ -9,7 +9,7 @@ import "taro-ui/dist/style/components/fab.scss";
 import "taro-ui/dist/style/components/badge.scss";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
-import GameItem from "../../../Components/GameItem";
+import GameItem from "../../../Components/MartianGameItem";
 import { PAGE_LEN } from "../../../const";
 import { createGame } from "../game/gameApi";
 import { navigateTo } from "../../../utils";
@@ -17,9 +17,9 @@ import { navigateTo } from "../../../utils";
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
   const tabList = [{ title: "大厅" }, { title: "我的房间" }];
-  const [hallGameList, setHallGameList] = useState<GameData[]>([]);
+  const [hallGameList, setHallGameList] = useState<Martian.GameData[]>([]);
   const [hallPageNum, setHallPageNum] = useState<number>(0);
-  const [myGameList, setMyGameList] = useState<GameData[]>([]);
+  const [myGameList, setMyGameList] = useState<Martian.GameData[]>([]);
   const [myPageNum, setMyPageNum] = useState<number>(0);
   const [hallPageEnd, setHallPageEnd] = useState<boolean>(false);
   const [myPageEnd, setMyPageEnd] = useState<boolean>(false);
@@ -70,7 +70,7 @@ export default function Index() {
   }
 
   return (
-    <View className="hall">
+    <View className="martian-hall">
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
           <ScrollView
@@ -88,15 +88,15 @@ export default function Index() {
               <AtDivider
                 className="divider"
                 content="只显示最近3小时的活跃房间"
-                fontColor="#fff"
-                lineColor="#fff"
+                fontColor="#666"
+                lineColor="#666"
               />
             ) : (
               <AtIcon
                 className="loading"
                 value="loading-3"
                 size="36"
-                color="#fff"
+                color="#666"
               ></AtIcon>
             )}
           </ScrollView>
@@ -117,15 +117,15 @@ export default function Index() {
               <AtDivider
                 className="divider"
                 content="没有更多了"
-                fontColor="#fff"
-                lineColor="#fff"
+                fontColor="#666"
+                lineColor="#666"
               />
             ) : (
               <AtIcon
                 className="loading"
                 value="loading-3"
                 size="36"
-                color="#fff"
+                color="#666"
               ></AtIcon>
             )}
           </ScrollView>
@@ -153,7 +153,7 @@ export default function Index() {
           <Text className="at-fab__icon at-icon at-icon-reload"></Text>
         </AtFab>
       </View>
-      <View className="fab-btn guide">
+      {/* <View className="fab-btn guide">
         <AtFab
           onClick={() => {
             navigateTo("Yahtzee", `guide/index`);
@@ -161,11 +161,11 @@ export default function Index() {
         >
           <Text className="at-fab__icon at-icon at-icon-help"></Text>
         </AtFab>
-      </View>
+      </View> */}
       <View className="fab-btn ranking">
         <AtFab
           onClick={() => {
-            navigateTo("Yahtzee", `ranking/index`);
+            navigateTo("Martian", `ranking/index`);
           }}
         >
           <Text className="at-fab__icon at-icon at-icon-numbered-list"></Text>
@@ -174,7 +174,7 @@ export default function Index() {
       <View className="fab-btn history">
         <AtFab
           onClick={() => {
-            navigateTo("Yahtzee", `history/index`);
+            navigateTo("Martian", `history/index`);
           }}
         >
           <Text className="at-fab__icon at-icon at-icon-clock"></Text>

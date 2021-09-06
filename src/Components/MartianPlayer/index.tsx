@@ -6,6 +6,7 @@ import "taro-ui/dist/style/components/action-sheet.scss";
 import Achievement from "../../Components/Achievement";
 import { useMemo, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
+import { AchievementGameIndex } from "../../const";
 
 interface IProps {
   data: Player;
@@ -23,8 +24,7 @@ export default function Index({
   showScore = false,
   showActive = false,
   showOffline = false,
-  // TODO
-  showAchievement = false,
+  showAchievement = true,
   showSetting = false,
   kickPlayer = () => {},
   colorType = "white",
@@ -45,7 +45,7 @@ export default function Index({
   }
 
   return (
-    <View className={`player ${showActive && inRound ? "active" : ""}`}>
+    <View className={`martian-player ${showActive && inRound ? "active" : ""}`}>
       <View
         className={`player-info ${offline ? "offline" : ""}`}
         onClick={() => {
@@ -75,6 +75,7 @@ export default function Index({
         data={data}
         isOpened={isAchievementOpened}
         onClose={hideAchievement}
+        initGameIndex={AchievementGameIndex.martian}
       ></Achievement>
       <AtActionSheet
         isOpened={isActionSheetOpened}

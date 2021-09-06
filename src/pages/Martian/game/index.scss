@@ -4,7 +4,6 @@ page {
   background-color: #06050a;
   z-index: -1;
 }
-
 .martian-game {
   .bk-img {
     position: fixed;
@@ -20,10 +19,29 @@ page {
   height: 100%;
   box-sizing: border-box;
   padding: 20px 0;
+  .count-down-box {
+    margin-top: 10px;
+    height: 70px;
+    justify-content: center;
+    .count-down {
+      width: 70px;
+      height: 60px;
+      line-height: 70px;
+      font-size: 50px;
+      font-family: LCDAT;
+      color: #fff;
+      background-color: #44ca4c;
+      text-align: center;
+      border-radius: 10px;
+      &.error {
+        background-color: #c00;
+      }
+    }
+  }
   .dice-list-box {
     flex: 1;
     box-sizing: border-box;
-    padding: 0 20px;
+    padding: 10px 20px;
     &.no-padding {
       padding: 0;
     }

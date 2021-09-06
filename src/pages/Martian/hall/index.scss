@@ -1,6 +1,12 @@
-.hall {
+page {
+  background-color: #eef5ff;
+}
+.martian-hall {
   height: 100%;
-  background-color: #46b3ff;
+  background-color: #eef5ff;
+  & > .at-tabs .at-tabs__header {
+    background-color: #eef5ff;
+  }
   .at-tabs {
     height: 100%;
   }
@@ -20,7 +26,7 @@
   }
   .divider {
     .at-divider__content {
-      background-color: #46b3ff;
+      background-color: #eef5ff;
     }
     .at-divider__line {
       left: 5%;

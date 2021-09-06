@@ -238,10 +238,11 @@ async function updatePlayer(players, env) {
 
     // 更新胜率等数据
     const { result: updateData } = await cloud.callFunction({
-      name: "getAchievement",
+      name: "updateAchievement",
       data: {
         env,
         id: openid,
+        game: "yahtzee",
       },
     });
 
@@ -251,7 +252,11 @@ async function updatePlayer(players, env) {
       data: {
         env,
         openid,
-        data: updateData,
+        data: {
+          achievement: {
+            yahtzee: updateData,
+          },
+        },
       },
     });
   });

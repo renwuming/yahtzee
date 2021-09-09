@@ -7,11 +7,13 @@ import "taro-ui/dist/style/components/modal.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 // @ts-ignore
+import CoverImg from "../../assets/imgs/cover.jpg";
+// @ts-ignore
 import YahtzeeLogoImg from "../../assets/imgs/yahtzee-share.png";
 // @ts-ignore
 import MartianLogoImg from "../../assets/imgs/martian-share.jpg";
 // @ts-ignore
-import CoverImg from "../../assets/imgs/cover.jpg";
+import CantStopLogoImg from "../../assets/imgs/cantstop-share.jpg";
 import {
   forceGetUserProfile,
   getUserProfile,
@@ -21,6 +23,7 @@ import {
 import LoadPage from "../../Components/LoadPage";
 import Player from "../../Components/Player";
 import { useState } from "react";
+import { createGame } from "../CantStop/game/gameApi";
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<any>(
@@ -66,6 +69,18 @@ export default function Index() {
         </View>
       </View>
       <View className="btn-list">
+        <AtButton
+          circle
+          type="primary"
+          onClick={() => {
+            getUserProfile(() => {
+              createGame();
+            });
+          }}
+        >
+          <Image src={CantStopLogoImg}></Image>
+          欲罢不能
+        </AtButton>
         <AtButton
           circle
           type="primary"

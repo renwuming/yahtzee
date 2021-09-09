@@ -163,9 +163,12 @@ export default function Index() {
     };
   }, [end, pageShow, gameData, roundTimeStamp]);
 
-  function selectTheDice({ value }) {
+  async function selectTheDice({ value }) {
     if (!inRound) return;
-    selectDice(id, value);
+    if (waiting) return;
+    setWaiting(true);
+    await selectDice(id, value);
+    setWaiting(false);
   }
 
   async function endTheRound() {
@@ -223,14 +226,22 @@ export default function Index() {
         src="https://cdn.renwuming.cn/static/martian/imgs/martian-bk.jpg"
         mode="aspectFill"
       />
-      <PlayerList
-        players={players}
-        start={start}
-        end={end}
-        showSetting={own && !start}
-        kickPlayer={kickPlayer}
-        showOffline={!end}
-      ></PlayerList>
+      <View className='top-box'>
+        <PlayerList
+          players={players}
+          start={start}
+          end={end}
+          showSetting={own && !start}
+          kickPlayer={kickPlayer}
+          showOffline={!end}
+        ></PlayerList>
+        {singlePlayer && start && !end && (
+          <View className="round-sum-box">
+            <Text className="text">回合数</Text>
+            <Text className="number">{roundSum}</Text>
+          </View>
+        )}
+      </View>
       {start && !end && !singlePlayer && (
         <View className="at-row at-row__align--center count-down-box">
           {/* 倒计时小于一定时间再显示，避免回合切换时的突兀 */}

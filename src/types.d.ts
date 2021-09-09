@@ -114,3 +114,40 @@ declare namespace Martian {
     ufoWin: boolean;
   }
 }
+
+declare namespace CantStop {
+  type DiceData = number;
+  interface GameBaseData {
+    _id: string;
+    owner: Player;
+    players: CantStopPlayer[];
+    start?: boolean;
+    roundPlayer?: number;
+    round: Round;
+    winner?: number;
+    end?: boolean;
+    roundSum?: number;
+    roundTimeStamp: number;
+
+    _createTime: Date;
+    _updateTime: Date;
+  }
+
+  interface GameData extends GameBaseData {
+    own: boolean;
+    inGame: boolean;
+    inRound: boolean;
+    playerIndex: number;
+    canJoin: boolean;
+  }
+  interface Round {
+    roundTimeStamp: number;
+    stage: number;
+    diceList: DiceData[];
+    roundProgress: number[];
+    roundRoad: number[];
+  }
+  interface CantStopPlayer extends Player {
+    progress: number[];
+  }
+}

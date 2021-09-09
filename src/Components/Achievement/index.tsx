@@ -26,7 +26,11 @@ export default function Index({
   onClose,
   initGameIndex = AchievementGameIndex.yahtzee,
 }: IProps) {
-  const tabList = [{ title: "快艇骰子" }, { title: "火星骰" }];
+  const tabList = [
+    { title: "快艇骰子" },
+    { title: "火星骰" },
+    { title: "欲罢不能" },
+  ];
   const [tabIndex, setTabIndex] = useState<number>(initGameIndex);
   const [achievementData, setAchievementData] = useState<any>(null);
 
@@ -44,7 +48,7 @@ export default function Index({
     if (isOpened) initAchievement();
   }, [isOpened]);
 
-  const { yahtzee, martian } = achievementData || {};
+  const { yahtzee, martian, cantstop } = achievementData || {};
 
   function handleAchievementValue(value) {
     return value === undefined || value === null ? "-" : value;
@@ -128,6 +132,38 @@ export default function Index({
                 <Text className="left">单人局总数</Text>
                 <Text className="info">
                   {handleAchievementValue(martian?.singleNum)}
+                </Text>
+              </View>
+            </AtTabsPane>
+            <AtTabsPane current={tabIndex} index={2}>
+              <View className="detail-row">
+                <Text className="left red">单人局最少回合</Text>
+                <Text className="red">
+                  {handleAchievementValue(cantstop?.minRoundSum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局胜率</Text>
+                <Text className="info">
+                  {handleAchievementValue(cantstop?.multiWinRate)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局胜利</Text>
+                <Text className="info">
+                  {handleAchievementValue(cantstop?.multiWinSum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">多人局总数</Text>
+                <Text className="info">
+                  {handleAchievementValue(cantstop?.multiNum)}
+                </Text>
+              </View>
+              <View className="detail-row">
+                <Text className="left">单人局总数</Text>
+                <Text className="info">
+                  {handleAchievementValue(cantstop?.singleNum)}
                 </Text>
               </View>
             </AtTabsPane>

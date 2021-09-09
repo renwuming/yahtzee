@@ -12,6 +12,9 @@ export default {
     "pages/Martian/ranking/index",
     "pages/Martian/hall/index",
     "pages/Martian/history/index",
+    // 欲罢不能
+    "pages/CantStop/game/index",
+    "pages/CantStop/hall/index",
   ],
   window: {
     backgroundTextStyle: "light",

@@ -1,7 +1,7 @@
 import { View, Text, Image } from "@tarojs/components";
 /* @ts-ignore */
 import yahtzeeImg from "../../assets/imgs/yahtzee.png";
-import "./icons.scss";
+import "./index.scss";
 
 export function Dice1() {
   return (

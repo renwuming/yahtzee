@@ -11,7 +11,7 @@ import {
   Straight,
   FiveOfKind,
   FullHouse,
-} from "./icons";
+} from "../DiceIcon";
 
 export const scoreRatings = [
   [
@@ -154,7 +154,7 @@ function isStraight(values: number[]): boolean {
 }
 
 function isMiniStraight(values: number[]): boolean {
-  values = [...new Set(values)].sort((a, b) => a - b);
+  values = Array.from(new Set(values)).sort((a, b) => a - b);
   return /1234|2345|3456/.test(values.join(""));
 }
 

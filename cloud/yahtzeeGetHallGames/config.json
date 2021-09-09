@@ -6,7 +6,7 @@
     {
       "name": "timer1",
       "type": "timer",
-      "config": "* */1 * * * * *"
+      "config": "* */5 * * * * *"
     }
   ]
 }

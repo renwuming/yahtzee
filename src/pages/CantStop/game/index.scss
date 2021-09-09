@@ -1,0 +1,80 @@
+page {
+  min-height: 100%;
+  height: 100%;
+  background-color: #181717;
+  z-index: -1;
+}
+.cantstop-game {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 20px;
+  .player-list-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+  }
+  .round-sum-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 240px;
+    height: 70px;
+    margin-top: 20px;
+    margin-left: 20px;
+    color: #fff;
+    font-size: 30px;
+    border-radius: 12px;
+    background-color: rgba(90, 90, 90, 0.5);
+    .text {
+      font-family: yansong;
+    }
+    .number {
+      margin-left: 10px;
+      font-size: 40px;
+      font-family: TrebuchetMS;
+    }
+  }
+  .game-result-row {
+    flex: 1;
+  }
+  .btn-row {
+    display: flex;
+    height: 100%;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .dice-btn,
+    .end-btn {
+      margin: 20px 0;
+      width: 160px;
+    }
+  }
+  .end-box {
+    flex: 1;
+    box-sizing: border-box;
+    padding: 0;
+  }
+  .result-box {
+    display: flex;
+    width: 100%;
+    height: 170px;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 44px;
+    background-color: #999;
+    .text {
+      font-family: yansong;
+    }
+    .number {
+      margin-left: 10px;
+      font-size: 60px;
+      font-family: TrebuchetMS;
+    }
+  }
+}

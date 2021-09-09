@@ -65,6 +65,18 @@
           "pathName": "pages/Yahtzee/game/index",
           "query": "id=14139e126114aef404aeaf213538207e",
           "scene": null
+        },
+        {
+          "name": "欲罢不能",
+          "pathName": "pages/CantStop/game/index",
+          "query": "id=14139e126138e30c0ae768450ebe07dd",
+          "scene": null
+        },
+        {
+          "name": "欲罢不能2",
+          "pathName": "pages/CantStop/game/index",
+          "query": "id=14139e126139e1e80b24e01261ea1076",
+          "scene": null
         }
       ]
     }

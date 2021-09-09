@@ -33,6 +33,4 @@ exports.main = async (event) => {
     // });
     // .then((res) => res.data)
     .remove();
-
-  console.log(list);
 };

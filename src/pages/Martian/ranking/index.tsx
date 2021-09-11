@@ -1,7 +1,7 @@
 interface RankItemProps {
   index: number;
   data: Player;
-  type: "score" | "sum";
+  type: "round" | "sum";
 }
 
 function RankItem({ index, data, type }: RankItemProps) {
@@ -12,10 +12,10 @@ function RankItem({ index, data, type }: RankItemProps) {
       <View className="user-box">
         <PlayerItem data={data}></PlayerItem>
       </View>
-      {type === "score" ? (
+      {type === "round" ? (
         <View className="column-right">
-          <Text className="score-title">分数</Text>
-          <Text className="score">{achievement?.martian?.highScore}</Text>
+          <Text className="score-title">最少回合数</Text>
+          <Text className="score">{achievement?.martian?.minRoundSum}</Text>
         </View>
       ) : (
         <View className="column-right">
@@ -41,7 +41,7 @@ import { CallCloudFunction } from "../../../utils";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const tabList = [{ title: "积分榜" }, { title: "赌神榜" }];
+  const tabList = [{ title: "赌神榜" }, { title: "幸运榜" }];
   const [list1, setList1] = useState<Player[]>([]);
   const [pageNum1, setPageNum1] = useState<number>(0);
   const [list2, setList2] = useState<Player[]>([]);
@@ -54,7 +54,7 @@ export default function Index() {
     const list = await CallCloudFunction({
       name: "martianGetRanking",
       data: {
-        type: "score",
+        type: "sum",
         skip: pageNum1 * PAGE_LEN,
       },
     });
@@ -74,7 +74,7 @@ export default function Index() {
     const list = await CallCloudFunction({
       name: "martianGetRanking",
       data: {
-        type: "sum",
+        type: "round",
         skip: pageNum2 * PAGE_LEN,
       },
     });
@@ -105,7 +105,7 @@ export default function Index() {
           >
             {list1.map((data, index) => {
               return (
-                <RankItem data={data} index={index} type={"score"}></RankItem>
+                <RankItem data={data} index={index} type={"sum"}></RankItem>
               );
             })}
             {page1End ? (
@@ -136,7 +136,7 @@ export default function Index() {
           >
             {list2.map((data, index) => {
               return (
-                <RankItem data={data} index={index} type={"sum"}></RankItem>
+                <RankItem data={data} index={index} type={"round"}></RankItem>
               );
             })}
             {page2End ? (

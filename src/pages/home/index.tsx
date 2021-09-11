@@ -74,7 +74,7 @@ export default function Index() {
           type="primary"
           onClick={() => {
             getUserProfile(() => {
-              createGame();
+              navigateTo("CantStop", `hall/index`);
             });
           }}
         >

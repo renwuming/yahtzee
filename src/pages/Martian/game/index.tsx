@@ -122,8 +122,8 @@ export default function Index() {
     ufoCanWin,
     shouldRetreat,
     canSelect,
-    canSelectUfo,
-    allUfoToSelect,
+    cantSelectAnyUfo,
+    allToSelectIsUfo,
     ufoWin,
     roundTimeStamp,
   } = round || {};
@@ -202,10 +202,10 @@ export default function Index() {
       stage === MartianStage.Select &&
       (!canSelect ||
         !ufoCanWin ||
-        // 无法选择飞碟，并且坦克多于飞碟
-        (!canSelectUfo && !ufoWin) ||
+        // 无法选择更多飞碟，并且坦克多于飞碟
+        (cantSelectAnyUfo && !ufoWin) ||
         // 掷骰子结果全是飞碟，并且坦克少于飞碟或者战利品为0
-        (allUfoToSelect && (ufoWin || awardList.length === 0)))
+        (allToSelectIsUfo && (ufoWin || awardList.length === 0)))
     ) {
       endTheRound();
     } else {
@@ -226,7 +226,7 @@ export default function Index() {
         src="https://cdn.renwuming.cn/static/martian/imgs/martian-bk.jpg"
         mode="aspectFill"
       />
-      <View className='top-box'>
+      <View className="top-box">
         <PlayerList
           players={players}
           start={start}

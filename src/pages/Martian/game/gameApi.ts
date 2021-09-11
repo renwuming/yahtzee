@@ -119,8 +119,16 @@ function handleRound(round: Martian.Round): Martian.Round {
   const canSelectUfoList = canSelectList.filter(
     ({ value }) => MartianDiceMap[value] === "ufo"
   );
-  const canSelectUfo = canSelectUfoList.length > 0;
-  const allUfoToSelect = canSelectUfoList.length === canSelectList.length;
+  // 可选骰子只有一种，并且是飞碟
+  const allToSelectIsUfo =
+    canSelectList.length === diceList.length &&
+    getKindsNum(canSelectList) === 1 &&
+    canSelectUfoList.length > 0;
+  // 可选骰子只有一种，并且不是飞碟
+  const cantSelectAnyUfo =
+    canSelectList.length === diceList.length &&
+    getKindsNum(canSelectList) === 1 &&
+    canSelectUfoList.length <= 0;
   const canSelect = canSelectList.length > 0 && stage === MartianStage.Select;
   const roundScore = calculateScore(round);
 
@@ -130,8 +138,8 @@ function handleRound(round: Martian.Round): Martian.Round {
     ufoCanWin,
     shouldRetreat,
     canSelect,
-    canSelectUfo,
-    allUfoToSelect,
+    cantSelectAnyUfo,
+    allToSelectIsUfo,
     ufoWin,
   };
 }

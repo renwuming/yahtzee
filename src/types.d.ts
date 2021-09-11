@@ -48,6 +48,8 @@ interface GameData extends GameBaseData {
   playerIndex: number;
 }
 
+type AnyGameData = GameData | Martian.GameData | CantStop.GameData;
+
 interface Player {
   nickName: string;
   avatarUrl: string;
@@ -109,8 +111,8 @@ declare namespace Martian {
     ufoCanWin: boolean;
     shouldRetreat: boolean;
     canSelect: boolean;
-    canSelectUfo: boolean;
-    allUfoToSelect: boolean;
+    cantSelectAnyUfo: boolean;
+    allToSelectIsUfo: boolean;
     ufoWin: boolean;
   }
 }

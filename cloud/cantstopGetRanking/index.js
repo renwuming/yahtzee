@@ -13,13 +13,14 @@ exports.main = async (event) => {
   const _skip = +(skip || 0);
   const _pageLength = +(pageLength || 10);
 
-  if (type === "score") {
+  if (type === "round") {
     const list = await db
       .collection("players")
       .where({
-        "achievement.yahtzee.highScore": _.exists(1),
+        "achievement.cantstop.minRoundSum": _.exists(1),
+        "achievement.cantstop.minRoundSum": _.neq(null),
       })
-      .orderBy("achievement.yahtzee.highScore", "desc")
+      .orderBy("achievement.cantstop.minRoundSum", "asc")
       .field({
         avatarUrl: 1,
         nickName: 1,
@@ -36,9 +37,9 @@ exports.main = async (event) => {
     const list = await db
       .collection("players")
       .where({
-        "achievement.yahtzee.multiWinSum": _.exists(1),
+        "achievement.cantstop.multiWinSum": _.exists(1),
       })
-      .orderBy("achievement.yahtzee.multiWinSum", "desc")
+      .orderBy("achievement.cantstop.multiWinSum", "desc")
       .field({
         avatarUrl: 1,
         nickName: 1,

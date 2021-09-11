@@ -8,21 +8,34 @@ import { navigateTo } from "../../utils";
 
 interface IProps {
   index: number;
-  game: Martian.GameData;
+  game: AnyGameData;
+  gameType: string;
   type?: "history" | "hall";
 }
 
-export default function Index({ index, game, type = "hall" }: IProps) {
+export default function Index({
+  index,
+  game,
+  gameType,
+  type = "hall",
+}: IProps) {
   const { openid } = Taro.getStorageSync("userInfo");
-  const { _id, players, start, winners } = game;
+  const { _id, players, start } = game;
   const historyType = type === "history";
 
   const openids = players.map((item) => item.openid);
   const playerIndex = openids.indexOf(openid);
   const singleGame = players.length === 1;
-  const win = !singleGame && winners?.includes(playerIndex);
+  let win = false;
+  let timeout = false;
+  if (game["winners"] !== undefined) {
+    win = !singleGame && game["winners"]?.includes(playerIndex);
+  } else if (game["winner"] !== undefined) {
+    win = !singleGame && game["winner"] === playerIndex;
+    timeout = game["winner"] < 0;
+  }
 
-  function gotoGame(gameType: string) {
+  function gotoGame() {
     navigateTo(gameType, `game/index?id=${_id}`);
   }
 
@@ -30,7 +43,7 @@ export default function Index({ index, game, type = "hall" }: IProps) {
     <View
       className="martian-game-item"
       onClick={() => {
-        gotoGame("Martian");
+        gotoGame();
       }}
     >
       <Text className="index">{index + 1}</Text>
@@ -45,7 +58,9 @@ export default function Index({ index, game, type = "hall" }: IProps) {
       </View>
       <View className="column-right">
         {historyType ? (
-          singleGame ? null : win ? (
+          singleGame ? null : timeout ? (
+            <Text className="title">超时</Text>
+          ) : win ? (
             <Text className="title win">胜利</Text>
           ) : (
             <Text className="title fail">失败</Text>

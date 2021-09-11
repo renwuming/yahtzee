@@ -16,14 +16,15 @@ exports.main = async (event) => {
   const ONE_DAYS = 1 * 24 * 60 * 60 * 1000;
   const TIME = new Date(Date.now() - ONE_DAYS);
   const list = await db
-    .collection("martian_games")
+    .collection("cantstop_games")
     .where({
-      roundSum: _.gt(100),
+      _updateTime: _.lt(TIME),
       end: _.neq(true),
     })
     // .skip(1000)
     // .limit(1000)
     // .get()
+    // .then((res) => res.data)
     // .update({
     //   data: {
     //     maxMultiSum: db.command.remove(),
@@ -31,6 +32,7 @@ exports.main = async (event) => {
     //     multiWinRateValue: db.command.remove(),
     //   },
     // });
-    // .then((res) => res.data)
     .remove();
+
+  return list;
 };

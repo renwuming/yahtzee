@@ -113,6 +113,10 @@ export default function Index() {
 
   const canDice = inRound && stage === CantStopStage.Dice;
   const canSelect = stage === CantStopStage.Select;
+  const canEnd =
+    inRound &&
+    ((stage === CantStopStage.Select && canSelectDiceNum === 0) ||
+      stage === CantStopStage.Dice);
 
   // 游戏未结束时，一直更新在线状态和回合倒计时
   useEffect(() => {
@@ -231,10 +235,14 @@ export default function Index() {
                     <Text className="text">回合数</Text>
                     <Text className="number">{roundSum}</Text>
                   </View>
-                ) : (
+                ) : players[winner] ? (
                   <View className="result-box">
                     <Text className="text">获胜者</Text>
                     <Player data={players[winner]}></Player>
+                  </View>
+                ) : (
+                  <View className="result-box">
+                    <Text className="text">游戏超时</Text>
                   </View>
                 )}
               </View>
@@ -256,7 +264,7 @@ export default function Index() {
                   onClick={() => {
                     clickEndRound();
                   }}
-                  disabled={!inRound}
+                  disabled={!canEnd}
                 >
                   结束回合
                 </AtButton>

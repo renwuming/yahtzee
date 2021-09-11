@@ -9,7 +9,7 @@ import "taro-ui/dist/style/components/fab.scss";
 import "taro-ui/dist/style/components/badge.scss";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
-import GameItem from "../../../Components/MartianGameItem";
+import GameItem from "../../../Components/GameItemForMorePlayers";
 import { PAGE_LEN } from "../../../const";
 import { createGame } from "../game/gameApi";
 import { navigateTo } from "../../../utils";
@@ -82,7 +82,13 @@ export default function Index() {
             }}
           >
             {hallGameList.map((game, index) => {
-              return <GameItem game={game} index={index}></GameItem>;
+              return (
+                <GameItem
+                  game={game}
+                  index={index}
+                  gameType="Martian"
+                ></GameItem>
+              );
             })}
             {hallPageEnd ? (
               <AtDivider
@@ -111,7 +117,13 @@ export default function Index() {
             }}
           >
             {myGameList.map((game, index) => {
-              return <GameItem game={game} index={index}></GameItem>;
+              return (
+                <GameItem
+                  game={game}
+                  index={index}
+                  gameType="Martian"
+                ></GameItem>
+              );
             })}
             {myPageEnd ? (
               <AtDivider

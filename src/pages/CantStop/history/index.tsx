@@ -18,7 +18,7 @@ export default function Index() {
   async function updateList1() {
     if (page1End) return;
     const list = await CallCloudFunction({
-      name: "martianGetMyGames",
+      name: "cantstopGetGames",
       data: {
         type: "history",
         skip: pageNum1 * PAGE_LEN,
@@ -37,7 +37,7 @@ export default function Index() {
   }, []);
 
   return (
-    <View className="martian-history">
+    <View className="cantstop-history">
       <ScrollView
         className="scroll-view"
         scrollY={true}
@@ -51,7 +51,7 @@ export default function Index() {
             <GameItem
               game={data}
               index={index}
-              gameType="Martian"
+              gameType="CantStop"
               type="history"
             ></GameItem>
           );

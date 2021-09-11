@@ -1,7 +1,7 @@
 interface RankItemProps {
   index: number;
-  data: Player;
-  type: "score" | "sum";
+  data: CantStop.CantStopPlayer;
+  type: "round" | "sum";
 }
 
 function RankItem({ index, data, type }: RankItemProps) {
@@ -12,15 +12,15 @@ function RankItem({ index, data, type }: RankItemProps) {
       <View className="user-box">
         <PlayerItem data={data}></PlayerItem>
       </View>
-      {type === "score" ? (
+      {type === "round" ? (
         <View className="column-right">
-          <Text className="score-title">分数</Text>
-          <Text className="score">{achievement?.yahtzee?.highScore}</Text>
+          <Text className="score-title">最少回合数</Text>
+          <Text className="score">{achievement?.cantstop?.minRoundSum}</Text>
         </View>
       ) : (
         <View className="column-right">
           <Text className="score-title">获胜局数</Text>
-          <Text className="score">{achievement?.yahtzee?.multiWinSum}</Text>
+          <Text className="score">{achievement?.cantstop?.multiWinSum}</Text>
         </View>
       )}
     </View>
@@ -35,16 +35,16 @@ import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
-import PlayerItem from "../../../Components/Player";
+import PlayerItem from "../../../Components/CantStopPlayer";
 import { PAGE_LEN, RANKING_LEN } from "../../../const";
 import { CallCloudFunction } from "../../../utils";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const tabList = [{ title: "赌神榜" }, { title: "积分榜" }];
-  const [list1, setList1] = useState<Player[]>([]);
+  const tabList = [{ title: "赌神榜" }, { title: "幸运榜" }];
+  const [list1, setList1] = useState<CantStop.CantStopPlayer[]>([]);
   const [pageNum1, setPageNum1] = useState<number>(0);
-  const [list2, setList2] = useState<Player[]>([]);
+  const [list2, setList2] = useState<CantStop.CantStopPlayer[]>([]);
   const [pageNum2, setPageNum2] = useState<number>(0);
   const [page1End, setPage1End] = useState<boolean>(false);
   const [page2End, setPage2End] = useState<boolean>(false);
@@ -52,7 +52,7 @@ export default function Index() {
   async function updateList1() {
     if (page1End) return;
     const list = await CallCloudFunction({
-      name: "yahtzeeGetRanking",
+      name: "cantstopGetRanking",
       data: {
         type: "sum",
         skip: pageNum1 * PAGE_LEN,
@@ -72,9 +72,9 @@ export default function Index() {
     }
     if (page2End) return;
     const list = await CallCloudFunction({
-      name: "yahtzeeGetRanking",
+      name: "cantstopGetRanking",
       data: {
-        type: "score",
+        type: "round",
         skip: pageNum2 * PAGE_LEN,
       },
     });
@@ -92,7 +92,7 @@ export default function Index() {
   }, []);
 
   return (
-    <View className="ranking">
+    <View className="cantstop-ranking">
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
           <ScrollView
@@ -112,15 +112,15 @@ export default function Index() {
               <AtDivider
                 className="divider"
                 content={`只显示前${RANKING_LEN}名`}
-                fontColor="#fff"
-                lineColor="#fff"
+                fontColor="#666"
+                lineColor="#666"
               />
             ) : (
               <AtIcon
                 className="loading"
                 value="loading-3"
                 size="36"
-                color="#fff"
+                color="#666"
               ></AtIcon>
             )}
           </ScrollView>
@@ -136,22 +136,22 @@ export default function Index() {
           >
             {list2.map((data, index) => {
               return (
-                <RankItem data={data} index={index} type={"score"}></RankItem>
+                <RankItem data={data} index={index} type={"round"}></RankItem>
               );
             })}
             {page2End ? (
               <AtDivider
                 className="divider"
                 content={`只显示前${RANKING_LEN}名`}
-                fontColor="#fff"
-                lineColor="#fff"
+                fontColor="#666"
+                lineColor="#666"
               />
             ) : (
               <AtIcon
                 className="loading"
                 value="loading-3"
                 size="36"
-                color="#fff"
+                color="#666"
               ></AtIcon>
             )}
           </ScrollView>

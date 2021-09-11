@@ -15,6 +15,8 @@ export default {
     // 欲罢不能
     "pages/CantStop/game/index",
     "pages/CantStop/hall/index",
+    "pages/CantStop/history/index",
+    "pages/CantStop/ranking/index",
   ],
   window: {
     backgroundTextStyle: "light",

@@ -55,8 +55,8 @@
           "scene": null
         },
         {
-          "name": "火星骰大厅",
-          "pathName": "pages/Martian/hall/index",
+          "name": "欲罢不能大厅",
+          "pathName": "pages/CantStop/hall/index",
           "query": "",
           "scene": null
         },
@@ -75,7 +75,7 @@
         {
           "name": "欲罢不能2",
           "pathName": "pages/CantStop/game/index",
-          "query": "id=14139e126139e1e80b24e01261ea1076",
+          "query": "id=cd045e75613aec390ca42cd86a0045b1",
           "scene": null
         }
       ]

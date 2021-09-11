@@ -8,19 +8,26 @@ import { navigateTo } from "../../utils";
 
 interface IProps {
   index: number;
-  game: GameData;
+  game: AnyGameData;
   type?: "history" | "hall";
 }
 
 export default function Index({ index, game, type = "hall" }: IProps) {
   const { openid } = Taro.getStorageSync("userInfo");
-  const { _id, players, start, winner } = game;
+  const { _id, players, start } = game;
   const historyType = type === "history";
 
   const openids = players.map((item) => item.openid);
+  const playerIndex = openids.indexOf(openid);
   const singleGame = players.length === 1;
-  const draw = winner < 0;
-  const win = !singleGame && openids.indexOf(openid) === winner;
+  let win = false;
+  let draw = false;
+  if (game["winners"]!==undefined) {
+    win = !singleGame && game["winners"]?.includes(playerIndex);
+  } else if (game["winner"]!==undefined) {
+    win = !singleGame && game["winner"] === playerIndex;
+    draw = game["winner"] < 0;
+  }
 
   function gotoGame(gameType: string) {
     navigateTo(gameType, `game/index?id=${_id}`);

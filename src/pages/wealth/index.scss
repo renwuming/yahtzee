@@ -1,0 +1,72 @@
+page {
+  min-height: 100%;
+  height: 100%;
+  background-color: #eef5ff;
+}
+.wealth {
+  display: flex;
+  flex-wrap: wrap;
+  .item-box {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .item {
+    display: flex;
+    flex-direction: column;
+    width: 230px;
+    height: 310px;
+    background-color: #dbcbbc;
+    border-radius: 12px;
+    .top {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .img {
+        width: 130px;
+        height: 90px;
+      }
+      text {
+        display: inline-block;
+        margin-top: 4px;
+      }
+      .amount {
+        color: #856151;
+        font-size: 28px;
+        height: 36px;
+        line-height: 36px;
+      }
+      .intro {
+        color: #44352e;
+        font-size: 24px;
+        height: 30px;
+        line-height: 30px;
+      }
+      .rule {
+        color: #44352e;
+        font-size: 24px;
+        height: 30px;
+        line-height: 30px;
+      }
+    }
+    .bottom {
+      display: flex;
+      align-items: center;
+      height: 86px;
+      background-color: #efe3d5;
+    }
+    .at-button.at-button {
+      display: flex;
+      align-items: center;
+      width: 150px;
+      height: 44px;
+      line-height: 44px;
+      font-size: 30px;
+      color: #fff;
+      background-color: #ab5c4f;
+      border-color: #ab5c4f;
+    }
+  }
+}

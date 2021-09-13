@@ -7,12 +7,18 @@ import "./index.scss";
 import { initUserInfo, SLEEP } from "../../utils";
 import { useEffect, useState } from "react";
 
-export default function Index() {
+interface IProps {
+  setUserInfo?: (userInfo: Player) => void;
+}
+
+export default function Index({ setUserInfo = () => {} }: IProps) {
   const [isOpened, setOpened] = useState<boolean>(true);
 
   useEffect(() => {
     Promise.all([SLEEP(300), initUserInfo()]).then((_) => {
       setOpened(false);
+      const userInfo = Taro.getStorageSync("userInfo");
+      setUserInfo(userInfo);
     });
     // 请求最新版本小程序
     const updateManager = Taro.getUpdateManager();

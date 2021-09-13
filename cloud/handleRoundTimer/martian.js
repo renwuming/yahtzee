@@ -1,4 +1,3 @@
-// 云函数入口文件
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 

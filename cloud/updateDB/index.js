@@ -18,13 +18,13 @@ exports.main = async (event) => {
   const list = await db
     .collection("cantstop_games")
     .where({
-      _updateTime: _.lt(TIME),
-      end: _.neq(true),
+      // _updateTime: _.lt(TIME),
+      // end: _.neq(true),
+      winner: -1,
     })
-    // .skip(1000)
     // .limit(1000)
     // .get()
-    // .then((res) => res.data)
+    // .then((res) => res.data);
     // .update({
     //   data: {
     //     maxMultiSum: db.command.remove(),

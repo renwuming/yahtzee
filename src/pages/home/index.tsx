@@ -1,35 +1,18 @@
 import Taro from "@tarojs/taro";
 import { useShareAppMessage } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
-import { AtButton, AtIcon } from "taro-ui";
+import { AtButton } from "taro-ui";
 import "taro-ui/dist/style/components/button.scss";
 import "taro-ui/dist/style/components/modal.scss";
-import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
-// @ts-ignore
-import CoverImg from "../../assets/imgs/cover.jpg";
-// @ts-ignore
-import YahtzeeLogoImg from "../../assets/imgs/yahtzee-share.png";
 // @ts-ignore
 import MartianLogoImg from "../../assets/imgs/martian-share.jpg";
 // @ts-ignore
 import CantStopLogoImg from "../../assets/imgs/cantstop-share.jpg";
-import {
-  forceGetUserProfile,
-  getUserProfile,
-  navigateTo,
-  VERSION,
-} from "../../utils";
-import LoadPage from "../../Components/LoadPage";
-import Player from "../../Components/Player";
-import { useState } from "react";
-import { createGame } from "../CantStop/game/gameApi";
+import { getUserProfile, navigateTo, VERSION } from "../../utils";
+import MyPlayer from "../../Components/MyPlayer";
 
 export default function Index() {
-  const [userInfo, setUserInfo] = useState<any>(
-    Taro.getStorageSync("userInfo")
-  );
-
   // 设置分享
   useShareAppMessage(() => {
     const title = "骰子桌游大全，各种骰子游戏，快来玩吧！";
@@ -48,26 +31,12 @@ export default function Index() {
 
   return (
     <View className="home">
-      <LoadPage></LoadPage>
-      <Image className="cover" src={CoverImg}></Image>
+      <Image
+        className="cover"
+        src="https://cdn.renwuming.cn/static/yahtzee/imgs/cover.jpg"
+      ></Image>
       <Text className="version">{VERSION}</Text>
-      <View className="user-info">
-        <Player data={userInfo} colorType="black"></Player>
-        <View className="at-row icon-row">
-          <AtIcon
-            className="setting"
-            value="settings"
-            size="30"
-            color="#666"
-            onClick={() => {
-              forceGetUserProfile(() => {
-                const userInfo = Taro.getStorageSync("userInfo");
-                setUserInfo(userInfo);
-              });
-            }}
-          ></AtIcon>
-        </View>
-      </View>
+      <MyPlayer></MyPlayer>
       <View className="btn-list">
         <AtButton
           circle
@@ -102,7 +71,7 @@ export default function Index() {
             });
           }}
         >
-          <Image src={YahtzeeLogoImg}></Image>
+          <Image src="https://cdn.renwuming.cn/static/yahtzee/imgs/share.png"></Image>
           快艇骰子
         </AtButton>
         <AtButton

@@ -10,19 +10,6 @@
     margin-top: 10px;
     color: #999;
   }
-  .user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    margin-top: 20px;
-    .icon-row {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      width: 150px;
-    }
-  }
   .cover {
     width: 500px;
     height: 500px;
@@ -30,11 +17,10 @@
   }
   .btn-list {
     box-sizing: border-box;
-    margin-top: 30px;
-    padding: 0 50px;
-    width: 80%;
+    margin-top: 50px;
+    width: 60%;
     .at-button {
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       image {
         position: absolute;
         left: 0;

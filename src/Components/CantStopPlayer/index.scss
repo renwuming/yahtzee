@@ -6,16 +6,16 @@
   border-radius: 12px;
   padding: 10px;
   &.player-0 {
-    background-color: rgba(204, 0, 33, 0.5);
+    background-color: rgba(214, 83, 83, 0.7);
   }
   &.player-1 {
-    background-color: rgba(0, 204, 0, 0.5);
+    background-color: rgba(38, 148, 147, 0.7);
   }
   &.player-2 {
-    background-color: rgba(0, 99, 204, 0.5);
+    background-color: rgb(225, 152, 6, 0.7);
   }
   &.player-3 {
-    background-color: rgba(255, 99, 0, 0.5);
+    background-color: rgba(132, 143, 61, 0.7);
   }
   .active {
     position: absolute;

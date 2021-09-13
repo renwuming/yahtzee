@@ -1,5 +1,5 @@
 export default {
-  navigationBarTitleText: "骰子桌游大全",
+  navigationBarTitleText: "每日福利",
   navigationBarTextStyle: "black",
   navigationBarBackgroundColor: "#eef5ff",
 };

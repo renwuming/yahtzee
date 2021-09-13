@@ -4,6 +4,8 @@ import "taro-ui/dist/style/components/flex.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 import { ROAD_LIST } from "../../const";
+// @ts-ignore
+import CantStopBKImg from "../../assets/imgs/cantstop-bk.jpg";
 
 interface IProps {
   roundProgress: number[];
@@ -31,7 +33,7 @@ export default function Index({
     <View className="cantstop-board">
       <Image
         className="bk-img"
-        src="https://cdn.renwuming.cn/static/cantstop/imgs/cantstop-board.jpg"
+        src="https://cdn.renwuming.cn/static/cantstop/imgs/cantstop-bk.jpg"
         mode="aspectFill"
       />
       <View className="btn-box at-row step-row">

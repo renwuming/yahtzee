@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
-import { DependencyList, useEffect } from "react";
+import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.1.0";
+export const VERSION = "v4.2.0";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -110,4 +110,83 @@ export async function initUserInfo() {
     });
     await initUserInfo();
   }
+}
+
+function getVedio(adUnitId, cb) {
+  if (Taro.createRewardedVideoAd) {
+    const videoAd = Taro.createRewardedVideoAd({
+      adUnitId,
+    });
+    // 广告加载完成后，回调函数
+    videoAd.onLoad(() => {
+      const showVedioAd = () => {
+        videoAd.show().catch(() => {
+          showVedioErrToast();
+        });
+      };
+      cb(videoAd, showVedioAd);
+    });
+    videoAd.onError((err) => {
+      showVedioErrToast();
+      console.error("videoAd load error", err);
+    });
+  } else {
+    showVedioErrToast();
+  }
+}
+
+const adUnitId30 = "adunit-111b066b402c31d0";
+const adUnitId15 = "adunit-262b83d77c8a752a";
+
+export function getVedio30(cb) {
+  return getVedio(adUnitId30, cb);
+}
+export function getVedio15(cb) {
+  return getVedio(adUnitId15, cb);
+}
+
+function showVedioErrToast() {
+  Taro.showToast({
+    title: "获取广告失败",
+    icon: "none",
+    duration: 1500,
+  });
+}
+
+export function useDebounce(fn, delay, dep = []) {
+  const { current } = useRef({ fn, timer: null });
+  useEffect(
+    function () {
+      current.fn = fn;
+    },
+    [fn]
+  );
+
+  return useCallback(function f(...args) {
+    if (current.timer) {
+      clearTimeout(current.timer);
+    }
+    current.timer = setTimeout(() => {
+      current.fn(...args);
+    }, delay);
+  }, dep);
+}
+
+export function useThrottle(fn, delay, dep = []) {
+  const { current } = useRef({ fn, timer: null });
+  useEffect(
+    function () {
+      current.fn = fn;
+    },
+    [fn]
+  );
+
+  return useCallback(function f(...args) {
+    if (!current.timer) {
+      current.timer = setTimeout(() => {
+        delete current.timer;
+      }, delay);
+      current.fn(...args);
+    }
+  }, dep);
 }

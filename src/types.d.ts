@@ -1,3 +1,14 @@
+interface Wealth {
+  _id: string;
+  type: string;
+  amount: number;
+  intro: string;
+  maxTimes: number;
+  needVideo: boolean;
+  online: boolean;
+  remainingTimes: number;
+}
+
 interface DiceData {
   value: number;
   freezing?: boolean;
@@ -69,6 +80,8 @@ interface Player {
   highScore: number;
   timeStamp: number;
   achievement: any;
+  wealth: any;
+  wealthRecord: any;
 }
 
 declare namespace Martian {

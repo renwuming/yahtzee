@@ -1,0 +1,40 @@
+.my-player {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 20px;
+  padding: 10px 0;
+  border-top: 4px solid rgba(241, 181, 61, 0.5);
+  border-bottom: 4px solid rgba(241, 181, 61, 0.5);
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 30px;
+    width: 360px;
+    .icon {
+      width: 40px;
+      height: 40px;
+    }
+    .at-button__text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .icon-text {
+      display: inline-block;
+      width: 150px;
+      font-family: TrebuchetMS;
+    }
+    .at-button--primary.at-button--primary {
+      padding: 10px;
+      height: inherit;
+      line-height: inherit;
+      background-color: rgba(241, 181, 61, 0.5);
+      border-color: rgba(241, 181, 61, 0.5);
+      border-radius: 100px;
+    }
+  }
+}

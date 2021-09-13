@@ -77,6 +77,12 @@
           "pathName": "pages/CantStop/game/index",
           "query": "id=cd045e75613aec390ca42cd86a0045b1",
           "scene": null
+        },
+        {
+          "name": "每日福利",
+          "pathName": "pages/wealth/index",
+          "query": "",
+          "scene": null
         }
       ]
     }

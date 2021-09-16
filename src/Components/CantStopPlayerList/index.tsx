@@ -34,6 +34,7 @@ export default function Index({
             index={index}
             kickPlayer={kickPlayer}
             roundCountDown={inRound ? roundCountDown : null}
+            showGift={start && !end}
           ></Player>
         );
       })}

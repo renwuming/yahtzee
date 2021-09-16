@@ -17,6 +17,7 @@ interface IProps {
   showSetting?: boolean;
   kickPlayer?: (openid: string) => void;
   colorType?: string;
+  showGift?: boolean;
 }
 
 export default function Index({
@@ -28,6 +29,7 @@ export default function Index({
   showSetting = false,
   kickPlayer = () => {},
   colorType = "white",
+  showGift = false,
 }: IProps) {
   const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
@@ -76,6 +78,7 @@ export default function Index({
         isOpened={isAchievementOpened}
         onClose={hideAchievement}
         initGameIndex={AchievementGameIndex.martian}
+        showGift={showGift}
       ></Achievement>
       <AtActionSheet
         isOpened={isActionSheetOpened}

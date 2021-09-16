@@ -17,7 +17,6 @@ interface IProps {
   showSetting?: boolean;
   kickPlayer?: (openid: string) => void;
   colorType?: string;
-  showGift?: boolean;
 }
 
 export default function Index({
@@ -29,7 +28,6 @@ export default function Index({
   showSetting = false,
   kickPlayer = () => {},
   colorType = "white",
-  showGift = false,
 }: IProps) {
   const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
@@ -47,7 +45,7 @@ export default function Index({
   }
 
   return (
-    <View className={`player ${showActive && inRound ? "active" : ""}`}>
+    <View className={`home-player ${showActive && inRound ? "active" : ""}`}>
       <View
         className={`player-info ${offline ? "offline" : ""}`}
         onClick={() => {
@@ -77,8 +75,6 @@ export default function Index({
         data={data}
         isOpened={isAchievementOpened}
         onClose={hideAchievement}
-        initGameIndex={AchievementGameIndex.yahtzee}
-        showGift={showGift}
       ></Achievement>
       <AtActionSheet
         isOpened={isActionSheetOpened}

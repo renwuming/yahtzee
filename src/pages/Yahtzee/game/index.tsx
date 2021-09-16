@@ -280,6 +280,7 @@ export default function Index() {
       <PlayerList
         players={players}
         start={start}
+        end={end}
         showOffline={!end}
         showSetting={own && !start}
         kickPlayer={kickPlayer}

@@ -29,6 +29,7 @@ export default function Index({
           showOffline={showOffline}
           showSetting={index !== 0 && showSetting}
           kickPlayer={kickPlayer}
+          showGift={start && !end}
         ></Player>
       ))}
     </View>

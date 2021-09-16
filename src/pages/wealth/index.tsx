@@ -9,7 +9,7 @@ import "./index.scss";
 import GoldIcon from "../../assets/imgs/gold.png";
 import { getWealthList_Database, gainWealth_Database } from "./wealthApi";
 import { useEffect, useRef, useState } from "react";
-import { getVedio15, getVedio30, useDebounce, useThrottle } from "../../utils";
+import { getVedio30, useThrottle } from "../../utils";
 import LoadPage from "../../Components/LoadPage";
 
 export default function Index() {
@@ -23,7 +23,7 @@ export default function Index() {
   const { openid, wealthRecord } = userInfo;
 
   useReady(() => {
-    getVedio15((_videoAd, _showVideoAd) => {
+    getVedio30((_videoAd, _showVideoAd) => {
       videoAd.current = _videoAd;
       showVideoAd.current = _showVideoAd;
     });

@@ -10,6 +10,8 @@ import {
   AchievementGameIndex,
   MARTIAN_SHOW_ROUND_TIME_LIMIT,
 } from "../../const";
+// @ts-ignore
+import roseImg from "../../assets/imgs/rose.png";
 
 interface IProps {
   data: CantStop.CantStopPlayer;
@@ -21,6 +23,7 @@ interface IProps {
   kickPlayer?: (openid: string) => void;
   colorType?: string;
   roundCountDown?: string | number;
+  showGift?: boolean;
 }
 
 export default function Index({
@@ -33,6 +36,7 @@ export default function Index({
   colorType = "white",
   index = -1,
   roundCountDown,
+  showGift = false,
 }: IProps) {
   const { avatarUrl, nickName, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
@@ -57,6 +61,14 @@ export default function Index({
           doShowAchievement();
         }}
       >
+        <View className="gift-box">
+          <Image
+            id={`rose-${index}`}
+            className="rose"
+            src={roseImg}
+            mode="aspectFit"
+          />
+        </View>
         <Image className={`avatar`} src={avatarUrl}></Image>
         <Text className={colorType}>{nickName}</Text>
       </View>
@@ -96,6 +108,7 @@ export default function Index({
         isOpened={isAchievementOpened}
         onClose={hideAchievement}
         initGameIndex={AchievementGameIndex.cantstop}
+        showGift={showGift}
       ></Achievement>
       <AtActionSheet
         isOpened={isActionSheetOpened}

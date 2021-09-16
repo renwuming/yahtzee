@@ -5,6 +5,7 @@ import Player from "../Player";
 interface IProps {
   players: Player[];
   start: boolean;
+  end: boolean;
   showOffline?: boolean;
   showSetting?: boolean;
   kickPlayer?: (openid: string) => void;
@@ -13,6 +14,7 @@ interface IProps {
 export default function Index({
   players,
   start,
+  end,
   showOffline = false,
   showSetting = false,
   kickPlayer = () => {},
@@ -27,6 +29,7 @@ export default function Index({
           showOffline={showOffline}
           showSetting={index !== 0 && showSetting}
           kickPlayer={kickPlayer}
+          showGift={start && !end}
         ></Player>
       ))}
     </View>

@@ -67,6 +67,11 @@ export function getUserProfile(callback = () => {}) {
   }
 }
 
+export function isMe(openid): boolean {
+  const userInfo = Taro.getStorageSync("userInfo");
+  return openid === userInfo.openid;
+}
+
 function isDefaultInfo(data) {
   const { nickName, openid } = data;
   const chars = nickName.split("-")[1];

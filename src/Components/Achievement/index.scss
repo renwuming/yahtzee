@@ -42,6 +42,11 @@
     border: 0;
   }
   // 礼物
+  .gift-tab {
+    padding: 20px;
+    padding-top: 10px;
+    background-color: #2b3131;
+  }
   .gift-box {
     display: flex;
     flex-wrap: wrap;
@@ -54,9 +59,7 @@
     .item {
       display: flex;
       flex-direction: column;
-      width: 140px;
-      height: 160px;
-      background-color: #dbcbbc;
+      width: 100px;
       border-radius: 12px;
       overflow: hidden;
       .top {
@@ -67,57 +70,140 @@
         align-items: center;
         .img {
           width: 90px;
-          height: 60px;
-        }
-        text {
-          display: inline-block;
-          margin-top: 4px;
-        }
-        .amount {
-          color: #856151;
-          font-size: 28px;
-          height: 36px;
-          line-height: 36px;
-        }
-        .intro {
-          color: #44352e;
-          font-size: 24px;
-          height: 30px;
-          line-height: 30px;
-        }
-        .rule {
-          color: #44352e;
-          font-size: 24px;
-          height: 30px;
-          line-height: 30px;
+          height: 65px;
         }
       }
       .bottom {
         display: flex;
         align-items: center;
-        height: 46px;
-        background-color: #efe3d5;
       }
       .at-button.at-button {
         display: flex;
         align-items: center;
         width: 100px;
-        height: 34px;
-        line-height: 34px;
-        font-size: 24px;
+        height: 22px;
+        line-height: 22px;
+        font-size: 16px;
         color: #fff;
-        background-color: rgba(241, 181, 61, 0.5);
-        border-color: rgba(241, 181, 61, 0.5);
+        background-color: transparent;
+        border-color: transparent;
         .at-button__text {
           display: flex;
           align-items: center;
         }
         .img {
-          width: 22px;
-          height: 22px;
-          margin-right: 10px;
+          width: 18px;
+          height: 18px;
+          margin-right: 6px;
         }
       }
+    }
+  }
+  .rose {
+    display: none;
+  }
+  .rose-1 {
+    position: fixed;
+    top: 34px;
+    left: 110px;
+    width: 70px;
+    height: 70px;
+    opacity: 0;
+    z-index: 100;
+  }
+  .rose-2 {
+    position: fixed;
+    top: 34px;
+    left: 580px;
+    width: 70px;
+    height: 70px;
+    opacity: 0;
+    z-index: 100;
+  }
+  .rose-3 {
+    position: fixed;
+    top: 134px;
+    left: 110px;
+    width: 70px;
+    height: 70px;
+    opacity: 0;
+    z-index: 100;
+  }
+  .rose-4 {
+    position: fixed;
+    top: 134px;
+    left: 580px;
+    width: 70px;
+    height: 70px;
+    opacity: 0;
+    z-index: 100;
+  }
+  .gift-1-to-2 {
+    display: block;
+    animation: "gift-1-to-2" 1.2s;
+  }
+  .gift-2-to-1 {
+    display: block;
+    animation: "gift-2-to-1" 1.2s;
+  }
+  .gift-1-to-2 {
+    display: block;
+    animation: "gift-1-to-2" 1.2s;
+  }
+  .gift-2-to-1 {
+    display: block;
+    animation: "gift-2-to-1" 1.2s;
+  }
+  @keyframes gift-1-to-2 {
+    0% {
+      opacity: 0;
+      transform: scale(0.7) translateX(0);
+    }
+    15% {
+      opacity: 1;
+      transform: scale(1) translateX(0);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1) translateX(470rpx);
+    }
+    90% {
+      opacity: 1;
+      transform: scale(1) translateX(470rpx);
+    }
+    95% {
+      opacity: 0;
+      transform: scale(1) translateX(470rpx);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.7) translateX(0);
+    }
+  }
+  @keyframes gift-2-to-1 {
+    0% {
+      opacity: 0;
+      transform: scale(0.7) translateX(0);
+    }
+    15% {
+      opacity: 1;
+      transform: scale(1) translateX(0);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1) translateX(-470rpx);
+    }
+    90% {
+      opacity: 1;
+      transform: scale(1) translateX(-470rpx);
+    }
+    95% {
+      opacity: 0;
+      transform: scale(1) translateX(-470rpx);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.7) translateX(0);
     }
   }
 }

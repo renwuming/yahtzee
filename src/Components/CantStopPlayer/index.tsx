@@ -10,8 +10,6 @@ import {
   AchievementGameIndex,
   MARTIAN_SHOW_ROUND_TIME_LIMIT,
 } from "../../const";
-// @ts-ignore
-import roseImg from "../../assets/imgs/rose.png";
 
 interface IProps {
   data: CantStop.CantStopPlayer;
@@ -61,14 +59,6 @@ export default function Index({
           doShowAchievement();
         }}
       >
-        <View className="gift-box">
-          <Image
-            id={`rose-${index}`}
-            className="rose"
-            src={roseImg}
-            mode="aspectFit"
-          />
-        </View>
         <Image className={`avatar`} src={avatarUrl}></Image>
         <Text className={colorType}>{nickName}</Text>
       </View>

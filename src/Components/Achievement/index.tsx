@@ -62,6 +62,7 @@ export default function Index({
 
   const [tabIndex, setTabIndex] = useState<number>(0);
   const [achievementData, setAchievementData] = useState<any>(null);
+  const [v, setV] = useState<boolean>(false);
 
   async function initAchievement() {
     const { achievement } = await CallCloudFunction({
@@ -209,19 +210,29 @@ export default function Index({
               </AtTabsPane>
             )}
             {realShowGift && (
-              <AtTabsPane current={tabIndex} index={getTabIndex("礼物")}>
+              <AtTabsPane
+                className="gift-tab"
+                current={tabIndex}
+                index={getTabIndex("礼物")}
+              >
                 <View className="gift-box at-row at-row__align--center">
-                  <View className="item-box at-col at-col-4">
-                    <View className="item">
+                  <View className="item-box at-col at-col-3">
+                    <View
+                      className="item"
+                      onClick={() => {
+                        setV(true);
+                        // animate();
+                        setTimeout(() => {
+                          setV(false);
+                        }, 1500);
+                      }}
+                    >
                       <View className="top">
                         <Image className="img" src={roseImg} mode="aspectFit" />
                       </View>
                       <View className="bottom">
                         <AtButton
-                          onClick={() => {
-                            animate();
-                          }}
-                          // disabled={remainingTimes <= 0}
+                        // disabled={remainingTimes <= 0}
                         >
                           <Image
                             className="img"
@@ -239,6 +250,17 @@ export default function Index({
           </AtTabs>
         </AtModalContent>
       </AtModal>
+
+      <Image
+        className={`rose rose-1 ${v ? "gift-1-to-2" : ""}`}
+        src={roseImg}
+        mode="aspectFit"
+      />
+      <Image
+        className={`rose rose-2 ${v ? "gift-2-to-1" : ""}`}
+        src={roseImg}
+        mode="aspectFit"
+      />
     </View>
   );
 }

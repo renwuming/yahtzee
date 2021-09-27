@@ -1,3 +1,16 @@
+interface SeasonRank {
+  name: string;
+  list: SeasonRankPlayer[];
+  desTitle: string;
+  desContent: string;
+}
+
+interface SeasonRankPlayer extends Player {
+  rankType: string;
+  rankLevel: number;
+  rankImgUrl?: string;
+}
+
 interface Wealth {
   _id: string;
   type: string;
@@ -70,18 +83,10 @@ interface Player {
   default?: boolean;
   sumScore?: number;
   inRound?: boolean;
-  singleNum: number;
-  maxSingleSum: number;
-  multiNum: number;
-  maxMultiSum: number;
-  multiWinSum: number;
-  multiWinRateValue: number;
-  multiWinRate: string;
-  highScore: number;
-  timeStamp: number;
-  achievement: any;
-  wealth: any;
-  wealthRecord: any;
+  timeStamp?: number;
+  achievement?: any;
+  wealth?: any;
+  wealthRecord?: any;
 }
 
 declare namespace Martian {

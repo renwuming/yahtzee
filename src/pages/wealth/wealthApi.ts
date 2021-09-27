@@ -1,4 +1,3 @@
-import { UserInfo } from "@tarojs/taro";
 import { DB } from "../../utils";
 
 export async function getWealthList_Database(): Promise<Wealth[]> {

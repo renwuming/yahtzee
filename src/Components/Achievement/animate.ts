@@ -3,7 +3,7 @@ import Taro, { Current } from "@tarojs/taro";
 export function animate() {
   const selector = "#rose-0";
   const node = Taro.createSelectorQuery().select(selector);
-  console.log(node);
+  // console.log(node);
   Current.page.animate(
     selector,
     [
@@ -14,7 +14,7 @@ export function animate() {
     ],
     1500,
     function () {
-      console.log("清除了.block上的所有动画属性");
+      // console.log("清除了.block上的所有动画属性");
     }
     // () => {
     //   console.log("清除了.block上的所有动画属性");

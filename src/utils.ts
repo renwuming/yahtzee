@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.2.0";
+export const VERSION = "v4.3.0";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -24,8 +24,9 @@ export async function CallCloudFunction(params) {
 }
 
 export function navigateTo(pageType: string, pagePath: string) {
+  const url = "/pages/" + [pageType, pagePath].filter((e) => e).join("/");
   Taro.navigateTo({
-    url: `/pages/${pageType}/${pagePath}`,
+    url,
   });
 }
 

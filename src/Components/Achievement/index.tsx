@@ -37,7 +37,8 @@ export default function Index({
 }: IProps) {
   const { openid, nickName, avatarUrl } = data;
   const me = isMe(openid);
-  const realShowGift = showGift && !me;
+  // TODO
+  const realShowGift = false; // showGift && !me;
 
   const tabList = useMemo(() => {
     const list = [];

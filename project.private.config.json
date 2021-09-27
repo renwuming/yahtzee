@@ -83,6 +83,12 @@
           "pathName": "pages/wealth/index",
           "query": "",
           "scene": null
+        },
+        {
+          "name": "赛季排行榜",
+          "pathName": "pages/seasonRank/index",
+          "query": "",
+          "scene": null
         }
       ]
     }

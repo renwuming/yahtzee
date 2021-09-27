@@ -40,6 +40,17 @@ export default function Index() {
       <View className="btn-list">
         <AtButton
           circle
+          type="secondary"
+          onClick={() => {
+            getUserProfile(() => {
+              navigateTo("", `seasonRank/index`);
+            });
+          }}
+        >
+          赛季排行榜
+        </AtButton>
+        <AtButton
+          circle
           type="primary"
           onClick={() => {
             getUserProfile(() => {

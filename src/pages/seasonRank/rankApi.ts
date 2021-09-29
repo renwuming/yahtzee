@@ -30,9 +30,8 @@ export async function getSeasonRankList_Database(): Promise<SeasonRank> {
       if (!rankType) return 1;
       if (!rankType2) return -1;
 
-      const rankValue = rankMap[rankType] * 10 + rankLevel;
-      const rankValue2 = rankMap[rankType2] * 10 + rankLevel2;
-
+      const rankValue = rankMap[rankType] * 10 + +rankLevel;
+      const rankValue2 = rankMap[rankType2] * 10 + +rankLevel2;
       return rankValue2 - rankValue;
     })
     .slice(0, RANKING_LEN);

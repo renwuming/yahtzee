@@ -50,7 +50,11 @@ import {
 // import { TabItem } from "taro-ui/types/tabs";
 
 export default function Index() {
-  // const [tabList, setTabList] = useState<TabItem[]>([]);
+  const tabList = [
+    {
+      title: "世界榜",
+    },
+  ];
   const [tabIndex, setTabIndex] = useState<number>(0);
   const [list1, setList1] = useState<SeasonRankPlayer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -116,7 +120,7 @@ export default function Index() {
 
   return (
     <View className="season-ranking">
-      <AtTabs current={tabIndex} tabList={[]} onClick={setTabIndex}>
+      <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
           <ScrollView
             className="scroll-view"

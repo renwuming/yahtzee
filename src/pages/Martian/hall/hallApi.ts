@@ -8,6 +8,7 @@ export async function getHallGames(pageNum) {
     name: "martianGetHallGames",
     data: {
       skip,
+      pageLength: PAGE_LEN,
     },
   });
 }
@@ -20,6 +21,7 @@ export async function getMyGames(pageNum) {
     data: {
       skip,
       type: "hall",
+      pageLength: PAGE_LEN,
     },
   });
 }

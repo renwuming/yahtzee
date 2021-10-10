@@ -12,7 +12,7 @@ import { getHallGames, getMyGames } from "./hallApi";
 import GameItem from "../../../Components/GameItemForMorePlayers";
 import { PAGE_LEN } from "../../../const";
 import { createGame } from "../game/gameApi";
-import { navigateTo } from "../../../utils";
+import { gotoCantStopGuide, navigateTo } from "../../../utils";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
@@ -165,15 +165,17 @@ export default function Index() {
           <Text className="at-fab__icon at-icon at-icon-reload"></Text>
         </AtFab>
       </View>
-      {/* <View className="fab-btn guide">
+      <View className="fab-btn guide">
         <AtFab
           onClick={() => {
-            navigateTo("Yahtzee", `guide/index`);
+            gotoCantStopGuide();
           }}
         >
-          <Text className="at-fab__icon at-icon at-icon-help"></Text>
+          <AtBadge className="shake" value={"不会玩点我"}>
+            <Text className="at-fab__icon at-icon at-icon-help"></Text>
+          </AtBadge>
         </AtFab>
-      </View> */}
+      </View>
       <View className="fab-btn ranking">
         <AtFab
           onClick={() => {

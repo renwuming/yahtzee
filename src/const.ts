@@ -4,8 +4,9 @@ export enum AchievementGameIndex {
   cantstop,
 }
 export const MAX_PLAYERS = 4;
-export const PAGE_LEN = 10;
-export const RANKING_LEN = 50;
+export const PAGE_LEN = 20;
+export const RANKING_LEN = 60;
+export const HISTORY_LEN = 100;
 
 // 快艇骰子
 export const ROUND_TIME_LIMIT = 65;

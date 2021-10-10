@@ -24,7 +24,7 @@ async function execHandleExceptionMartian(db) {
 async function handleExceptionMartian(db, game) {
   const _ = db.command;
   const { _id, roundPlayer, players, start, roundSum } = game;
-  const realPlayers = players.filter((item) => item.openid);
+  const realPlayers = players.filter((item) => item && item.openid);
   const redundantPlayers = realPlayers.length < players.length;
   const updateData = {};
 
@@ -67,11 +67,7 @@ async function execHandleRoundTimerMartian(db) {
     .then((res) => res.data);
 
   list.forEach((item) => {
-    try {
-      handleRoundTimerMartian(item);
-    } catch (e) {
-      console.error(e);
-    }
+    handleRoundTimerMartian(item);
   });
 }
 

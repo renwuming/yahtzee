@@ -56,6 +56,7 @@ export default function Index() {
       data: {
         type: "sum",
         skip: pageNum1 * PAGE_LEN,
+        pageLength: PAGE_LEN,
       },
     });
     const newList = list1.concat(list);
@@ -66,16 +67,13 @@ export default function Index() {
     }
   }
   async function updateList2() {
-    if (list2.length >= RANKING_LEN) {
-      setPage2End(true);
-      return;
-    }
     if (page2End) return;
     const list = await CallCloudFunction({
       name: "yahtzeeGetRanking",
       data: {
         type: "score",
         skip: pageNum2 * PAGE_LEN,
+        pageLength: PAGE_LEN,
       },
     });
     const newList = list2.concat(list);

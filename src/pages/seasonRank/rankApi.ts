@@ -77,7 +77,7 @@ export async function applySeasonRank_Database() {
         nickName,
         avatarUrl,
         rankLevel: 1,
-        rankType: "",
+        rankType: "青铜",
       },
     ]);
 

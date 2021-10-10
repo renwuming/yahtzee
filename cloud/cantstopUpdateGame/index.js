@@ -98,6 +98,10 @@ async function handleUpdateData(action, oldData, data, env) {
   }
   // 掷骰子
   else if (action === "dice" && inRound) {
+    const {
+      round: { stage },
+    } = oldData;
+    if (stage === CantStopStage.Select) return;
     const newRoundData = diceIt();
     return {
       round: newRoundData,
@@ -105,6 +109,10 @@ async function handleUpdateData(action, oldData, data, env) {
   }
   // 更新爬山进度
   else if (action === "updateProgress" && inRound) {
+    const {
+      round: { stage },
+    } = oldData;
+    if (stage === CantStopStage.Dice) return;
     const { list } = data;
     const newRoundData = updateProgress(round, list);
     return {
@@ -184,6 +192,7 @@ function endRound(round, players, roundPlayer, roundSum) {
 
 function judgeEnd(players, roundPlayer) {
   const { progress } = players[roundPlayer];
+  if (!progress) return {};
   const win =
     progress.filter((num, road) => {
       const top = getRoadNum(road);

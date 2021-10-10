@@ -45,7 +45,7 @@
         {
           "name": "火星骰多人2",
           "pathName": "pages/Martian/game/index",
-          "query": "id=cd045e756134735d0ae37b2709efb77a",
+          "query": "id=8937eaa961430c1f0bbbf7a3158e8996",
           "scene": null
         },
         {
@@ -75,7 +75,7 @@
         {
           "name": "欲罢不能2",
           "pathName": "pages/CantStop/game/index",
-          "query": "id=cd045e75613eb4990d35094020e39285",
+          "query": "id=14139e126156cdb01094c42615184509",
           "scene": null
         },
         {

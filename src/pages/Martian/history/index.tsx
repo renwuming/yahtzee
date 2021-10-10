@@ -6,7 +6,7 @@ import "taro-ui/dist/style/components/tabs.scss";
 import "taro-ui/dist/style/components/icon.scss";
 import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
-import { PAGE_LEN } from "../../../const";
+import { PAGE_LEN, HISTORY_LEN } from "../../../const";
 import { CallCloudFunction } from "../../../utils";
 import GameItem from "../../../Components/GameItemForMorePlayers";
 
@@ -22,12 +22,13 @@ export default function Index() {
       data: {
         type: "history",
         skip: pageNum1 * PAGE_LEN,
+        pageLength: PAGE_LEN,
       },
     });
     const newList = list1.concat(list);
     setList1(newList);
     setPageNum1(pageNum1 + 1);
-    if (list.length < PAGE_LEN) {
+    if (newList.length >= HISTORY_LEN || list.length < PAGE_LEN) {
       setPage1End(true);
     }
   }
@@ -59,7 +60,7 @@ export default function Index() {
         {page1End ? (
           <AtDivider
             className="divider"
-            content="没有更多了"
+            content={`只显示最近${HISTORY_LEN}个`}
             fontColor="#666"
             lineColor="#666"
           />

@@ -30,6 +30,7 @@ import LoadPage from "../../../Components/LoadPage";
 
 import {
   getUserProfile,
+  gotoYahtzeeGuide,
   navigateTo,
   SLEEP,
   watchDataBase,
@@ -430,7 +431,7 @@ export default function Index() {
       <View
         className="guide-btn"
         onClick={() => {
-          navigateTo("Yahtzee", "guide/index");
+          gotoYahtzeeGuide();
         }}
       >
         <AtFab size="small">帮助</AtFab>

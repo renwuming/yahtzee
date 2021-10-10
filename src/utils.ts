@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.3.1";
+export const VERSION = "v4.3.2";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -195,4 +195,23 @@ export function useThrottle(fn, delay, dep = []) {
       current.fn(...args);
     }
   }, dep);
+}
+
+export function gotoYahtzeeGuide() {
+  Taro.navigateToMiniProgram({
+    appId: "wx7564fd5313d24844",
+    path: "pages/video/video?__preload_=16338757224551&__key_=16338757224552&avid=582666822",
+  });
+}
+export function gotoMartianGuide() {
+  Taro.navigateToMiniProgram({
+    appId: "wx7564fd5313d24844",
+    path: "pages/video/video?__preload_=16338757224553&__key_=16338757224554&avid=886531668",
+  });
+}
+export function gotoCantStopGuide() {
+  Taro.navigateToMiniProgram({
+    appId: "wx7564fd5313d24844",
+    path: "pages/video/video?__preload_=163387572245513&__key_=163387572245514&avid=929195716",
+  });
 }

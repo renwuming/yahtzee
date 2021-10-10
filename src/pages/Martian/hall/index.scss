@@ -50,6 +50,15 @@ page {
       left: 50px;
       right: initial;
       bottom: 380px;
+      .at-badge__num {
+        padding: 8px;
+        top: -84px;
+        right: -22px;
+        width: 102px;
+      }
+      .shake.at-badge {
+        animation: shake 1.5s linear infinite;
+      }
     }
     &.ranking {
       left: 50px;

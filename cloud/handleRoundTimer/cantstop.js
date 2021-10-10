@@ -24,10 +24,9 @@ async function execHandleExceptionCantStop(db) {
 async function handleExceptionCantStop(db, game) {
   const _ = db.command;
   const { _id, roundPlayer, players, start, roundSum } = game;
-  const realPlayers = players.filter((item) => item.openid);
+  const realPlayers = players.filter((item) => item && item.openid);
   const redundantPlayers = realPlayers.length < players.length;
   const updateData = {};
-
   // 纠正玩家离开房间后，更新了在线时间戳
   if (redundantPlayers) {
     updateData.players = realPlayers;
@@ -67,11 +66,7 @@ async function execHandleRoundTimerCantStop(db) {
     .then((res) => res.data);
 
   list.forEach((item) => {
-    try {
-      handleRoundTimerCantStop(item);
-    } catch (e) {
-      console.error(e);
-    }
+    handleRoundTimerCantStop(item);
   });
 }
 

@@ -266,7 +266,7 @@ export default function Index() {
                   }}
                   disabled={!canEnd}
                 >
-                  结束回合
+                  {stage === CantStopStage.Select ? "前功尽弃" : "见好就收"}
                 </AtButton>
               </View>
             )

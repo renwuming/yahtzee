@@ -16,11 +16,7 @@ async function execHandleRoundTimerYahtzee(db) {
     .then((res) => res.data);
 
   list.forEach((item) => {
-    try {
-      handleRoundTimerYahtzee(item);
-    } catch (e) {
-      console.error(e);
-    }
+    handleRoundTimerYahtzee(item);
   });
 }
 
@@ -79,7 +75,7 @@ async function execHandleExceptionYahtzee(db) {
 async function handleExceptionYahtzee(db, game) {
   const _ = db.command;
   const { _id, roundPlayer, players, start } = game;
-  const realPlayers = players.filter((item) => item.openid);
+  const realPlayers = players.filter((item) => item && item.openid);
   const redundantPlayers = realPlayers.length < players.length;
   const updateData = {};
 

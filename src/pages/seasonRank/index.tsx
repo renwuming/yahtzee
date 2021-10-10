@@ -89,14 +89,12 @@ export default function Index() {
   }
   function applySeasonRank() {
     Taro.showModal({
-      content: "确定您已经在【蓝宝盒】小程序报名参赛？",
-      cancelText: "未报名",
-      confirmText: "已报名",
+      content:
+        "请先去【蓝宝盒】小程序报名参赛，然后加入“任同学の桌游小程序”交流群进行比赛",
+      confirmText: "现在报名",
+      cancelText: "我已报名",
       success: async (res) => {
         if (res.confirm) {
-          await applySeasonRank_Database();
-          reloadPage();
-        } else if (res.cancel) {
           Taro.showModal({
             content: "现在去报名参赛？",
             success: async (res) => {
@@ -105,10 +103,15 @@ export default function Index() {
                   appId: "wx1b154d20a69a455e",
                   path: "pages/lobby/room?id=14139e12615000670f57d2945a4ad31e",
                 });
+                await applySeasonRank_Database();
+                reloadPage();
               } else if (res.cancel) {
               }
             },
           });
+        } else if (res.cancel) {
+          await applySeasonRank_Database();
+          reloadPage();
         }
       },
     });
@@ -127,7 +130,7 @@ export default function Index() {
             scrollY={true}
             enableBackToTop={true}
             onScrollToLower={() => {
-              updateList1();
+              // updateList1();
             }}
           >
             {list1.map((data, index) => {

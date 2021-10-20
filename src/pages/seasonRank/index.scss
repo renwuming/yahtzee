@@ -113,3 +113,56 @@ page {
     }
   }
 }
+
+.rank-item-2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 20px;
+  background-color: #aaa;
+  &:nth-child(odd) {
+    background-color: #333;
+  }
+  &:first-child {
+    border-top: 0;
+  }
+  .index {
+    position: absolute;
+    left: 20px;
+    display: block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    &.top {
+      background-color: #ffcc00;
+    }
+  }
+  .user-box {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+  }
+  .column-right {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 130px;
+    .score-title,
+    .score {
+      color: #fff;
+      font-family: yansong;
+    }
+    .score {
+      font-family: TrebuchetMS;
+    }
+  }
+}

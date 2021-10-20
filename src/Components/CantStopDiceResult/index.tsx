@@ -1,8 +1,6 @@
 import { View, Text } from "@tarojs/components";
 import { AtButton } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
-import "taro-ui/dist/style/components/flex.scss";
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from "../DiceIcon";
 import { getRoadNum, MAX_ROAD_NUM_CANTSTOP } from "../../const";
 

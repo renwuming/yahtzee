@@ -46,5 +46,11 @@ exports.main = async (event) => {
     },
   });
 
+  db.collection("game_events").add({
+    data: {
+      gameID: res._id,
+    },
+  });
+
   return res;
 };

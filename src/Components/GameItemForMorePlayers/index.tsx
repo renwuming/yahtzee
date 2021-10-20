@@ -1,10 +1,10 @@
 import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
-import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
 
 import PlayerItem from "../MartianPlayer";
 import { navigateTo } from "../../utils";
+import { PlayerContext } from "../../const";
 
 interface IProps {
   index: number;
@@ -49,11 +49,13 @@ export default function Index({
       <Text className="index">{index + 1}</Text>
       <View className="user-box">
         {players.map((item) => (
-          <PlayerItem
-            data={item}
-            showOffline={!historyType}
-            showAchievement={false}
-          ></PlayerItem>
+          <PlayerContext.Provider
+            value={{
+              showOffline: !historyType,
+            }}
+          >
+            <PlayerItem data={item} showAchievement={false}></PlayerItem>
+          </PlayerContext.Provider>
         ))}
       </View>
       <View className="column-right">

@@ -4,15 +4,17 @@ import Taro, {
   useDidShow,
   useShareAppMessage,
 } from "@tarojs/taro";
-import { View, Text, Image } from "@tarojs/components";
+import { View, Text } from "@tarojs/components";
 import { AtButton, AtModal } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
 import { useEffect, useRef, useState } from "react";
-import "taro-ui/dist/style/components/flex.scss";
 import PlayerList from "../../../Components/CantStopPlayerList";
 import Player from "../../../Components/CantStopPlayer";
-import { getUserProfile } from "../../../utils";
+import {
+  execGiftActions,
+  getUserProfile,
+  watchEvents_DataBase,
+} from "../../../utils";
 import Board from "../../../Components/CantStopBoard";
 import DiceResult from "../../../Components/CantStopDiceResult";
 import {
@@ -28,7 +30,15 @@ import {
   updateProgress,
   watchDataBase,
 } from "./gameApi";
-import { CantStopStage, CANTSTOP_ROUND_TIME_LIMIT } from "../../../const";
+import {
+  AchievementGameIndex,
+  ACTION_DELAY,
+  CantStopStage,
+  CANTSTOP_ROUND_TIME_LIMIT,
+  PlayerContext,
+} from "../../../const";
+import { GameGift } from "../../../Components/Gifts";
+import LoadPage from "../../../Components/LoadPage";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -95,17 +105,38 @@ export default function Index() {
       setPlayers(players);
     }
   };
+  const lastGiftActionExecTime = useRef<Date>(
+    new Date(Date.now() - ACTION_DELAY)
+  );
+  const eventCb = useRef(null);
+  eventCb.current = (data, updatedFields = []) => {
+    const { giftActionList } = data || {};
+    if (!giftActionList) return;
+    execGiftActions(giftActionList, lastGiftActionExecTime, players);
+  };
   // 监听数据库变化
   useEffect(() => {
     if (!pageShow) return;
     const watcher = watchDataBase(id, cb);
+    const eventsWatcher = watchEvents_DataBase(id, eventCb);
     return () => {
       watcher.close();
+      eventsWatcher.close();
     };
   }, [pageShow]);
 
-  const { start, end, own, inGame, round, canJoin, roundSum, winner, inRound } =
-    gameData || {};
+  const {
+    start,
+    end,
+    own,
+    inGame,
+    round,
+    canJoin,
+    roundSum,
+    winner,
+    inRound,
+    playerIndex,
+  } = gameData || {};
   const { stage, diceList, roundProgress, roundRoad, roundTimeStamp } =
     round || {};
 
@@ -192,16 +223,25 @@ export default function Index() {
   }
   return (
     <View className="cantstop-game">
+      <LoadPage></LoadPage>
+      <GameGift />
       <View className="player-list-box">
-        <PlayerList
-          players={players}
-          start={start}
-          end={end}
-          showSetting={own && !start}
-          kickPlayer={kickPlayer}
-          showOffline={!end}
-          roundCountDown={singlePlayer ? Infinity : roundCountDown}
-        ></PlayerList>
+        <PlayerContext.Provider
+          value={{
+            gameID: id,
+            players,
+            playerIndex,
+            kickPlayer,
+            initGameIndex: AchievementGameIndex.cantstop,
+            showActive: !end,
+            showSetting: own && !start,
+            showOffline: !end,
+            showGift: start && !end && inGame,
+            roundCountDown: singlePlayer ? Infinity : roundCountDown,
+          }}
+        >
+          <PlayerList players={players}></PlayerList>
+        </PlayerContext.Provider>
         {singlePlayer && start && !end && (
           <View className="round-sum-box">
             <Text className="text">回合数</Text>

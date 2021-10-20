@@ -1,3 +1,15 @@
+interface GiftAction {
+  index?: number;
+  createdAt: Date;
+  sender: string;
+  receiver: string;
+  type: string;
+}
+interface GiftItem {
+  type: string;
+  icon: () => {};
+  price: number;
+}
 interface SeasonRank {
   name: string;
   list: SeasonRankPlayer[];
@@ -85,6 +97,7 @@ interface Player {
   inRound?: boolean;
   timeStamp?: number;
   achievement?: any;
+  gift?: any;
   wealth?: any;
   wealthRecord?: any;
 }

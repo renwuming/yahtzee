@@ -1,8 +1,6 @@
 import Taro, { useDidShow } from "@tarojs/taro";
 import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtIcon } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 import Player from "../HomePlayer";
 import { forceGetUserProfile, getUserProfile, navigateTo } from "../../utils";

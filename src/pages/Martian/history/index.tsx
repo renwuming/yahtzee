@@ -1,10 +1,6 @@
 import { ScrollView, View } from "@tarojs/components";
 import { useEffect, useState } from "react";
 import { AtDivider, AtIcon } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/tabs.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
 import { PAGE_LEN, HISTORY_LEN } from "../../../const";
 import { CallCloudFunction } from "../../../utils";

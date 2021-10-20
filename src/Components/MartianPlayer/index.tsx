@@ -1,43 +1,33 @@
 import { View, Image, Text } from "@tarojs/components";
 import "./index.scss";
-import "taro-ui/dist/style/components/modal.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/action-sheet.scss";
 import Achievement from "../../Components/Achievement";
-import { useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
-import { AchievementGameIndex } from "../../const";
+import { PlayerContext } from "../../const";
 
 interface IProps {
   data: Player;
-  showScore?: boolean;
-  showActive?: boolean;
-  showOffline?: boolean;
-  showAchievement?: boolean;
-  showSetting?: boolean;
-  kickPlayer?: (openid: string) => void;
+  index?: number;
   colorType?: string;
-  showGift?: boolean;
+  showAchievement?: boolean;
 }
 
 export default function Index({
   data,
-  showScore = false,
-  showActive = false,
-  showOffline = false,
-  showAchievement = true,
-  showSetting = false,
-  kickPlayer = () => {},
+  index = -1,
   colorType = "white",
-  showGift = false,
+  showAchievement = true,
 }: IProps) {
+  const playerContext = useContext(PlayerContext);
+  const { showScore, showSetting, showOffline, showActive, kickPlayer } =
+    playerContext;
+
+  const realShowSetting = index !== 0 && showSetting;
   const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
   const [isActionSheetOpened, setActionSheetOpened] = useState<boolean>(false);
 
-  const offline = useMemo(() => {
-    return showOffline && Date.now() - (timeStamp || 0) > 5000;
-  }, [data]);
+  const offline = showOffline && Date.now() - (timeStamp || 0) > 5000;
 
   function doShowAchievement() {
     showAchievement && setAchievementOpened(true);
@@ -54,7 +44,11 @@ export default function Index({
           doShowAchievement();
         }}
       >
-        <Image className={`avatar`} src={avatarUrl}></Image>
+        <Image
+          className={`avatar`}
+          id={`player-${index}-avatar`}
+          src={avatarUrl}
+        ></Image>
         <Text className={colorType}>{nickName}</Text>
       </View>
       {showScore && (
@@ -62,7 +56,7 @@ export default function Index({
           <Text>{sumScore}</Text>
         </View>
       )}
-      {showSetting && (
+      {realShowSetting && (
         <AtIcon
           className="setting"
           value="settings"
@@ -75,10 +69,9 @@ export default function Index({
       )}
       <Achievement
         data={data}
+        index={index}
         isOpened={isAchievementOpened}
         onClose={hideAchievement}
-        initGameIndex={AchievementGameIndex.martian}
-        showGift={showGift}
       ></Achievement>
       <AtActionSheet
         isOpened={isActionSheetOpened}

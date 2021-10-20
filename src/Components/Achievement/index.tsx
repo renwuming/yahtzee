@@ -1,3 +1,4 @@
+import Taro, { useDidShow } from "@tarojs/taro";
 import { View, Text, CommonEventFunction, Image } from "@tarojs/components";
 import {
   AtModal,
@@ -6,39 +7,32 @@ import {
   AtTabs,
   AtTabsPane,
   AtButton,
+  AtIcon,
 } from "taro-ui";
-import "taro-ui/dist/style/components/tabs.scss";
-import "taro-ui/dist/style/components/flex.scss";
-import { useEffect, useMemo, useState } from "react";
-import { CallCloudFunction, isMe } from "../../utils";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { CallCloudFunction, isMe, navigateTo } from "../../utils";
 import "./index.scss";
-import "taro-ui/dist/style/components/modal.scss";
-import { AchievementGameIndex } from "../../const";
+import { AchievementGameIndex, PlayerContext } from "../../const";
 // @ts-ignore
-import roseImg from "../../assets/imgs/rose.png";
-// @ts-ignore
-import goldImg from "../../assets/imgs/gold.png";
-import { animate } from "./animate";
+import GoldIcon from "../../assets/imgs/gold.png";
+import { Bomb, Rose, Praise } from "../Gifts";
+import { updateGiftDeal_Database } from "./giftApi";
 
 interface IProps {
   data: Player;
+  index?: number;
   isOpened: boolean;
   onClose: CommonEventFunction<any>;
-  initGameIndex?: number;
-  showGift?: boolean;
 }
 
-export default function Index({
-  data,
-  isOpened,
-  onClose,
-  initGameIndex = -1,
-  showGift = false,
-}: IProps) {
+export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
+  const playerContext = useContext(PlayerContext);
+  const { showGift, initGameIndex, playerIndex, players, gameID } =
+    playerContext;
+
   const { openid, nickName, avatarUrl } = data;
   const me = isMe(openid);
-  // TODO
-  const realShowGift = false; // showGift && !me;
+  const realShowGift = showGift && !me;
 
   const tabList = useMemo(() => {
     const list = [];
@@ -62,22 +56,26 @@ export default function Index({
   }, [initGameIndex, realShowGift]);
 
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const [achievementData, setAchievementData] = useState<any>(null);
-  const [v, setV] = useState<boolean>(false);
-
+  const [playerData, setPlayerData] = useState<any>(null);
+  const [waiting, setWaiting] = useState<boolean>(false);
   async function initAchievement() {
-    const { achievement } = await CallCloudFunction({
+    const playerData = await CallCloudFunction({
       name: "getPlayers",
       data: { openid },
     });
-    setAchievementData(achievement);
+    setPlayerData(playerData);
   }
 
   useEffect(() => {
     if (isOpened) initAchievement();
   }, [isOpened]);
+  useDidShow(() => {
+    initAchievement();
+  });
 
-  const { yahtzee, martian, cantstop } = achievementData || {};
+  const { achievement, wealth } = playerData || {};
+  const { yahtzee, martian, cantstop } = achievement || {};
+  const { gold } = wealth || {};
 
   function handleAchievementValue(value) {
     return value === undefined || value === null ? "-" : value;
@@ -88,6 +86,46 @@ export default function Index({
     return tabList.indexOf(item);
   }
 
+  const giftList: GiftItem[] = [
+    {
+      type: "rose",
+      icon: Rose,
+      price: 10,
+    },
+    {
+      type: "bomb",
+      icon: Bomb,
+      price: 10,
+    },
+    {
+      type: "praise",
+      icon: Praise,
+      price: 10,
+    },
+  ];
+
+  async function sendGiftTo(gift: GiftItem) {
+    if (waiting) return;
+    const { type, price } = gift;
+    const sender = players[playerIndex].openid;
+    const receiver = players[index].openid;
+    try {
+      setWaiting(true);
+      await updateGiftDeal_Database(sender, receiver, type, price, gameID);
+    } catch (err) {
+      Taro.showToast({
+        title: err,
+        icon: "none",
+        duration: 1000,
+      });
+    }
+    setWaiting(false);
+  }
+
+  function gotoWealthPage() {
+    navigateTo("wealth", "index");
+  }
+
   return (
     <View className="achievement-box">
       <AtModal isOpened={isOpened} onClose={onClose}>
@@ -96,6 +134,20 @@ export default function Index({
             <Image className={`avatar`} src={avatarUrl}></Image>
             <Text>{nickName}</Text>
           </View>
+          {me && (
+            <View className="at-row btn-row">
+              <AtButton
+                type="primary"
+                onClick={() => {
+                  gotoWealthPage();
+                }}
+              >
+                <Image className="icon" src={GoldIcon} mode="aspectFit" />
+                <Text className="icon-text">{gold || 0}</Text>
+                <AtIcon value="add" size="16" color="#fff"></AtIcon>
+              </AtButton>
+            </View>
+          )}
         </AtModalHeader>
         <AtModalContent>
           <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
@@ -217,51 +269,35 @@ export default function Index({
                 index={getTabIndex("礼物")}
               >
                 <View className="gift-box at-row at-row__align--center">
-                  <View className="item-box at-col at-col-3">
-                    <View
-                      className="item"
-                      onClick={() => {
-                        setV(true);
-                        // animate();
-                        setTimeout(() => {
-                          setV(false);
-                        }, 1500);
-                      }}
-                    >
-                      <View className="top">
-                        <Image className="img" src={roseImg} mode="aspectFit" />
-                      </View>
-                      <View className="bottom">
-                        <AtButton
-                        // disabled={remainingTimes <= 0}
+                  {giftList.map((item) => {
+                    const { icon, price } = item;
+                    return (
+                      <View className="item-box at-col at-col-3">
+                        <View
+                          className="item"
+                          onClick={() => {
+                            sendGiftTo(item);
+                          }}
                         >
-                          <Image
-                            className="img"
-                            src={goldImg}
-                            mode="aspectFit"
-                          />
-                          10
-                        </AtButton>
+                          <View className="top">{icon()}</View>
+                          <View className="bottom">
+                            <Image
+                              className="img"
+                              src={GoldIcon}
+                              mode="aspectFit"
+                            />
+                            {price}
+                          </View>
+                        </View>
                       </View>
-                    </View>
-                  </View>
+                    );
+                  })}
                 </View>
               </AtTabsPane>
             )}
           </AtTabs>
         </AtModalContent>
       </AtModal>
-
-      <Image
-        className={`rose rose-1 ${v ? "gift-1-to-2" : ""}`}
-        src={roseImg}
-        mode="aspectFit"
-      />
-      <Image
-        className={`rose rose-2 ${v ? "gift-2-to-1" : ""}`}
-        src={roseImg}
-        mode="aspectFit"
-      />
     </View>
   );
 }

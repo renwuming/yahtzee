@@ -210,6 +210,9 @@ function selectDice(round, value) {
 
 function endRound(round, players, roundPlayer, roundSum) {
   const score = calculateScore(round);
+  if (!players[roundPlayer].sumScore) {
+    players[roundPlayer].sumScore = 0;
+  }
   players[roundPlayer].sumScore += score;
   const _round = newRound();
   const newRoundPlayer = getNewRoundPlayerIndex(roundPlayer, players);

@@ -2,13 +2,7 @@ import Taro from "@tarojs/taro";
 import { useShareAppMessage } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
 import { AtButton } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/modal.scss";
 import "./index.scss";
-// @ts-ignore
-import MartianLogoImg from "../../assets/imgs/martian-share.jpg";
-// @ts-ignore
-import CantStopLogoImg from "../../assets/imgs/cantstop-share.jpg";
 import { getUserProfile, navigateTo, VERSION } from "../../utils";
 import MyPlayer from "../../Components/MyPlayer";
 
@@ -47,7 +41,7 @@ export default function Index() {
             });
           }}
         >
-          赛季排行榜
+          排行榜
         </AtButton>
         <AtButton
           circle
@@ -58,7 +52,7 @@ export default function Index() {
             });
           }}
         >
-          <Image src={CantStopLogoImg}></Image>
+          <Image src="https://cdn.renwuming.cn/static/cantstop/imgs/cantstop-share.jpg"></Image>
           欲罢不能
         </AtButton>
         <AtButton
@@ -70,7 +64,7 @@ export default function Index() {
             });
           }}
         >
-          <Image src={MartianLogoImg}></Image>
+          <Image src="https://cdn.renwuming.cn/static/martian/imgs/martian-share.jpg"></Image>
           火星骰
         </AtButton>
         <AtButton

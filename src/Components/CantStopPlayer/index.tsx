@@ -1,48 +1,33 @@
 import { View, Image, Text } from "@tarojs/components";
 import "./index.scss";
-import "taro-ui/dist/style/components/modal.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/action-sheet.scss";
 import Achievement from "../../Components/Achievement";
-import { useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
-import {
-  AchievementGameIndex,
-  MARTIAN_SHOW_ROUND_TIME_LIMIT,
-} from "../../const";
+import { MARTIAN_SHOW_ROUND_TIME_LIMIT, PlayerContext } from "../../const";
 
 interface IProps {
   data: CantStop.CantStopPlayer;
   index?: number;
-  showActive?: boolean;
-  showOffline?: boolean;
-  showAchievement?: boolean;
-  showSetting?: boolean;
-  kickPlayer?: (openid: string) => void;
   colorType?: string;
-  roundCountDown?: string | number;
-  showGift?: boolean;
+  showAchievement?: boolean;
 }
 
 export default function Index({
   data,
-  showActive = false,
-  showOffline = false,
-  showAchievement = true,
-  showSetting = false,
-  kickPlayer = () => {},
-  colorType = "white",
   index = -1,
-  roundCountDown,
-  showGift = false,
+  colorType = "white",
+  showAchievement = true,
 }: IProps) {
+  const playerContext = useContext(PlayerContext);
+  const { showSetting, showOffline, showActive, roundCountDown, kickPlayer } =
+    playerContext;
+
+  const realShowSetting = index !== 0 && showSetting;
   const { avatarUrl, nickName, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
   const [isActionSheetOpened, setActionSheetOpened] = useState<boolean>(false);
 
-  const offline = useMemo(() => {
-    return showOffline && Date.now() - (timeStamp || 0) > 5000;
-  }, [data]);
+  const offline = showOffline && Date.now() - (timeStamp || 0) > 5000;
 
   function doShowAchievement() {
     showAchievement && setAchievementOpened(true);
@@ -59,7 +44,11 @@ export default function Index({
           doShowAchievement();
         }}
       >
-        <Image className={`avatar`} src={avatarUrl}></Image>
+        <Image
+          className={`avatar`}
+          id={`player-${index}-avatar`}
+          src={avatarUrl}
+        ></Image>
         <Text className={colorType}>{nickName}</Text>
       </View>
       {showActive && inRound && (
@@ -70,7 +59,7 @@ export default function Index({
           color="#f1b53d"
         ></AtIcon>
       )}
-      {showSetting && (
+      {realShowSetting && (
         <AtIcon
           className="setting"
           value="settings"
@@ -95,10 +84,9 @@ export default function Index({
         )}
       <Achievement
         data={data}
+        index={index}
         isOpened={isAchievementOpened}
         onClose={hideAchievement}
-        initGameIndex={AchievementGameIndex.cantstop}
-        showGift={showGift}
       ></Achievement>
       <AtActionSheet
         isOpened={isActionSheetOpened}

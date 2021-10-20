@@ -1,8 +1,41 @@
+import { Context, createContext } from "react";
+
+export const PlayerContext: Context<{
+  gameID?: string;
+  players?: Player[];
+  initGameIndex?: number;
+  playerIndex?: number;
+  showScore?: boolean;
+  showActive?: boolean;
+  showOffline?: boolean;
+  showSetting?: boolean;
+  kickPlayer?: (openid: string) => void;
+  roundCountDown?: string | number;
+  showGift?: boolean;
+}> = createContext({
+  gameID: null,
+  players: [],
+  initGameIndex: -1,
+  playerIndex: -1,
+  showScore: false,
+  showActive: false,
+  showOffline: false,
+  showSetting: false,
+  kickPlayer: () => {},
+  roundCountDown: Infinity,
+  showGift: false,
+});
+
 export enum AchievementGameIndex {
   yahtzee,
   martian,
   cantstop,
 }
+
+export const ACTION_DELAY = 5000;
+export const ANIMATION_BACKUP_SUM = 10;
+export const ANIMATION_BACKUP_LIST = new Array(ANIMATION_BACKUP_SUM).fill(0);
+
 export const MAX_PLAYERS = 4;
 export const PAGE_LEN = 20;
 export const RANKING_LEN = 60;

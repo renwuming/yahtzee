@@ -1,9 +1,6 @@
 import Taro, { useReady } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
 import { AtButton, AtIcon } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/flex.scss";
 import "./index.scss";
 // @ts-ignore
 import GoldIcon from "../../assets/imgs/gold.png";

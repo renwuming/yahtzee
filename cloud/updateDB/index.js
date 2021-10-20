@@ -10,21 +10,21 @@ exports.main = async (event) => {
   const db = cloud.database();
   const _ = db.command;
 
-  return;
+  return; // TODO >>>>>>>>>>>>>>>>
 
   // 删除旧数据
   const ONE_DAYS = 1 * 24 * 60 * 60 * 1000;
   const TIME = new Date(Date.now() - ONE_DAYS);
   const list = await db
-    .collection("cantstop_games")
+    .collection("martian_games")
     .where({
       // _updateTime: _.lt(TIME),
-      // end: _.neq(true),
-      winner: -1,
+      end: _.neq(true),
+      //       winner: -1,
     })
-    // .limit(1000)
-    // .get()
-    // .then((res) => res.data);
+    //     .limit(1000)
+    //     .get()
+    //     .then((res) => res.data);
     // .update({
     //   data: {
     //     maxMultiSum: db.command.remove(),

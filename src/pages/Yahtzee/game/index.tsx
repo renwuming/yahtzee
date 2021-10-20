@@ -8,17 +8,16 @@ import {
 } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { AtButton, AtFab, AtModal } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/flex.scss";
-import "taro-ui/dist/style/components/modal.scss";
-import "taro-ui/dist/style/components/fab.scss";
 
 import "./index.scss";
 import {
+  AchievementGameIndex,
+  ACTION_DELAY,
   DEFAULT_DICE_LIST,
   DEFAULT_SCORES,
   DICE_CHANCES_NUM,
   DICE_NUM,
+  PlayerContext,
   ROUND_TIME_LIMIT,
   SHOW_ROUND_TIME_LIMIT,
 } from "../../../const";
@@ -31,9 +30,10 @@ import LoadPage from "../../../Components/LoadPage";
 import {
   getUserProfile,
   gotoYahtzeeGuide,
-  navigateTo,
   SLEEP,
   watchDataBase,
+  execGiftActions,
+  watchEvents_DataBase,
 } from "../../../utils";
 import {
   getGameData,
@@ -46,6 +46,7 @@ import {
   updateGameScores,
   updatePlayerOnline_Database,
 } from "./gameApi";
+import { GameGift } from "../../../Components/Gifts";
 
 export default function Index() {
   // 页面参数
@@ -87,6 +88,7 @@ export default function Index() {
     winner,
     roundTimeStamp,
     roundScores: scores,
+    playerIndex,
   } = gameData || {
     otherScores: DEFAULT_SCORES,
   };
@@ -127,13 +129,24 @@ export default function Index() {
     });
   }, [dicing]);
 
+  const lastGiftActionExecTime = useRef<Date>(
+    new Date(Date.now() - ACTION_DELAY)
+  );
+  const eventCb = useRef(null);
+  eventCb.current = (data, updatedFields = []) => {
+    const { giftActionList } = data || {};
+    if (!giftActionList) return;
+    execGiftActions(giftActionList, lastGiftActionExecTime, players);
+  };
+
   // 监听数据库变化
   useEffect(() => {
     if (!pageShow) return;
-
     const watcher = watchDataBase(id, cb);
+    const eventsWatcher = watchEvents_DataBase(id, eventCb);
     return () => {
       watcher.close();
+      eventsWatcher.close();
     };
   }, [pageShow]);
 
@@ -278,14 +291,23 @@ export default function Index() {
   return (
     <View className="game">
       <LoadPage></LoadPage>
-      <PlayerList
-        players={players}
-        start={start}
-        end={end}
-        showOffline={!end}
-        showSetting={own && !start}
-        kickPlayer={kickPlayer}
-      ></PlayerList>
+      <GameGift />
+      <PlayerContext.Provider
+        value={{
+          gameID: id,
+          players,
+          playerIndex,
+          kickPlayer,
+          initGameIndex: AchievementGameIndex.yahtzee,
+          showScore: start,
+          showSetting: own && !start,
+          showActive: !end,
+          showOffline: !end,
+          showGift: start && !end && inGame,
+        }}
+      >
+        <PlayerList players={players}></PlayerList>
+      </PlayerContext.Provider>
       <View className="scroll-box">
         <RatingTable
           diceList={diceList}

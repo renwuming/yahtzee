@@ -1,6 +1,5 @@
 import { View } from "@tarojs/components";
 import { AtButton } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
 
 export default function Index() {

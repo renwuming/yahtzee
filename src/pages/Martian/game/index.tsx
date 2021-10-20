@@ -6,13 +6,15 @@ import Taro, {
 } from "@tarojs/taro";
 import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtModal } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
 import "./index.scss";
 import Dice from "../../../Components/MartianDice";
 import {
+  AchievementGameIndex,
+  ACTION_DELAY,
   MartianStage,
   MARTIAN_ROUND_TIME_LIMIT,
   MARTIAN_SHOW_ROUND_TIME_LIMIT,
+  PlayerContext,
 } from "../../../const";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -28,10 +30,15 @@ import {
   updatePlayerOnline_Database,
   watchDataBase,
 } from "./gameApi";
-import "taro-ui/dist/style/components/flex.scss";
 import PlayerList from "../../../Components/MartianPlayerList";
 import Player from "../../../Components/MartianPlayer";
-import { getUserProfile } from "../../../utils";
+import {
+  execGiftActions,
+  getUserProfile,
+  watchEvents_DataBase,
+} from "../../../utils";
+import LoadPage from "../../../Components/LoadPage";
+import { GameGift } from "../../../Components/Gifts";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -44,7 +51,8 @@ export default function Index() {
     return {
       title,
       path: `/pages/Martian/game/index?id=${id}`,
-      imageUrl: "https://cdn.renwuming.cn/static/martian/imgs/share.jpg",
+      imageUrl:
+        "https://cdn.renwuming.cn/static/martian/imgs/martian-share.jpg",
     };
   });
 
@@ -91,12 +99,23 @@ export default function Index() {
       setPlayers(players);
     }
   };
+  const lastGiftActionExecTime = useRef<Date>(
+    new Date(Date.now() - ACTION_DELAY)
+  );
+  const eventCb = useRef(null);
+  eventCb.current = (data, updatedFields = []) => {
+    const { giftActionList } = data || {};
+    if (!giftActionList) return;
+    execGiftActions(giftActionList, lastGiftActionExecTime, players);
+  };
   // 监听数据库变化
   useEffect(() => {
     if (!pageShow) return;
     const watcher = watchDataBase(id, cb);
+    const eventsWatcher = watchEvents_DataBase(id, eventCb);
     return () => {
       watcher.close();
+      eventsWatcher.close();
     };
   }, [pageShow]);
 
@@ -110,6 +129,7 @@ export default function Index() {
     winners,
     roundSum,
     canJoin,
+    playerIndex,
   } = gameData || {};
   const {
     stage,
@@ -221,20 +241,30 @@ export default function Index() {
   }
   return (
     <View className="martian-game">
+      <LoadPage></LoadPage>
+      <GameGift />
       <Image
         className="bk-img"
         src="https://cdn.renwuming.cn/static/martian/imgs/martian-bk.jpg"
         mode="aspectFill"
       />
       <View className="top-box">
-        <PlayerList
-          players={players}
-          start={start}
-          end={end}
-          showSetting={own && !start}
-          kickPlayer={kickPlayer}
-          showOffline={!end}
-        ></PlayerList>
+        <PlayerContext.Provider
+          value={{
+            gameID: id,
+            players,
+            playerIndex,
+            kickPlayer,
+            initGameIndex: AchievementGameIndex.martian,
+            showScore: start,
+            showSetting: own && !start,
+            showActive: !end,
+            showOffline: !end,
+            showGift: start && !end && inGame,
+          }}
+        >
+          <PlayerList players={players}></PlayerList>
+        </PlayerContext.Provider>
         {singlePlayer && start && !end && (
           <View className="round-sum-box">
             <Text className="text">回合数</Text>

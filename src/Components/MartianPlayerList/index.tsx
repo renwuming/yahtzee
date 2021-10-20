@@ -4,33 +4,13 @@ import Player from "../MartianPlayer";
 
 interface IProps {
   players: Player[];
-  start: boolean;
-  end: boolean;
-  showOffline?: boolean;
-  showSetting?: boolean;
-  kickPlayer?: (openid: string) => void;
 }
 
-export default function Index({
-  players,
-  start,
-  end,
-  showOffline = false,
-  showSetting = false,
-  kickPlayer = () => {},
-}: IProps) {
+export default function Index({ players }: IProps) {
   return (
     <View className="martian-player-list">
       {players.map((player, index) => (
-        <Player
-          data={player}
-          showScore={start}
-          showActive={!end}
-          showOffline={showOffline}
-          showSetting={index !== 0 && showSetting}
-          kickPlayer={kickPlayer}
-          showGift={start && !end}
-        ></Player>
+        <Player data={player} index={index}></Player>
       ))}
     </View>
   );

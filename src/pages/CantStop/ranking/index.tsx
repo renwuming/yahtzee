@@ -30,10 +30,6 @@ function RankItem({ index, data, type }: RankItemProps) {
 import { ScrollView, View, Text } from "@tarojs/components";
 import { useEffect, useState } from "react";
 import { AtDivider, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/tabs.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/divider.scss";
 import "./index.scss";
 import PlayerItem from "../../../Components/CantStopPlayer";
 import { PAGE_LEN, RANKING_LEN } from "../../../const";

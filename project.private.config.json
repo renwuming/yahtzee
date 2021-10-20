@@ -21,7 +21,7 @@
         {
           "name": "快艇骰子",
           "pathName": "pages/Yahtzee/game/index",
-          "query": "id=2d44d6c261133a83046596a246600bfb",
+          "query": "id=2d44d6c2612b8bf407b9cf1a1158ee9b",
           "scene": null
         },
         {
@@ -45,7 +45,7 @@
         {
           "name": "火星骰多人2",
           "pathName": "pages/Martian/game/index",
-          "query": "id=8937eaa961430c1f0bbbf7a3158e8996",
+          "query": "id=859059a5616b803a0065f577211ff6bf",
           "scene": null
         },
         {
@@ -61,12 +61,6 @@
           "scene": null
         },
         {
-          "name": "快艇骰子2",
-          "pathName": "pages/Yahtzee/game/index",
-          "query": "id=14139e126114aef404aeaf213538207e",
-          "scene": null
-        },
-        {
           "name": "欲罢不能",
           "pathName": "pages/CantStop/game/index",
           "query": "id=14139e126138e30c0ae768450ebe07dd",
@@ -75,7 +69,7 @@
         {
           "name": "欲罢不能2",
           "pathName": "pages/CantStop/game/index",
-          "query": "id=14139e126156cdb01094c42615184509",
+          "query": "id=cd045e75613eb4990d35094020e39285",
           "scene": null
         },
         {
@@ -88,6 +82,12 @@
           "name": "赛季排行榜",
           "pathName": "pages/seasonRank/index",
           "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/Martian/game/index",
+          "pathName": "pages/Martian/game/index",
+          "query": "id=14139e126163d009122cf48c20bdaa6c",
           "scene": null
         }
       ]

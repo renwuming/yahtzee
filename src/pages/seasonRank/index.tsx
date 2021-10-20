@@ -22,6 +22,28 @@ function RankItem({ data }: RankItemProps) {
   );
 }
 
+interface CharmItemProps {
+  index: number;
+  data: Player;
+}
+
+function CharmItem({ index, data }: CharmItemProps) {
+  const { gift } = data;
+  const roseSum = gift?.receive?.rose || 0;
+  return (
+    <View key="rank" className="rank-item-2">
+      <Text className={"index " + (index < 3 ? "top" : "")}>{index + 1}</Text>
+      <View className="user-box">
+        <PlayerItem2 data={data}></PlayerItem2>
+      </View>
+      <View className="column-right">
+        <Text className="score-title">🌹</Text>
+        <Text className="score">{roseSum}</Text>
+      </View>
+    </View>
+  );
+}
+
 import Taro from "@tarojs/taro";
 import { ScrollView, View, Text, Image } from "@tarojs/components";
 import { useEffect, useState } from "react";
@@ -35,31 +57,34 @@ import {
   AtModalHeader,
   AtModalContent,
 } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/tabs.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/divider.scss";
-import "taro-ui/dist/style/components/fab.scss";
 import "./index.scss";
 import PlayerItem from "../../Components/SeasonRankPlayer";
-import { RANKING_LEN } from "../../const";
+import PlayerItem2 from "../../Components/Player";
+import { RANKING_LEN, PAGE_LEN } from "../../const";
 import {
   applySeasonRank_Database,
+  getCharmRankList_Database,
   getSeasonRankList_Database,
 } from "./rankApi";
-// import { TabItem } from "taro-ui/types/tabs";
+import { TabItem } from "taro-ui/types/tabs";
 
 export default function Index() {
-  const tabList = [
+  const [tabList, setTabList] = useState<TabItem[]>([
     {
-      title: "世界榜",
+      title: "赛季排行",
     },
-  ];
+    {
+      title: "魅力榜",
+    },
+  ]);
   const [tabIndex, setTabIndex] = useState<number>(0);
   const [list1, setList1] = useState<SeasonRankPlayer[]>([]);
+  const [list2, setList2] = useState<Player[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [seansonRank, setSeansonRank] = useState<SeasonRank>(null);
+  const [pageNum2, setPageNum2] = useState<number>(0);
+  const [page2End, setPage2End] = useState<boolean>(false);
 
   const { desTitle, desContent } = seansonRank || {};
   const showContent = desContent?.split("\\n").join("\n");
@@ -68,19 +93,27 @@ export default function Index() {
     setLoading(true);
     const data = await getSeasonRankList_Database();
     const { name, list } = data;
-
+    tabList[0].title = `${name}赛季`;
+    setTabList(tabList);
     setSeansonRank(data);
     setList1(list);
-    Taro.setNavigationBarTitle({
-      title: `${name}-赛季排行榜`,
-    });
     setLoading(false);
+  }
+  async function updateList2() {
+    const list = await getCharmRankList_Database(pageNum2 * PAGE_LEN, PAGE_LEN);
+    const newList = list2.concat(list);
+    setList2(newList);
+    setPageNum2(pageNum2 + 1);
+    if (newList.length >= RANKING_LEN || list.length < PAGE_LEN) {
+      setPage2End(true);
+    }
   }
 
   useEffect(() => {
     updateList1().then((_) => {
       setIsOpened(true);
     });
+    updateList2();
   }, []);
 
   function reloadPage() {
@@ -153,17 +186,47 @@ export default function Index() {
             )}
           </ScrollView>
         </AtTabsPane>
+        <AtTabsPane current={tabIndex} index={1}>
+          <ScrollView
+            className="scroll-view scroll-view2"
+            scrollY={true}
+            enableBackToTop={true}
+            onScrollToLower={() => {
+              updateList2();
+            }}
+          >
+            {list2.map((data, index) => {
+              return <CharmItem data={data} index={index}></CharmItem>;
+            })}
+            {page2End ? (
+              <AtDivider
+                className="divider"
+                content={`只显示前${RANKING_LEN}名`}
+                fontColor="#666"
+                lineColor="#666"
+              />
+            ) : (
+              <AtIcon
+                className="loading"
+                value="loading-3"
+                size="36"
+                color="#666"
+              ></AtIcon>
+            )}
+          </ScrollView>
+        </AtTabsPane>
       </AtTabs>
-      <View className="fab-btn">
-        <AtFab
-          onClick={async () => {
-            applySeasonRank();
-          }}
-        >
-          我要上榜
-        </AtFab>
-      </View>
-
+      {tabIndex === 0 && (
+        <View className="fab-btn">
+          <AtFab
+            onClick={async () => {
+              applySeasonRank();
+            }}
+          >
+            我要上榜
+          </AtFab>
+        </View>
+      )}
       <AtModal isOpened={isOpened} onClose={onClose}>
         <AtModalHeader>
           <Text>{desTitle}</Text>

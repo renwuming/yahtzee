@@ -1,12 +1,6 @@
 import { ScrollView, View, Text } from "@tarojs/components";
 import { useEffect, useState } from "react";
 import { AtBadge, AtDivider, AtFab, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
-import "taro-ui/dist/style/components/button.scss";
-import "taro-ui/dist/style/components/tabs.scss";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/divider.scss";
-import "taro-ui/dist/style/components/fab.scss";
-import "taro-ui/dist/style/components/badge.scss";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
 import GameItem from "../../../Components/GameItemForMorePlayers";

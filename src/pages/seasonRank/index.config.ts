@@ -1,5 +1,5 @@
 export default {
-  navigationBarTitleText: "赛季排行榜",
+  navigationBarTitleText: "排行榜",
   navigationBarTextStyle: "black",
   navigationBarBackgroundColor: "#eef5ff",
 };

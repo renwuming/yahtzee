@@ -1,8 +1,6 @@
-import Taro from "@tarojs/taro";
+import Taro, { useDidShow } from "@tarojs/taro";
 import { View } from "@tarojs/components";
 import { AtToast } from "taro-ui";
-import "taro-ui/dist/style/components/toast.scss";
-import "taro-ui/dist/style/components/icon.scss";
 import "./index.scss";
 import { initUserInfo, SLEEP } from "../../utils";
 import { useEffect, useState } from "react";
@@ -14,7 +12,8 @@ interface IProps {
 export default function Index({ setUserInfo = () => {} }: IProps) {
   const [isOpened, setOpened] = useState<boolean>(true);
 
-  useEffect(() => {
+  useDidShow(() => {
+    setOpened(true);
     Promise.all([SLEEP(300), initUserInfo()]).then((_) => {
       setOpened(false);
       const userInfo = Taro.getStorageSync("userInfo");
@@ -35,7 +34,7 @@ export default function Index({ setUserInfo = () => {} }: IProps) {
         },
       });
     });
-  }, []);
+  });
 
   return (
     <View className="load-page">

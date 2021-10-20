@@ -49,8 +49,6 @@ export async function getSeasonRankList_Database(): Promise<SeasonRank> {
 export async function applySeasonRank_Database() {
   const { openid } = Taro.getStorageSync("userInfo");
 
-  const _ = DB.command;
-
   const [userInfo] = await DB.collection("players")
     .where({
       openid,
@@ -90,4 +88,22 @@ export async function applySeasonRank_Database() {
         },
       });
   }
+}
+
+export async function getCharmRankList_Database(
+  skip: number,
+  pageLength: number
+): Promise<Player[]> {
+  const _: any = DB.command;
+  const list = await DB.collection("players")
+    .where({
+      "gift.receive.rose": _.exists(1),
+    })
+    .orderBy("gift.receive.rose", "desc")
+    .skip(skip)
+    .limit(pageLength)
+    .get()
+    .then((res) => res.data);
+
+  return list as Player[];
 }

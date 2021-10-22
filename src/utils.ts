@@ -2,7 +2,7 @@ import Taro, { Current } from "@tarojs/taro";
 import { ANIMATION_BACKUP_SUM } from "./const";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.5.0";
+export const VERSION = "v4.5.1";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -242,22 +242,29 @@ export function execGiftActions(
   lastGiftActionExecTime: React.MutableRefObject<Date>,
   players: Player[]
 ) {
-  const filterFn = createTimeFilter(lastGiftActionExecTime.current);
-  const newList = uniqActionsByCreatedAt(
-    list.map((item, index) => ({ index, ...item })).filter(filterFn)
-  );
+  const newList = uniqActionsByCreatedAt(list);
   execGiftAnimations(players, newList, lastGiftActionExecTime);
 }
 
-function uniqActionsByCreatedAt(list) {
-  const map = new Map();
+function uniqActionsByCreatedAt(list: GiftAction[]) {
+  const createdMap = new Map();
+  const typeMap = new Map();
   list.forEach((item) => {
-    const { createdAt } = item;
-    map.set(createdAt, item);
+    const { type, createdAt } = item;
+    if (createdMap.get(createdAt)) return;
+    createdMap.set(createdAt, true);
+    if (typeMap.get(type)) {
+      typeMap.get(type).push(item);
+    } else {
+      typeMap.set(type, [item]);
+    }
   });
-  return Array.from(map.keys())
-    .map((key) => map.get(key))
-    .sort((a, b) => a.createdAt - b.createdAt);
+
+  return Array.from(typeMap.keys())
+    .map((key) => typeMap.get(key))
+    .reduce((res, list) => {
+      return res.concat(list.map((item, index) => ({ index, ...item })));
+    }, []);
 }
 
 const createTimeFilter =
@@ -271,16 +278,16 @@ export function execGiftAnimations(
   lastGiftActionExecTime: React.MutableRefObject<Date>
 ) {
   const filterFn = createTimeFilter(lastGiftActionExecTime.current);
-  list = list.filter(filterFn);
+  list = list.filter(filterFn).sort((a, b) => +a.createdAt - +b.createdAt);
   if (list.length <= 0) return;
-  const [action] = list;
-  const { type, sender, receiver, createdAt, index } = action;
   const openids = players.map((item) => item.openid);
-  const senderIndex = openids.indexOf(sender);
-  const receiverIndex = openids.indexOf(receiver);
-  lastGiftActionExecTime.current = createdAt;
-  sendGiftAnimate(type, senderIndex, receiverIndex, index, () => {
-    execGiftAnimations(players, list, lastGiftActionExecTime);
+  lastGiftActionExecTime.current = list.slice(-1)[0].createdAt;
+  // 同时执行动画队列
+  list.forEach((action) => {
+    const { type, sender, receiver, index } = action;
+    const senderIndex = openids.indexOf(sender);
+    const receiverIndex = openids.indexOf(receiver);
+    sendGiftAnimate(type, senderIndex, receiverIndex, index);
   });
 }
 
@@ -289,13 +296,12 @@ function sendGiftAnimate(
   senderIndex: number,
   receiverIndex: number,
   giftIndex: number,
-  cb
+  cb = () => {}
 ) {
   if (senderIndex < 0 || receiverIndex < 0 || senderIndex === receiverIndex)
     return;
   const domIndex = giftIndex % ANIMATION_BACKUP_SUM;
   const selector = `#game-gift-container .${type}-${domIndex}`;
-
   const start = `#player-${senderIndex}-avatar`;
   const target = `#player-${receiverIndex}-avatar`;
   const query = Taro.createSelectorQuery();

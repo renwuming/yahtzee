@@ -236,7 +236,7 @@ export default function Index() {
             showActive: !end,
             showSetting: own && !start,
             showOffline: !end,
-            showGift: start && !end && inGame,
+            showGift: !end && inGame,
             roundCountDown: singlePlayer ? Infinity : roundCountDown,
           }}
         >

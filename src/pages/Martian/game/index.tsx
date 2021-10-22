@@ -260,7 +260,7 @@ export default function Index() {
             showSetting: own && !start,
             showActive: !end,
             showOffline: !end,
-            showGift: start && !end && inGame,
+            showGift: !end && inGame,
           }}
         >
           <PlayerList players={players}></PlayerList>
@@ -291,13 +291,17 @@ export default function Index() {
               <Text className="text">回合数</Text>
               <Text className="number">{roundSum}</Text>
             </View>
-          ) : (
+          ) : winners.length > 0 ? (
             <View className="result-box">
               <Text className="text">获胜者</Text>
               {winners.map((index) => {
                 const data = players[index];
                 return <Player data={data}></Player>;
               })}
+            </View>
+          ) : (
+            <View className="result-box">
+              <Text className="text">游戏超时</Text>
             </View>
           )}
         </View>

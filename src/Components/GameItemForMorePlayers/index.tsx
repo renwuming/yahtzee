@@ -30,6 +30,7 @@ export default function Index({
   let timeout = false;
   if (game["winners"] !== undefined) {
     win = !singleGame && game["winners"]?.includes(playerIndex);
+    timeout = game["winners"].length === 0;
   } else if (game["winner"] !== undefined) {
     win = !singleGame && game["winner"] === playerIndex;
     timeout = game["winner"] < 0;

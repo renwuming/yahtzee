@@ -303,7 +303,7 @@ export default function Index() {
           showSetting: own && !start,
           showActive: !end,
           showOffline: !end,
-          showGift: start && !end && inGame,
+          showGift: !end && inGame,
         }}
       >
         <PlayerList players={players}></PlayerList>

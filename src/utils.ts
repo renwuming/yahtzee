@@ -2,7 +2,7 @@ import Taro, { Current } from "@tarojs/taro";
 import { ANIMATION_BACKUP_SUM } from "./const";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.5.1";
+export const VERSION = "v4.5.2";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({

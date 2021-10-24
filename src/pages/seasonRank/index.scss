@@ -46,8 +46,12 @@ page {
     bottom: 100px;
     z-index: 900;
     .at-fab {
-      width: 140px;
-      height: 140px;
+      width: 116px;
+      height: 116px;
+      font-size: 24px;
+    }
+    &.des-btn {
+      bottom: 240px;
     }
   }
 }

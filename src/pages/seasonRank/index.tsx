@@ -110,9 +110,7 @@ export default function Index() {
   }
 
   useEffect(() => {
-    updateList1().then((_) => {
-      setIsOpened(true);
-    });
+    updateList1();
     updateList2();
   }, []);
 
@@ -217,14 +215,25 @@ export default function Index() {
         </AtTabsPane>
       </AtTabs>
       {tabIndex === 0 && (
-        <View className="fab-btn">
-          <AtFab
-            onClick={async () => {
-              applySeasonRank();
-            }}
-          >
-            我要上榜
-          </AtFab>
+        <View>
+          <View className="fab-btn des-btn">
+            <AtFab
+              onClick={async () => {
+                setIsOpened(true);
+              }}
+            >
+              赛季说明
+            </AtFab>
+          </View>
+          <View className="fab-btn">
+            <AtFab
+              onClick={async () => {
+                applySeasonRank();
+              }}
+            >
+              我要上榜
+            </AtFab>
+          </View>
         </View>
       )}
       <AtModal isOpened={isOpened} onClose={onClose}>

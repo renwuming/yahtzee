@@ -23,7 +23,7 @@ export default {
   window: {
     backgroundTextStyle: "light",
     navigationBarBackgroundColor: "#fff",
-    navigationBarTitleText: "骰子桌游大全",
+    navigationBarTitleText: "桌游大全",
     navigationBarTextStyle: "black",
     backgroundColor: "#eef5ff",
   },

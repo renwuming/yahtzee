@@ -6,29 +6,92 @@
   min-height: 100%;
   background-color: #eef5ff;
   padding: 20px 0;
+  padding-bottom: 50px;
   .version {
-    margin-top: 10px;
+    margin: 20px 0;
     color: #999;
   }
-  .cover {
-    width: 500px;
-    height: 500px;
-    border-radius: 20px;
-  }
-  .btn-list {
-    box-sizing: border-box;
-    margin-top: 50px;
-    width: 60%;
+  .game-list {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    width: 100%;
+    padding-bottom: 10px;
+    .item-box {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
     .at-button {
-      margin-bottom: 30px;
-      image {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 90px;
-        height: 90px;
-        border-radius: 90px;
-        vertical-align: middle;
+      width: 90%;
+      height: 300px;
+      padding: 0;
+      border-radius: 8px;
+      .at-button__text {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .item {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+      .top {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        image {
+          width: 90%;
+          height: 90%;
+        }
+      }
+      .bottom {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        line-height: 40px;
+        font-size: 30px;
+        color: #4871b6;
+        padding-bottom: 20px;
+      }
+    }
+  }
+  .bottom-list {
+    justify-content: center;
+    .at-button {
+      width: 140px;
+      height: 140px;
+      padding: 0;
+      border-radius: 140px;
+      margin: 0 20px;
+      .at-button__text {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .icon-btn {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        image {
+          width: 90%;
+          height: 70%;
+        }
+        text {
+          height: 40px;
+          line-height: 30px;
+          font-size: 20px;
+          color: #4871b6;
+        }
       }
     }
   }

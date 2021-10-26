@@ -1,3 +1,5 @@
+import path from "path";
+
 const config = {
   projectName: "yahtzee",
   date: "2021-6-12",
@@ -54,6 +56,7 @@ const config = {
       },
     },
   },
+  alias: { "@": path.resolve(__dirname, "..", "src") },
 };
 
 module.exports = function (merge) {

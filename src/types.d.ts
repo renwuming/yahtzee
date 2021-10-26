@@ -184,3 +184,12 @@ declare namespace CantStop {
     progress: number[];
   }
 }
+
+declare namespace Set {
+  interface SetCardData {
+    color: string;
+    shape: string;
+    fill: string;
+    n: number;
+  }
+}

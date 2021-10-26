@@ -116,7 +116,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
       Taro.showToast({
         title: err,
         icon: "none",
-        duration: 1000,
+        duration: 1500,
       });
     }
     setWaiting(false);

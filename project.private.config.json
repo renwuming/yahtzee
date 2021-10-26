@@ -63,7 +63,7 @@
         {
           "name": "欲罢不能",
           "pathName": "pages/CantStop/game/index",
-          "query": "id=14139e126138e30c0ae768450ebe07dd",
+          "query": "id=859059a5617218030148718b0927800e",
           "scene": null
         },
         {
@@ -88,6 +88,12 @@
           "name": "火星骰3",
           "pathName": "pages/Martian/game/index",
           "query": "id=fa24ce1a6170b689012c2ecc7d502564",
+          "scene": null
+        },
+        {
+          "name": "Set",
+          "pathName": "pages/Set/game/index",
+          "query": "",
           "scene": null
         }
       ]

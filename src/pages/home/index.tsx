@@ -25,8 +25,15 @@ export default function Index() {
 
   const gameList = [
     {
+      name: "神奇形色牌",
+      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover.png",
+      pageType: "Set",
+      pagePath: `game/index`,
+    },
+    {
       name: "快艇骰子",
-      imgUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/share.png",
+      imgUrl:
+        "https://cdn.renwuming.cn/static/diceGames/imgs/yahtzee-cover.png",
       pageType: "Yahtzee",
       pagePath: `hall/index`,
     },

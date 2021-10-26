@@ -2,7 +2,10 @@ import Taro, { Current } from "@tarojs/taro";
 import { ANIMATION_BACKUP_SUM } from "./const";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.5.2";
+export const VERSION = "v4.6.0";
+
+export const CLOUD_BASE_URL =
+  "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
 
 const CLOUD_ENV = process.env.CLOUD_ENV;
 Taro.cloud.init({
@@ -22,6 +25,21 @@ export async function CallCloudFunction(params) {
 
   const res: any = await Taro.cloud.callFunction(params);
   return res.result;
+}
+
+export function shuffle(arr) {
+  var length = arr.length,
+    temp,
+    random;
+  while (0 != length) {
+    random = Math.floor(Math.random() * length);
+    length--;
+    // swap
+    temp = arr[length];
+    arr[length] = arr[random];
+    arr[random] = temp;
+  }
+  return arr;
 }
 
 export function navigateTo(pageType: string, pagePath: string) {

@@ -2,7 +2,8 @@
   .detail-row {
     margin-top: 10px;
     font-weight: bold;
-    font-family: TrebuchetMS, "Microsoft YaHei", sans-serif;
+    font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+      sans-serif;
     color: #555;
     .left {
       display: inline-block;
@@ -51,7 +52,8 @@
     .icon-text {
       display: inline-block;
       width: 150px;
-      font-family: TrebuchetMS;
+      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+        sans-serif;
     }
     .at-button--primary.at-button--primary {
       padding: 10px;

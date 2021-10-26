@@ -19,6 +19,8 @@ export default {
     "pages/CantStop/hall/index",
     "pages/CantStop/history/index",
     "pages/CantStop/ranking/index",
+    // 神奇形色牌
+    "pages/Set/game/index",
   ],
   window: {
     backgroundTextStyle: "light",

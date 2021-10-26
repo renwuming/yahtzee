@@ -1,0 +1,91 @@
+page {
+  min-height: 100%;
+  height: 100%;
+}
+.set-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px 0;
+  .card-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    .card-item {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      width: 185px;
+      height: 200px;
+      .img-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        &.row-1 {
+          padding-left: 3.5%;
+        }
+        &.row-2 {
+          padding-left: 7%;
+        }
+        &.row-3 {
+          padding-left: 10.5%;
+        }
+        .card-img {
+          width: 40%;
+          height: 100%;
+          margin-left: -7%;
+        }
+      }
+      &.selected .at-button {
+        border: 2px solid #e97a29;
+      }
+      .at-button {
+        width: 95%;
+        height: 95%;
+        padding: 0;
+        border-radius: 8px;
+        .at-button__text {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+  .ctrl-box {
+    width: 580px;
+    .card-box {
+      height: 220px;
+    }
+    .at-button {
+      margin-top: 20px;
+    }
+    .at-button--secondary.at-button--secondary {
+      background: #fff;
+    }
+  }
+  .result-box {
+    display: flex;
+    margin-top: 40px;
+    width: 100%;
+    height: 170px;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 44px;
+    background-color: #999;
+    .text {
+      font-family: yansong;
+    }
+  }
+}

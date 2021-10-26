@@ -36,7 +36,8 @@
     text-align: center;
     background-color: rgba(255, 255, 255, 0.7);
     color: #0f1a2d;
-    font-family: TrebuchetMS;
+    font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+      sans-serif;
     &.active {
       background-color: rgb(124, 84, 162);
       border-color: rgb(124, 84, 162);

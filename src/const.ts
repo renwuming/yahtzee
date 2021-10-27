@@ -30,6 +30,7 @@ export enum AchievementGameIndex {
   yahtzee,
   martian,
   cantstop,
+  set,
 }
 
 export const ACTION_DELAY = 5000;

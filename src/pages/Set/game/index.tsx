@@ -24,6 +24,8 @@ export default function Index() {
   const player = Taro.getStorageSync("userInfo");
   player.inRound = true;
   player.sumScore = 0;
+  player.successSum = 0;
+  player.failSum = 0;
 
   const [players, setPlayers] = useState<Player[]>([player]);
   const initList = useMemo(() => initCardList(), []);
@@ -37,6 +39,7 @@ export default function Index() {
   const [selectedCardList, setSelectedCardList] = useState<Set.SetCardData[]>(
     []
   );
+  const [errorTimes, setErrorTimes] = useState<number>(0);
 
   function selectCard(item: Set.SetCardData) {
     const index = selectedCardList.indexOf(item);
@@ -59,36 +62,33 @@ export default function Index() {
   function submitSet() {
     const isSet = judgeSet(selectedCardList);
     if (isSet) {
-      Taro.showToast({
-        title: "成功 +2",
-        icon: "none",
-        duration: 1500,
-      });
+      // Taro.showToast({
+      //   title: "成功",
+      //   icon: "none",
+      //   duration: 1500,
+      // });
       const newCardList = gameCardList.filter(
         (item) => !selectedCardList.includes(item)
       );
 
       const maxLoopSum = Math.ceil(reserveCardList.length / 3);
       let loopSum = 0;
-      let newReserveCardList = [];
+      let newReserveCardList = reserveCardList;
       let addList = [];
       let continueFlag = true;
       while (continueFlag) {
-        addList = reserveCardList.splice(0, 3);
+        addList = newReserveCardList.splice(0, 3);
         const list = newCardList.concat(addList);
-        if (judgeSetExists(list) || loopSum >= maxLoopSum) {
-          newReserveCardList = reserveCardList;
+        if (judgeSetExists(list)) {
           continueFlag = false;
-          // 游戏结束
-          if (loopSum >= maxLoopSum) {
-            setEnd(true);
-          }
+        } else if (loopSum >= maxLoopSum) {
+          continueFlag = false;
+          setEnd(true);
         } else {
-          newReserveCardList = reserveCardList.concat(addList);
+          newReserveCardList = newReserveCardList.concat(addList);
         }
         loopSum++;
       }
-
       // 在原位置更新 Card
       let i = 0;
       gameCardList.forEach((item, index) => {
@@ -103,15 +103,18 @@ export default function Index() {
       setReserveCardList(newReserveCardList);
       setSelectedCardList([]);
       players[0].sumScore += 2;
+      players[0].successSum += 1;
       setPlayers([...players]);
     } else {
       Taro.showToast({
-        title: "失败 -1",
+        title: "失误",
         icon: "none",
         duration: 1500,
       });
-      players[0].sumScore -= 1;
+      players[0].sumScore = Math.max(0, players[0].sumScore - 1);
+      players[0].failSum += 1;
       setPlayers([...players]);
+      setErrorTimes(errorTimes + 1);
     }
   }
 
@@ -136,7 +139,7 @@ export default function Index() {
           players,
           playerIndex: 0,
           // kickPlayer,
-          initGameIndex: AchievementGameIndex.martian,
+          initGameIndex: AchievementGameIndex.set,
           showScore: true,
           // showSetting: own && !start,
           showActive: true,
@@ -151,27 +154,39 @@ export default function Index() {
           const { color, shape, fill, n } = item;
           const selected = selectedCardList.includes(item);
           const nlist = new Array(n).fill(0);
+          const notEmpty = color && shape && fill;
           return (
             <View className={`card-item ${selected ? "selected" : ""}`}>
-              <AtButton
-                onClick={() => {
-                  selectCard(item);
-                }}
-                disabled={end}
-              >
-                <View className={`img-row row-${n}`}>
-                  {nlist.map((_) => (
-                    <Image
-                      className="card-img"
-                      mode="aspectFit"
-                      src={`https://cdn.renwuming.cn/static/set/imgs/${color}-${shape}-${fill}.jpg`}
-                    ></Image>
-                  ))}
-                </View>
-              </AtButton>
+              {notEmpty && (
+                <AtButton
+                  onClick={() => {
+                    if (end) return;
+                    selectCard(item);
+                  }}
+                >
+                  <View className={`img-row row-${n}`}>
+                    {nlist.map((_) => (
+                      <Image
+                        className="card-img"
+                        mode="aspectFit"
+                        src={`https://cdn.renwuming.cn/static/set/imgs/${color}-${shape}-${fill}.jpg`}
+                      ></Image>
+                    ))}
+                  </View>
+                </AtButton>
+              )}
             </View>
           );
         })}
+      </View>
+      <View className="info-box at-row at-row__align--center">
+        <View className="reserve-num-box">
+          <Text className="text">卡牌剩余</Text>
+          <Text className="number">
+            {reserveCardList.length +
+              gameCardList.filter((item) => !!item.color).length}
+          </Text>
+        </View>
       </View>
 
       {end ? (
@@ -188,9 +203,9 @@ export default function Index() {
                 <View className={`card-item`}>
                   <AtButton
                     onClick={() => {
+                      if (end) return;
                       selectCard(item);
                     }}
-                    disabled={end}
                   >
                     <View className={`img-row row-${n}`}>
                       {nlist.map((_) => (

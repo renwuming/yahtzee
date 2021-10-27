@@ -100,6 +100,9 @@ interface Player {
   gift?: any;
   wealth?: any;
   wealthRecord?: any;
+  // set
+  successSum?: number;
+  failSum?: number;
 }
 
 declare namespace Martian {

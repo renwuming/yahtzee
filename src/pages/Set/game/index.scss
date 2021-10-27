@@ -88,4 +88,27 @@ page {
       font-family: yansong;
     }
   }
+  .info-box {
+    padding: 0 10px;
+    .reserve-num-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 240px;
+      height: 70px;
+      color: #fff;
+      font-size: 30px;
+      border-radius: 12px;
+      background-color: rgba(90, 90, 90, 0.5);
+      .text {
+        font-family: yansong;
+      }
+      .number {
+        margin-left: 10px;
+        font-size: 40px;
+        font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
+          Arial, sans-serif;
+      }
+    }
+  }
 }

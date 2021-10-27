@@ -1,9 +1,10 @@
 .martian-player {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  padding: 0 10px;
+  padding: 10px;
   &.active {
     background-color: #999;
   }
@@ -35,10 +36,25 @@
   }
   .score {
     width: 50px;
-    text-align: center;
+    text-align: right;
     text {
       font-size: 40px;
       color: #f4fcfe;
+      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+        sans-serif;
+    }
+  }
+  .set-game-info {
+    margin-top: 10px;
+    .text {
+      font-size: 26px;
+      color: #f4fcfe;
+      font-family: yansong;
+    }
+    .number {
+      color: #f4fcfe;
+      margin-left: 10px;
+      font-size: 34px;
       font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
         sans-serif;
     }

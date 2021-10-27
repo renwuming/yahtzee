@@ -72,5 +72,6 @@ export function judgeSet(list: Set.SetCardData[]): boolean {
 }
 
 function getKinds(list: any[], key: string): number {
+  if (list.some((item) => !item.color)) return 0;
   return Array.from(new Set(list.map((item) => item[key]))).length;
 }

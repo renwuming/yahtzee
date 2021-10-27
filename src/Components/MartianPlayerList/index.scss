@@ -1,6 +1,6 @@
 .martian-player-list {
   display: flex;
   padding: 0 100px;
-  height: 130px;
+  min-height: 130px;
   justify-content: space-around;
 }

@@ -3,7 +3,7 @@ import "./index.scss";
 import Achievement from "../../Components/Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
-import { PlayerContext } from "../../const";
+import { AchievementGameIndex, PlayerContext } from "../../const";
 
 interface IProps {
   data: Player;
@@ -19,11 +19,26 @@ export default function Index({
   showAchievement = true,
 }: IProps) {
   const playerContext = useContext(PlayerContext);
-  const { showScore, showSetting, showOffline, showActive, kickPlayer } =
-    playerContext;
+  const {
+    showScore,
+    showSetting,
+    showOffline,
+    showActive,
+    kickPlayer,
+    initGameIndex,
+  } = playerContext;
 
   const realShowSetting = index !== 0 && showSetting;
-  const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
+  const {
+    avatarUrl,
+    nickName,
+    sumScore,
+    inRound,
+    timeStamp,
+    openid,
+    successSum,
+    failSum,
+  } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
   const [isActionSheetOpened, setActionSheetOpened] = useState<boolean>(false);
 
@@ -38,22 +53,38 @@ export default function Index({
 
   return (
     <View className={`martian-player ${showActive && inRound ? "active" : ""}`}>
-      <View
-        className={`player-info ${offline ? "offline" : ""}`}
-        onClick={() => {
-          doShowAchievement();
-        }}
-      >
-        <Image
-          className={`avatar`}
-          id={`player-${index}-avatar`}
-          src={avatarUrl}
-        ></Image>
-        <Text className={colorType}>{nickName}</Text>
+      <View className="at-row at-row__align--center">
+        <View
+          className={`player-info ${offline ? "offline" : ""}`}
+          onClick={() => {
+            doShowAchievement();
+          }}
+        >
+          <Image
+            className={`avatar`}
+            id={`player-${index}-avatar`}
+            src={avatarUrl}
+          ></Image>
+          {initGameIndex === AchievementGameIndex.set ? null : (
+            <Text className={colorType}>{nickName}</Text>
+          )}
+        </View>
+        {showScore && (
+          <View className="score">
+            <Text>{sumScore}</Text>
+          </View>
+        )}
       </View>
-      {showScore && (
-        <View className="score">
-          <Text>{sumScore}</Text>
+      {initGameIndex === AchievementGameIndex.set && (
+        <View className="set-game-info">
+          <View className="at-row at-row__align--center">
+            <Text className="text">成功</Text>
+            <Text className="number">{successSum || 0}</Text>
+          </View>
+          <View className="at-row at-row__align--center">
+            <Text className="text">失误</Text>
+            <Text className="number">{failSum || 0}</Text>
+          </View>
         </View>
       )}
       {realShowSetting && (

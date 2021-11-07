@@ -15,7 +15,7 @@ export default function Index({}: IProps) {
   const [userInfo, setUserInfo] = useState<any>(
     Taro.getStorageSync("userInfo")
   );
-  const { wealth } = userInfo || {};
+  const { wealth, nickName } = userInfo || {};
 
   function gotoWealthPage() {
     navigateTo("wealth", "index");
@@ -28,20 +28,8 @@ export default function Index({}: IProps) {
   return (
     <View className="my-player">
       <LoadPage setUserInfo={setUserInfo}></LoadPage>
-      <Player data={userInfo} colorType="black" />
-      <View className="at-row btn-row">
-        <AtButton
-          type="primary"
-          onClick={() => {
-            getUserProfile(() => {
-              gotoWealthPage();
-            });
-          }}
-        >
-          <Image className="icon" src={GoldIcon} mode="aspectFit" />
-          <Text className="icon-text">{wealth?.gold || 0}</Text>
-          <AtIcon value="add" size="16" color="#fff"></AtIcon>
-        </AtButton>
+      <View className="at-row top-row">
+        <Player data={userInfo} colorType="black" />
         <AtButton
           type="primary"
           onClick={() => {
@@ -52,6 +40,19 @@ export default function Index({}: IProps) {
           }}
         >
           <AtIcon value="settings" size="20" color="#fff"></AtIcon>
+        </AtButton>
+      </View>
+      <View className="at-row bottom-row">
+        <Image className="icon" src={GoldIcon} mode="aspectFit" />
+        <Text className="icon-text">{wealth?.gold || 0}</Text>
+        <AtButton
+          onClick={() => {
+            getUserProfile(() => {
+              gotoWealthPage();
+            });
+          }}
+        >
+          免费获取
         </AtButton>
       </View>
     </View>

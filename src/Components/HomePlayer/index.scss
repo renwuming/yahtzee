@@ -8,25 +8,27 @@
   }
   .player-info {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     &.offline {
       opacity: 0.4;
     }
     .avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 80px;
+      width: 130px;
+      height: 130px;
+      border-radius: 130px;
+      border: 1px solid #c5d9e8;
     }
     text {
       color: #fff;
-      font-size: 26px;
+      font-size: 36px;
       width: 140px;
       text-align: center;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      margin-left: 20px;
+      margin-top: 50px;
       &.black {
         color: #666;
       }

@@ -1,41 +1,64 @@
 .my-player {
+  position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  width: 100%;
+  width: 97.4%;
   margin-top: 20px;
-  padding: 10px 0;
-  border-top: 4px solid rgba(241, 181, 61, 0.5);
-  border-bottom: 4px solid rgba(241, 181, 61, 0.5);
-  .btn-row {
+  padding: 0 40px;
+  border: 1px solid #c5d9e8;
+  border-radius: 10px;
+  .home-player {
+    margin-top: -40px;
+  }
+  .top-row {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    margin-left: 30px;
-    width: 360px;
+    .at-button--primary.at-button--primary {
+      margin: 0;
+      padding: 10px;
+      margin-left: 50px;
+      height: inherit;
+      line-height: inherit;
+      background-color: transparent;
+      background-color: rgba(241, 181, 61, 0.5);
+      border-color: transparent;
+      border-radius: 100px;
+    }
+  }
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    margin: 30px 0;
     .icon {
-      width: 40px;
-      height: 40px;
+      width: 70px;
+      height: 70px;
+    }
+    .icon-text {
+      display: inline-block;
+      color: rgba(241, 181, 61, 0.8);
+      font-size: 50px;
+      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+        sans-serif;
+    }
+    .at-button {
+      margin: 0;
+      padding: 10px;
+      height: inherit;
+      line-height: inherit;
+      background-color: transparent;
+      border-color: transparent;
     }
     .at-button__text {
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-    .icon-text {
-      display: inline-block;
-      width: 150px;
-      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
-        sans-serif;
-    }
-    .at-button--primary.at-button--primary {
-      padding: 10px;
-      height: inherit;
-      line-height: inherit;
-      background-color: rgba(241, 181, 61, 0.5);
-      border-color: rgba(241, 181, 61, 0.5);
-      border-radius: 100px;
+      color: #4871b6;
     }
   }
 }

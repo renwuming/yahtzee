@@ -1,45 +1,93 @@
 import PlayerList from "@/Components/MartianPlayerList";
-import { AchievementGameIndex, PlayerContext } from "@/const";
+import Player from "@/Components/MartianPlayer";
+import { AchievementGameIndex, PlayerContext, SET_TIME_LIMIT } from "@/const";
+import { useGameApi } from "@/utils_api";
 import { View, Image, Text } from "@tarojs/components";
-import Taro, { useShareAppMessage } from "@tarojs/taro";
-import { useMemo, useState } from "react";
+import Taro, { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
+import { useState } from "react";
 import { AtButton } from "taro-ui";
-import { initCardList, judgeSet, judgeSetExists } from "./gameApi";
+import {
+  getGameData,
+  handleGameAction,
+  handleGameData,
+  judgeSetExists,
+  submitSetCloud,
+} from "./gameApi";
 import "./index.scss";
+import { getUserProfile } from "@/utils";
 
 export default function Index() {
+  const id = getCurrentInstance()?.router?.params?.id;
   // 设置分享
   useShareAppMessage(() => {
     const { nickName } = Taro.getStorageSync("userInfo");
-    const title = `${nickName}邀请你来玩神奇形色牌！`;
     return {
-      title,
-      path: `/pages/Set/game/index`,
+      title: `${nickName}邀请你来玩神奇形色牌！`,
+      path: `/pages/Set/game/index?id=${id}`,
       imageUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover.png",
     };
   });
 
-  const INIT_CARD_SUM = 12;
-
-  const player = Taro.getStorageSync("userInfo");
-  player.inRound = true;
-  player.sumScore = 0;
-  player.successSum = 0;
-  player.failSum = 0;
-
-  const [players, setPlayers] = useState<Player[]>([player]);
-  const initList = useMemo(() => initCardList(), []);
-  const [end, setEnd] = useState<boolean>(false);
-  const [gameCardList, setGameCardList] = useState<Set.SetCardData[]>(
-    initList.slice(0, INIT_CARD_SUM)
+  const [players, setPlayers] = useState<Set.SetPlayer[]>([]);
+  const [gameData, setGameData] = useState<Set.GameData>(null);
+  const [roundCountDown, setRoundCountDown] = useState<number | string>(
+    Infinity
   );
-  const [reserveCardList, setReserveCardList] = useState<Set.SetCardData[]>(
-    initList.slice(INIT_CARD_SUM)
-  );
+
+  useGameApi({
+    id,
+    gameDbName: "set_games",
+    initFn,
+    gameDataWatchCb,
+    getGameData,
+    gameData,
+    setRoundCountDown,
+  });
+
+  function initFn(data: Set.GameBaseData) {
+    const gameData = handleGameData(data);
+    const { players } = gameData;
+    setPlayers(players);
+    setGameData(gameData);
+  }
+
+  function gameDataWatchCb(data, updatedFields = []) {
+    if (!data) return;
+    const gameDataChange =
+      updatedFields.filter(
+        (key) => !(key === "_updateTime" || /^players\.\d/.test(key))
+      ).length > 0;
+    if (gameDataChange) {
+      initFn(data);
+    } else {
+      const gameData = handleGameData(data);
+      const { players } = gameData;
+      setPlayers(players);
+    }
+  }
+
+  const {
+    gameCardList,
+    reserveCardList,
+    end,
+    start,
+    inGame,
+    own,
+    winners,
+    canJoin,
+    timer,
+  } = gameData || {};
+
+  const reserveCardsSum =
+    (reserveCardList?.length || 0) +
+      gameCardList?.filter((item) => !!item.color).length || "";
+
+  const showGameCardList = start ? gameCardList : new Array(12).fill({});
+  const singlePlayer = players.length === 1;
+
   const [selectedCardList, setSelectedCardList] = useState<Set.SetCardData[]>(
     []
   );
-  const [errorTimes, setErrorTimes] = useState<number>(0);
 
   function selectCard(item: Set.SetCardData) {
     const index = selectedCardList.indexOf(item);
@@ -60,62 +108,8 @@ export default function Index() {
   }
 
   function submitSet() {
-    const isSet = judgeSet(selectedCardList);
-    if (isSet) {
-      // Taro.showToast({
-      //   title: "成功",
-      //   icon: "none",
-      //   duration: 1500,
-      // });
-      const newCardList = gameCardList.filter(
-        (item) => !selectedCardList.includes(item)
-      );
-
-      const maxLoopSum = Math.ceil(reserveCardList.length / 3);
-      let loopSum = 0;
-      let newReserveCardList = reserveCardList;
-      let addList = [];
-      let continueFlag = true;
-      while (continueFlag) {
-        addList = newReserveCardList.splice(0, 3);
-        const list = newCardList.concat(addList);
-        if (judgeSetExists(list)) {
-          continueFlag = false;
-        } else if (loopSum >= maxLoopSum) {
-          continueFlag = false;
-          setEnd(true);
-        } else {
-          newReserveCardList = newReserveCardList.concat(addList);
-        }
-        loopSum++;
-      }
-      // 在原位置更新 Card
-      let i = 0;
-      gameCardList.forEach((item, index) => {
-        if (i >= 3) return;
-        if (selectedCardList.includes(item)) {
-          gameCardList[index] = addList[i] || {};
-          i++;
-        }
-      });
-
-      setGameCardList([...gameCardList]);
-      setReserveCardList(newReserveCardList);
-      setSelectedCardList([]);
-      players[0].sumScore += 2;
-      players[0].successSum += 1;
-      setPlayers([...players]);
-    } else {
-      Taro.showToast({
-        title: "失误",
-        icon: "none",
-        duration: 1500,
-      });
-      players[0].sumScore = Math.max(0, players[0].sumScore - 1);
-      players[0].failSum += 1;
-      setPlayers([...players]);
-      setErrorTimes(errorTimes + 1);
-    }
+    submitSetCloud(id, selectedCardList);
+    setSelectedCardList([]);
   }
 
   function showTips() {
@@ -131,33 +125,54 @@ export default function Index() {
     }
   }
 
-  return (
+  function startBtnClick() {
+    if (players.length <= 1) {
+      Taro.showModal({
+        title: "开始单人模式？",
+        success: function (res) {
+          if (res.confirm) {
+            handleGameAction(id, "startGame");
+          }
+        },
+      });
+    } else {
+      handleGameAction(id, "startGame");
+    }
+  }
+
+  function kickPlayer(openid) {
+    handleGameAction(id, "kickPlayer", {
+      openid,
+    });
+  }
+
+  return gameData ? (
     <View className="set-game">
       <PlayerContext.Provider
         value={{
-          // gameID: id,
+          gameID: id,
           players,
           playerIndex: 0,
-          // kickPlayer,
+          kickPlayer,
           initGameIndex: AchievementGameIndex.set,
-          showScore: true,
-          // showSetting: own && !start,
+          showScore: start,
+          showSetting: own && !start,
           showActive: true,
-          // showOffline: !end,
-          // showGift: !end && inGame,
+          showOffline: !end,
+          showGift: !end && inGame,
         }}
       >
         <PlayerList players={players}></PlayerList>
       </PlayerContext.Provider>
       <View className="card-box at-row at-row__align--center">
-        {gameCardList.map((item) => {
+        {showGameCardList?.map((item) => {
           const { color, shape, fill, n } = item;
           const selected = selectedCardList.includes(item);
           const nlist = new Array(n).fill(0);
           const notEmpty = color && shape && fill;
           return (
             <View className={`card-item ${selected ? "selected" : ""}`}>
-              {notEmpty && (
+              {notEmpty ? (
                 <AtButton
                   onClick={() => {
                     if (end) return;
@@ -174,6 +189,8 @@ export default function Index() {
                     ))}
                   </View>
                 </AtButton>
+              ) : (
+                <View className="empty"></View>
               )}
             </View>
           );
@@ -181,19 +198,43 @@ export default function Index() {
       </View>
       <View className="info-box at-row at-row__align--center">
         <View className="reserve-num-box">
-          <Text className="text">卡牌剩余</Text>
-          <Text className="number">
-            {reserveCardList.length +
-              gameCardList.filter((item) => !!item.color).length}
-          </Text>
+          <Text className="text">剩余卡牌</Text>
+          <Text className="number">{reserveCardsSum}</Text>
         </View>
+        {timer && start && !end && (
+          <View className="reserve-num-box count-down-box">
+            <Text className="text">剩余时间</Text>
+            {/* 倒计时小于一定时间再显示，避免回合切换时的突兀 */}
+            {roundCountDown <= SET_TIME_LIMIT && (
+              <View
+                className={`count-down ${roundCountDown < 10 ? "error" : ""}`}
+              >
+                {roundCountDown}
+              </View>
+            )}
+          </View>
+        )}
       </View>
 
       {end ? (
-        <View className="result-box">
-          <Text className="text">游戏结束</Text>
-        </View>
-      ) : (
+        singlePlayer ? (
+          <View className="result-box">
+            <Text className="text">游戏结束</Text>
+          </View>
+        ) : winners.length > 0 ? (
+          <View className="result-box">
+            <Text className="text">获胜者</Text>
+            {winners.map((index) => {
+              const data = players[index];
+              return <Player data={data}></Player>;
+            })}
+          </View>
+        ) : (
+          <View className="result-box">
+            <Text className="text">游戏超时</Text>
+          </View>
+        )
+      ) : start ? (
         <View className="ctrl-box">
           <View className="card-box at-row at-row__align--center">
             {selectedCardList.map((item) => {
@@ -228,18 +269,57 @@ export default function Index() {
             }}
             disabled={selectedCardList.length !== 3}
           >
-            提交 SET ！
+            SET ！
           </AtButton>
-          <AtButton
+          {/* <AtButton
             type="secondary"
             onClick={() => {
               showTips();
             }}
           >
             提示
+          </AtButton> */}
+        </View>
+      ) : (
+        <View className="ctrl-box before-start">
+          {own ? (
+            <AtButton
+              type="primary"
+              onClick={() => {
+                startBtnClick();
+              }}
+            >
+              开始
+            </AtButton>
+          ) : inGame ? (
+            <AtButton
+              type="secondary"
+              onClick={() => {
+                getUserProfile(() => {
+                  handleGameAction(id, "leaveGame");
+                });
+              }}
+            >
+              离开
+            </AtButton>
+          ) : (
+            <AtButton
+              type="secondary"
+              onClick={() => {
+                getUserProfile(() => {
+                  handleGameAction(id, "joinGame");
+                });
+              }}
+              disabled={!canJoin}
+            >
+              加入
+            </AtButton>
+          )}
+          <AtButton type="secondary" openType="share">
+            邀请朋友
           </AtButton>
         </View>
       )}
     </View>
-  );
+  ) : null;
 }

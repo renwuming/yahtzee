@@ -24,7 +24,21 @@ exports.main = async (event) => {
       })
       .get()
       .then((res) => res.data);
-    return list.length > 0 ? list[0] : {};
+
+    const exists = list.length > 0;
+    const data = exists ? list[0] : {};
+    if (exists) {
+      db.collection("players")
+        .where({
+          openid,
+        })
+        .update({
+          data: {
+            lastOnLine: new Date(),
+          },
+        });
+    }
+    return data;
   }
   // 查询集合
   else if (openid instanceof Array) {

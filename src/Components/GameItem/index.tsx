@@ -8,7 +8,7 @@ import { PlayerContext } from "../../const";
 
 interface IProps {
   index: number;
-  game: AnyGameData;
+  game: any;
   type?: "history" | "hall";
 }
 

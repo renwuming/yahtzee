@@ -6,7 +6,7 @@ import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import { AchievementGameIndex, PlayerContext } from "../../const";
 
 interface IProps {
-  data: Player;
+  data: AnyPlayer;
   index?: number;
   colorType?: string;
   showAchievement?: boolean;
@@ -51,6 +51,8 @@ export default function Index({
     setAchievementOpened(false);
   }
 
+  const isSetPlayer = initGameIndex === AchievementGameIndex.set;
+
   return (
     <View className={`martian-player ${showActive && inRound ? "active" : ""}`}>
       <View className="at-row at-row__align--center">
@@ -65,17 +67,26 @@ export default function Index({
             id={`player-${index}-avatar`}
             src={avatarUrl}
           ></Image>
-          {initGameIndex === AchievementGameIndex.set ? null : (
-            <Text className={colorType}>{nickName}</Text>
-          )}
+          {isSetPlayer ? null : <Text className={colorType}>{nickName}</Text>}
         </View>
         {showScore && (
           <View className="score">
             <Text>{sumScore}</Text>
           </View>
         )}
+        {realShowSetting && (
+          <AtIcon
+            className="setting"
+            value="settings"
+            size="18"
+            color="#176999"
+            onClick={() => {
+              setActionSheetOpened(true);
+            }}
+          ></AtIcon>
+        )}
       </View>
-      {initGameIndex === AchievementGameIndex.set && (
+      {isSetPlayer && showScore && (
         <View className="set-game-info">
           <View className="at-row at-row__align--center">
             <Text className="text">成功</Text>
@@ -86,17 +97,6 @@ export default function Index({
             <Text className="number">{failSum || 0}</Text>
           </View>
         </View>
-      )}
-      {realShowSetting && (
-        <AtIcon
-          className="setting"
-          value="settings"
-          size="18"
-          color="#176999"
-          onClick={() => {
-            setActionSheetOpened(true);
-          }}
-        ></AtIcon>
       )}
       <Achievement
         data={data}

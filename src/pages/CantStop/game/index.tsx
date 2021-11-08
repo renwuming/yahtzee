@@ -10,11 +10,8 @@ import "./index.scss";
 import { useEffect, useRef, useState } from "react";
 import PlayerList from "../../../Components/CantStopPlayerList";
 import Player from "../../../Components/CantStopPlayer";
-import {
-  execGiftActions,
-  getUserProfile,
-  watchEvents_DataBase,
-} from "../../../utils";
+import { getUserProfile } from "@/utils";
+import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
 import Board from "../../../Components/CantStopBoard";
 import DiceResult from "../../../Components/CantStopDiceResult";
 import {

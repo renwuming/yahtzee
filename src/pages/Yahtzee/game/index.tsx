@@ -32,9 +32,8 @@ import {
   gotoYahtzeeGuide,
   SLEEP,
   watchDataBase,
-  execGiftActions,
-  watchEvents_DataBase,
-} from "../../../utils";
+} from "@/utils";
+import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
 import {
   getGameData,
   handleGameData,

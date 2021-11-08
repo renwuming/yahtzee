@@ -11,6 +11,7 @@ import RankIcon from "../../assets/imgs/rank.png";
 import WechatIcon from "../../assets/imgs/wechat.png";
 // @ts-ignore
 import RewardIcon from "../../assets/imgs/reward.png";
+import { createGame } from "../Set/game/gameApi";
 
 export default function Index() {
   // 设置分享
@@ -28,7 +29,10 @@ export default function Index() {
       name: "神奇形色牌",
       imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover.png",
       pageType: "Set",
-      pagePath: `game/index`,
+      // pagePath: `game/index`,
+      navigateFn() {
+        createGame();
+      },
     },
     {
       name: "快艇骰子",

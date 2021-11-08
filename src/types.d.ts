@@ -69,7 +69,7 @@ interface GameBaseData {
   diceList?: DiceData[];
   winner?: number;
   end?: boolean;
-  roundTimeStamp: number;
+  roundTimeStamp?: number;
 
   _createTime: Date;
   _updateTime: Date;
@@ -78,13 +78,17 @@ interface GameBaseData {
 interface GameData extends GameBaseData {
   own: boolean;
   inGame: boolean;
-  inRound: boolean;
-  roundScores: Scores;
-  otherScores: Scores;
+  inRound?: boolean;
+  roundScores?: Scores;
+  otherScores?: Scores;
   playerIndex: number;
 }
 
-type AnyGameData = GameData | Martian.GameData | CantStop.GameData;
+type AnyGameData = GameData &
+  Martian.GameData &
+  CantStop.GameData &
+  Set.GameData;
+type AnyPlayer = Player & CantStop.CantStopPlayer & Set.SetPlayer;
 
 interface Player {
   nickName: string;
@@ -100,9 +104,6 @@ interface Player {
   gift?: any;
   wealth?: any;
   wealthRecord?: any;
-  // set
-  successSum?: number;
-  failSum?: number;
 }
 
 declare namespace Martian {
@@ -184,15 +185,41 @@ declare namespace CantStop {
     roundRoad: number[];
   }
   interface CantStopPlayer extends Player {
-    progress: number[];
+    progress?: number[];
   }
 }
 
 declare namespace Set {
   interface SetCardData {
+    index: number;
     color: string;
     shape: string;
     fill: string;
     n: number;
+  }
+  interface GameBaseData {
+    _id: string;
+    owner: Player;
+    players: Player[];
+    start?: boolean;
+    startTime?: Date | number;
+    winners?: number[];
+    end?: boolean;
+    gameCardList?: SetCardData[];
+    reserveCardList?: SetCardData[];
+    timer?: boolean;
+
+    _createTime: Date;
+    _updateTime: Date;
+  }
+  interface GameData extends GameBaseData {
+    own: boolean;
+    inGame: boolean;
+    playerIndex: number;
+    canJoin: boolean;
+  }
+  interface SetPlayer extends Player {
+    successSum?: number;
+    failSum?: number;
   }
 }

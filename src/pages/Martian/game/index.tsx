@@ -32,11 +32,8 @@ import {
 } from "./gameApi";
 import PlayerList from "../../../Components/MartianPlayerList";
 import Player from "../../../Components/MartianPlayer";
-import {
-  execGiftActions,
-  getUserProfile,
-  watchEvents_DataBase,
-} from "../../../utils";
+import { execGiftActions, watchEvents_DataBase } from "../../../utils_api";
+import { getUserProfile } from "@/utils";
 import LoadPage from "../../../Components/LoadPage";
 import { GameGift } from "../../../Components/Gifts";
 

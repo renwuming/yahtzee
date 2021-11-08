@@ -1,4 +1,82 @@
-import { shuffle } from "@/utils";
+import Taro from "@tarojs/taro";
+import { MAX_PLAYERS } from "@/const";
+import { CallCloudFunction, navigateTo, shuffle } from "@/utils";
+
+export async function getGameData(id: string): Promise<Set.GameBaseData> {
+  return await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: "findOne",
+      gameDbName: "set_games",
+      id,
+    },
+  });
+}
+
+export async function handleGameAction(
+  id: string,
+  action: string,
+  data: any = {}
+) {
+  return await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: action,
+      gameDbName: "set_games",
+      id,
+      data,
+    },
+  });
+}
+
+export async function submitSetCloud(id: string, list: Set.SetCardData[]) {
+  return await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: "submitSet",
+      gameDbName: "set_games",
+      id,
+      data: {
+        list,
+      },
+    },
+  });
+}
+
+export function handleGameData(data: Set.GameBaseData): Set.GameData {
+  const { openid } = Taro.getStorageSync("userInfo");
+  const { owner, players, startTime } = data;
+
+  players.forEach((item) => {
+    item.inRound = true;
+  });
+
+  const own = owner.openid === openid;
+  const canJoin = players.length < MAX_PLAYERS;
+  const openids = players.map((item) => item.openid);
+  const playerIndex = openids.indexOf(openid);
+  const inGame = playerIndex >= 0;
+
+  return {
+    ...data,
+    own,
+    inGame,
+    playerIndex,
+    canJoin,
+    startTime: startTime ? new Date(startTime) : Infinity,
+  };
+}
+
+export async function createGame() {
+  const { _id } = await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: "create",
+      gameDbName: "set_games",
+    },
+  });
+  navigateTo("Set", `game/index?id=${_id}`);
+}
 
 const COLORS = ["red", "green", "purple"];
 const SHAPES = ["diamond", "rect", "S"];
@@ -38,7 +116,7 @@ export function initCardList() {
 }
 
 export function judgeSetExists(
-  list: Set.SetCardData[]
+  list: Set.SetCardData[] = []
 ): boolean | Set.SetCardData[] {
   const L = list.length;
   for (let i = 0; i < L; i++)

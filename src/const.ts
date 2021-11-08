@@ -99,3 +99,7 @@ export function getRoadNum(road) {
   if (road <= 7) return road * 2 - 1;
   return 27 - road * 2;
 }
+
+// Set
+export const INIT_CARD_SUM = 12;
+export const SET_TIME_LIMIT = 5 * 60;

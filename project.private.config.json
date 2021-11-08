@@ -93,7 +93,13 @@
         {
           "name": "Set",
           "pathName": "pages/Set/game/index",
-          "query": "",
+          "query": "id=18ed0968617d7848029d945427e23ddc",
+          "scene": null
+        },
+        {
+          "name": "Set2",
+          "pathName": "pages/Set/game/index",
+          "query": "id=859059a5617d799c02e44d465f659379",
           "scene": null
         }
       ]

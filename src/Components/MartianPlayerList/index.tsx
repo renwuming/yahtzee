@@ -3,7 +3,7 @@ import "./index.scss";
 import Player from "../MartianPlayer";
 
 interface IProps {
-  players: Player[];
+  players: AnyPlayer[];
 }
 
 export default function Index({ players }: IProps) {

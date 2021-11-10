@@ -8,8 +8,10 @@ import { useState } from "react";
 import { AtButton } from "taro-ui";
 import {
   getGameData,
+  getIndexof,
   handleGameAction,
   handleGameData,
+  inList,
   judgeSetExists,
   submitSetCloud,
 } from "./gameApi";
@@ -58,6 +60,9 @@ export default function Index() {
         (key) => !(key === "_updateTime" || /^players\.\d/.test(key))
       ).length > 0;
     if (gameDataChange) {
+      if (updatedFields.includes("gameCardList")) {
+        setSelectedCardList([]);
+      }
       initFn(data);
     } else {
       const gameData = handleGameData(data);
@@ -90,7 +95,7 @@ export default function Index() {
   );
 
   function selectCard(item: Set.SetCardData) {
-    const index = selectedCardList.indexOf(item);
+    const index = getIndexof(selectedCardList, item);
     if (index >= 0) {
       selectedCardList.splice(index, 1);
     } else {
@@ -167,7 +172,7 @@ export default function Index() {
       <View className="card-box at-row at-row__align--center">
         {showGameCardList?.map((item) => {
           const { color, shape, fill, n } = item;
-          const selected = selectedCardList.includes(item);
+          const selected = inList(selectedCardList, item);
           const nlist = new Array(n).fill(0);
           const notEmpty = color && shape && fill;
           return (

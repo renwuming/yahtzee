@@ -78,8 +78,8 @@ export default function Index() {
   ];
   return (
     <View className="home">
-      <MyPlayer></MyPlayer>
       <Text className="version">{VERSION}</Text>
+      <MyPlayer></MyPlayer>
       <View className="game-list at-row at-row__align--center">
         {gameList.map((item) => {
           const { name, imgUrl, pageType, pagePath, navigateFn } = item;

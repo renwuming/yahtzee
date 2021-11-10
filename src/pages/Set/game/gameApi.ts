@@ -153,3 +153,11 @@ function getKinds(list: any[], key: string): number {
   if (list.some((item) => !item.color)) return 0;
   return Array.from(new Set(list.map((item) => item[key]))).length;
 }
+
+export function inList(list, item) {
+  return list.map((item) => item.index).includes(item.index);
+}
+
+export function getIndexof(list, item) {
+  return list.map((item) => item.index).indexOf(item.index);
+}

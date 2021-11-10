@@ -66,6 +66,7 @@ exports.create = async function create(gameDbName) {
       _updateTime: date,
       gameCardList,
       reserveCardList,
+      selectedCardList: [],
       timer: true,
     },
   });
@@ -89,7 +90,7 @@ exports.handleGame = async function handleGame(id, action, data, gameDbName) {
     .get()
     .then((res) => res.data);
 
-  const newData = await handleUpdateData(action, oldData, data);
+  const newData = await handleUpdateData(action, oldData, data, id, gameDbName);
 
   if (newData) {
     const date = new Date();
@@ -108,7 +109,7 @@ exports.handleGame = async function handleGame(id, action, data, gameDbName) {
   return null;
 };
 
-async function handleUpdateData(action, oldData, data) {
+async function handleUpdateData(action, oldData, data, id, gameDbName) {
   const { OPENID } = cloud.getWXContext();
   const { owner, players, start } = oldData;
   const openids = players.map((item) => item.openid);
@@ -160,7 +161,14 @@ async function handleUpdateData(action, oldData, data) {
   // 提交 Set
   else if (action === "submitSet") {
     const { list } = data;
-    const newData = submitSet(list, players, playerIndex, oldData);
+    const newData = await submitSet(
+      list,
+      players,
+      playerIndex,
+      oldData,
+      id,
+      gameDbName
+    );
 
     return newData;
   } else if (action === "endByTimer") {
@@ -238,19 +246,25 @@ function shuffle(arr) {
   return arr;
 }
 
-function submitSet(list, players, playerIndex, oldData) {
+async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
   const player = players[playerIndex];
   const success = judgeSet(list);
 
   if (success) {
+    // 先更新被选过的卡片
+    await updateSelectedCardList(list, id, gameDbName);
+
     player.successSum += 1;
     player.sumScore += 2;
 
-    const { gameCardList, reserveCardList } = oldData;
+    const { gameCardList, reserveCardList, selectedCardList } = oldData;
+    const _selectedCardList = selectedCardList.concat(list);
+    const newCardList = gameCardList.filter(
+      (item) => !inList(_selectedCardList, item)
+    );
 
-    const newCardList = gameCardList.filter((item) => !inList(list, item));
-
-    const maxLoopSum = Math.ceil(reserveCardList.length / 3);
+    const fillN = 12 - newCardList.length;
+    const maxLoopSum = Math.ceil(reserveCardList.length / fillN);
     let loopSum = 0;
     let newReserveCardList = reserveCardList;
     let addList = [];
@@ -258,7 +272,7 @@ function submitSet(list, players, playerIndex, oldData) {
     let end = false;
     let winners = [];
     while (continueFlag) {
-      addList = newReserveCardList.splice(0, 3);
+      addList = newReserveCardList.splice(0, fillN);
       const list = newCardList.concat(addList);
       if (judgeSetExists(list)) {
         continueFlag = false;
@@ -273,24 +287,30 @@ function submitSet(list, players, playerIndex, oldData) {
     // 在原位置更新 Card
     let i = 0;
     gameCardList.forEach((item, index) => {
-      if (i >= 3) return;
-      if (inList(list, item)) {
+      if (i >= fillN) return;
+      if (inList(_selectedCardList, item)) {
         gameCardList[index] = addList[i] || {};
         i++;
       }
     });
 
-    if (end) {
-      winners = getWinners(players);
-    }
+    // 被选过的卡片
+    const cardList = await getSelectedCardList(id, gameDbName);
+    if (cardList !== _selectedCardList) {
+      submitSet(list, players, playerIndex, oldData, id, gameDbName);
+    } else {
+      if (end) {
+        winners = getWinners(players);
+      }
 
-    return {
-      gameCardList,
-      reserveCardList,
-      end,
-      winners,
-      [`players.${playerIndex}`]: player,
-    };
+      return {
+        gameCardList,
+        reserveCardList,
+        end,
+        winners,
+        [`players.${playerIndex}`]: player,
+      };
+    }
   } else {
     player.failSum += 1;
     player.sumScore = Math.max(0, player.sumScore - 1);
@@ -299,6 +319,28 @@ function submitSet(list, players, playerIndex, oldData) {
       [`players.${playerIndex}`]: player,
     };
   }
+}
+
+async function updateSelectedCardList(list, id, gameDbName) {
+  const db = cloud.database();
+  const _ = db.command;
+  return await db
+    .collection(gameDbName)
+    .doc(id)
+    .update({
+      data: {
+        selectedCardList: _.push(list),
+      },
+    });
+}
+async function getSelectedCardList(id, gameDbName) {
+  const db = cloud.database();
+  const { selectedCardList } = await db
+    .collection(gameDbName)
+    .doc(id)
+    .get()
+    .then((res) => res.data);
+  return selectedCardList;
 }
 
 function inList(list, item) {

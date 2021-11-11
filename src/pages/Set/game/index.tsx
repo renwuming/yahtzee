@@ -89,6 +89,8 @@ export default function Index() {
 
   const showGameCardList = start ? gameCardList : new Array(12).fill({});
   const singlePlayer = players.length === 1;
+  const timerGameTxt = singlePlayer ? "单人竞技" : "多人竞技";
+  const noTimerGameTxt = "单人练习";
 
   const [selectedCardList, setSelectedCardList] = useState<Set.SetCardData[]>(
     []
@@ -130,18 +132,19 @@ export default function Index() {
     }
   }
 
-  function startBtnClick() {
-    if (players.length <= 1) {
+  function startBtnClick(timer = true) {
+    if (singlePlayer) {
+      const title = `开始${timer ? timerGameTxt : noTimerGameTxt}？`;
       Taro.showModal({
-        title: "开始单人模式？",
+        title,
         success: function (res) {
           if (res.confirm) {
-            handleGameAction(id, "startGame");
+            handleGameAction(id, "startGame", { timer });
           }
         },
       });
     } else {
-      handleGameAction(id, "startGame");
+      handleGameAction(id, "startGame", { timer });
     }
   }
 
@@ -276,26 +279,40 @@ export default function Index() {
           >
             SET ！
           </AtButton>
-          {/* <AtButton
-            type="secondary"
-            onClick={() => {
-              showTips();
-            }}
-          >
-            提示
-          </AtButton> */}
+          {timer ? null : (
+            <AtButton
+              type="secondary"
+              onClick={() => {
+                showTips();
+              }}
+            >
+              提示
+            </AtButton>
+          )}
         </View>
       ) : (
         <View className="ctrl-box before-start">
           {own ? (
-            <AtButton
-              type="primary"
-              onClick={() => {
-                startBtnClick();
-              }}
-            >
-              开始
-            </AtButton>
+            <View>
+              <AtButton
+                type="primary"
+                onClick={() => {
+                  startBtnClick();
+                }}
+              >
+                {timerGameTxt}
+              </AtButton>
+              {singlePlayer && (
+                <AtButton
+                  type="primary"
+                  onClick={() => {
+                    startBtnClick(false);
+                  }}
+                >
+                  {noTimerGameTxt}
+                </AtButton>
+              )}
+            </View>
           ) : inGame ? (
             <AtButton
               type="secondary"

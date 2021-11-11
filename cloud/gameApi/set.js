@@ -67,7 +67,6 @@ exports.create = async function create(gameDbName) {
       gameCardList,
       reserveCardList,
       selectedCardList: [],
-      timer: true,
     },
   });
 
@@ -80,7 +79,13 @@ exports.create = async function create(gameDbName) {
   return res;
 };
 
-exports.handleGame = async function handleGame(id, action, data, gameDbName) {
+exports.handleGame = async function handleGame(
+  id,
+  action,
+  data,
+  gameDbName,
+  openid
+) {
   const db = cloud.database();
 
   // 先读旧数据
@@ -90,7 +95,14 @@ exports.handleGame = async function handleGame(id, action, data, gameDbName) {
     .get()
     .then((res) => res.data);
 
-  const newData = await handleUpdateData(action, oldData, data, id, gameDbName);
+  const newData = await handleUpdateData(
+    action,
+    oldData,
+    data,
+    id,
+    gameDbName,
+    openid
+  );
 
   if (newData) {
     const date = new Date();
@@ -109,8 +121,10 @@ exports.handleGame = async function handleGame(id, action, data, gameDbName) {
   return null;
 };
 
-async function handleUpdateData(action, oldData, data, id, gameDbName) {
-  const { OPENID } = cloud.getWXContext();
+async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
+  const db = cloud.database();
+  const _ = db.command;
+  const OPENID = openid || cloud.getWXContext().OPENID;
   const { owner, players, start } = oldData;
   const openids = players.map((item) => item.openid);
   const playerIndex = openids.indexOf(OPENID);
@@ -118,6 +132,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName) {
   const own = OPENID === owner.openid;
   // 开始游戏
   if (action === "startGame" && own) {
+    const { timer } = data;
     players.forEach((player) => {
       player.sumScore = 0;
       player.successSum = 0;
@@ -127,6 +142,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName) {
       startTime: new Date(),
       start: true,
       players,
+      timer,
     };
   }
   // 加入游戏
@@ -138,9 +154,8 @@ async function handleUpdateData(action, oldData, data, id, gameDbName) {
         openid: OPENID,
       },
     });
-    players.push(player);
     return {
-      players,
+      players: _.push(player),
     };
   }
   // 踢出某人
@@ -246,21 +261,31 @@ function shuffle(arr) {
   return arr;
 }
 
-async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
+async function submitSet(
+  list,
+  players,
+  playerIndex,
+  oldData,
+  id,
+  gameDbName,
+  successFlag = false // 提交 Set 冲突时，重新写入数据库标识
+) {
   const player = players[playerIndex];
-  const success = judgeSet(list);
+  const success = successFlag || judgeSet(list);
 
   if (success) {
-    // 先更新被选过的卡片
-    await updateSelectedCardList(list, id, gameDbName);
+    if (!successFlag) {
+      // 先更新被选过的卡片
+      await updateSelectedCardList(list, id, gameDbName);
+    }
 
     player.successSum += 1;
     player.sumScore += 2;
 
-    const { gameCardList, reserveCardList, selectedCardList } = oldData;
-    const _selectedCardList = selectedCardList.concat(list);
+    const selectedCardList = await getSelectedCardList(id, gameDbName);
+    const { gameCardList, reserveCardList } = oldData;
     const newCardList = gameCardList.filter(
-      (item) => !inList(_selectedCardList, item)
+      (item) => !inList(selectedCardList, item)
     );
 
     const fillN = 12 - newCardList.length;
@@ -288,16 +313,25 @@ async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
     let i = 0;
     gameCardList.forEach((item, index) => {
       if (i >= fillN) return;
-      if (inList(_selectedCardList, item)) {
+      if (inList(selectedCardList, item)) {
         gameCardList[index] = addList[i] || {};
         i++;
       }
     });
 
     // 被选过的卡片
-    const cardList = await getSelectedCardList(id, gameDbName);
-    if (cardList !== _selectedCardList) {
-      submitSet(list, players, playerIndex, oldData, id, gameDbName);
+    const newestSelectedCardList = await getSelectedCardList(id, gameDbName);
+    if (!isEqual(newestSelectedCardList, selectedCardList)) {
+      await submitSet(
+        list,
+        players,
+        playerIndex,
+        oldData,
+        id,
+        gameDbName,
+        true
+      );
+      return;
     } else {
       if (end) {
         winners = getWinners(players);
@@ -345,6 +379,13 @@ async function getSelectedCardList(id, gameDbName) {
 
 function inList(list, item) {
   return list.map((item) => item.index).includes(item.index);
+}
+
+function isEqual(list, list2) {
+  return (
+    list.map((item) => item.index).join("") ===
+    list2.map((item) => item.index).join("")
+  );
 }
 
 function getWinners(players) {

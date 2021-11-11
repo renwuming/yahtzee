@@ -2,7 +2,7 @@ import Taro, { Current } from "@tarojs/taro";
 import { ANIMATION_BACKUP_SUM } from "./const";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.6.1";
+export const VERSION = "v4.7.0";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";

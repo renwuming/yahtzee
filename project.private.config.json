@@ -87,7 +87,7 @@
         {
           "name": "火星骰3",
           "pathName": "pages/Martian/game/index",
-          "query": "id=fa24ce1a6170b689012c2ecc7d502564",
+          "query": "id=fa24ce1a618e368105f9499f472037b9",
           "scene": null
         },
         {
@@ -99,7 +99,7 @@
         {
           "name": "Set2",
           "pathName": "pages/Set/game/index",
-          "query": "id=859059a5618d519c053660cc6a42069d",
+          "query": "id=9e7190f1618e31b7054740400d2f52ca",
           "scene": null
         }
       ]

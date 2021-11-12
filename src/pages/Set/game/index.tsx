@@ -57,7 +57,8 @@ export default function Index() {
     if (!data) return;
     const gameDataChange =
       updatedFields.filter(
-        (key) => !(key === "_updateTime" || /^players\.\d/.test(key))
+        (key) =>
+          !(key === "_updateTime" || /^players\.\d+\.timeStamp/.test(key))
       ).length > 0;
     if (gameDataChange) {
       if (updatedFields.includes("gameCardList")) {
@@ -165,9 +166,10 @@ export default function Index() {
           initGameIndex: AchievementGameIndex.set,
           showScore: start,
           showSetting: own && !start,
-          showActive: true,
+          showActive: start,
           showOffline: !end,
           showGift: !end && inGame,
+          noNickName: true,
         }}
       >
         <PlayerList players={players}></PlayerList>

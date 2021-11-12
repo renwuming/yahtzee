@@ -9,6 +9,7 @@ export const PlayerContext: Context<{
   showActive?: boolean;
   showOffline?: boolean;
   showSetting?: boolean;
+  noNickName?: boolean;
   kickPlayer?: (openid: string) => void;
   roundCountDown?: string | number;
   showGift?: boolean;
@@ -21,6 +22,7 @@ export const PlayerContext: Context<{
   showActive: false,
   showOffline: false,
   showSetting: false,
+  noNickName: false,
   kickPlayer: () => {},
   roundCountDown: Infinity,
   showGift: false,

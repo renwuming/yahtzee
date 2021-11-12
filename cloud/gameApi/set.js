@@ -154,8 +154,9 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
         openid: OPENID,
       },
     });
+    players.push(player);
     return {
-      players: _.push(player),
+      players,
     };
   }
   // 踢出某人

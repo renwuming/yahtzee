@@ -13,7 +13,7 @@ const {
   execHandleRoundTimerCantStop,
   execHandleExceptionCantStop,
 } = require("./cantstop");
-const { execHandleTimerSet } = require("./set");
+const { execHandleTimerSet, execHandleExceptionSet } = require("./set");
 
 const ENV = "prod-0gjpxr644f6d941d";
 // 云函数入口函数
@@ -34,4 +34,5 @@ exports.main = async (event) => {
   execHandleExceptionCantStop(db);
   // Set
   execHandleTimerSet(db);
+  execHandleExceptionSet(db);
 };

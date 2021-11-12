@@ -38,6 +38,46 @@ function handleTimerSet(game) {
   }
 }
 
+async function execHandleExceptionSet(db) {
+  const _ = db.command;
+  // 处理【最近1小时的】【未结束的】游戏
+  const ONE_HOUR = 1 * 60 * 60 * 1000;
+  const TIME = new Date(Date.now() - ONE_HOUR);
+  const list = await db
+    .collection("set_games")
+    .where({
+      _updateTime: _.gt(TIME),
+      end: _.neq(true),
+    })
+    .limit(1000) // TODO 分页查询
+    .get()
+    .then((res) => res.data);
+
+  list.forEach((item) => {
+    handleExceptionSet(db, item);
+  });
+}
+
+async function handleExceptionSet(db, game) {
+  const _ = db.command;
+  const { _id, players } = game;
+  const realPlayers = players.filter((item) => item && item.openid);
+  const redundantPlayers = realPlayers.length < players.length;
+  const updateData = {};
+
+  // 纠正玩家离开房间后，更新了在线时间戳
+  if (redundantPlayers) {
+    updateData.players = realPlayers;
+  }
+
+  if (Object.keys(updateData).length > 0) {
+    await db.collection("set_games").doc(_id).update({
+      data: updateData,
+    });
+  }
+}
+
 module.exports = {
   execHandleTimerSet,
+  execHandleExceptionSet,
 };

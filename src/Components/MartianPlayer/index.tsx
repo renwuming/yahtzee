@@ -24,6 +24,7 @@ export default function Index({
     showSetting,
     showOffline,
     showActive,
+    noNickName,
     kickPlayer,
     initGameIndex,
   } = playerContext;
@@ -67,7 +68,7 @@ export default function Index({
             id={`player-${index}-avatar`}
             src={avatarUrl}
           ></Image>
-          {isSetPlayer ? null : <Text className={colorType}>{nickName}</Text>}
+          {!noNickName && <Text className={colorType}>{nickName}</Text>}
         </View>
         {showScore && (
           <View className="score">

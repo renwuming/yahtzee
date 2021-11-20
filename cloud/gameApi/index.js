@@ -1,8 +1,8 @@
 // 云函数入口文件
 const cloud = require("wx-server-sdk");
 
+const { findOne } = require("./common");
 const setHandleFn = require("./set");
-
 const handleFnMap = {
   set_games: setHandleFn,
 };
@@ -30,13 +30,3 @@ exports.main = async (event) => {
     );
   }
 };
-
-async function findOne(gameDbName, id) {
-  const db = cloud.database();
-  const data = await db
-    .collection(gameDbName)
-    .doc(id)
-    .get()
-    .then((res) => res.data);
-  return data;
-}

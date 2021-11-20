@@ -18,6 +18,8 @@ exports.main = async (event) => {
     return await handleMartianAchievement(db, openid);
   } else if (game === "cantstop") {
     return await handleCantStopAchievement(db, openid);
+  } else if (game === "set") {
+    return await handleSetAchievement(db, openid);
   }
 };
 
@@ -192,5 +194,67 @@ async function handleCantStopAchievement(db, openid) {
     multiWinRateValue,
     multiWinRate,
     minRoundSum,
+  };
+}
+
+async function handleSetAchievement(db, openid) {
+  // 查找所有包含此玩家的游戏
+  const games = await db
+    .collection("set_games")
+    .where({
+      "players.openid": openid,
+      end: true,
+    })
+    .limit(1000) // TODO 分页查询
+    .get()
+    .then((res) => res.data);
+
+  const singleGames = games.filter((item) => {
+    const { players } = item;
+    return players.length === 1;
+  });
+  const multiGames = games.filter((item) => {
+    const { players } = item;
+    return players.length > 1;
+  });
+
+  const singleNum = singleGames.length;
+  const multiNum = multiGames.length;
+
+  let multiWinSum = 0;
+  let highScore = 0;
+
+  singleGames.forEach((item) => {
+    const {
+      timer,
+      players: [player],
+    } = item;
+    timer && (highScore = Math.max(player.sumScore, highScore));
+  });
+
+  multiGames.forEach((item) => {
+    const {
+      timer,
+      players,
+      players: [player],
+      winners,
+    } = item;
+    const index = players.map((item) => item.openid).indexOf(openid);
+    if (winners.includes(index)) multiWinSum++;
+
+    timer && (highScore = Math.max(player.sumScore, highScore));
+  });
+
+  const multiWinRateValue =
+    multiWinSum === 0 ? 0 : +((multiWinSum / multiNum) * 100).toFixed(0);
+  const multiWinRate = `${multiWinRateValue}%`;
+
+  return {
+    singleNum,
+    multiNum,
+    multiWinSum,
+    multiWinRateValue,
+    multiWinRate,
+    highScore,
   };
 }

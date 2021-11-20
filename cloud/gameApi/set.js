@@ -1,7 +1,8 @@
 const cloud = require("wx-server-sdk");
 
-const MAX_PLAYERS = 4;
+const { updatePlayer, findOne } = require("./common");
 
+const MAX_PLAYERS = 4;
 const COLORS = ["red", "green", "purple"];
 const SHAPES = ["diamond", "rect", "S"];
 const FILLS = ["empty", "solid", "line"];
@@ -67,6 +68,7 @@ exports.create = async function create(gameDbName) {
       gameCardList,
       reserveCardList,
       selectedCardList: [],
+      recordList: [],
     },
   });
 
@@ -87,13 +89,8 @@ exports.handleGame = async function handleGame(
   openid
 ) {
   const db = cloud.database();
-
   // 先读旧数据
-  const { _id, ...oldData } = await db
-    .collection(gameDbName)
-    .doc(id)
-    .get()
-    .then((res) => res.data);
+  const { _id, ...oldData } = await findOne(gameDbName, id);
 
   const newData = await handleUpdateData(
     action,
@@ -188,11 +185,8 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
 
     return newData;
   } else if (action === "endByTimer") {
-    const winners = getWinners(players);
-    return {
-      end: true,
-      winners,
-    };
+    const endData = handleEndData(players);
+    return endData;
   }
 
   return null;
@@ -262,41 +256,52 @@ function shuffle(arr) {
   return arr;
 }
 
-async function submitSet(
-  list,
-  players,
-  playerIndex,
-  oldData,
-  id,
-  gameDbName,
-  successFlag = false // 提交 Set 冲突时，重新写入数据库标识
-) {
+async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
   const player = players[playerIndex];
-  const success = successFlag || judgeSet(list);
+  const success = judgeSet(list);
+  const submitTime = new Date();
+
+  const validSubmit = await judgeSubmitValid(
+    player.openid,
+    list,
+    id,
+    gameDbName
+  );
+  if (!validSubmit) return;
+
+  // 先更新提交Set记录
+  await updateSubmitRecord(
+    submitTime,
+    player.openid,
+    list,
+    success,
+    oldData.gameCardList,
+    id,
+    gameDbName
+  );
+  // 获取最新游戏数据
+  const { gameCardList, reserveCardList, selectedCardList } = await findOne(
+    gameDbName,
+    id
+  );
 
   if (success) {
-    if (!successFlag) {
-      // 先更新被选过的卡片
-      await updateSelectedCardList(list, id, gameDbName);
-    }
-
     player.successSum += 1;
     player.sumScore += 2;
 
-    const selectedCardList = await getSelectedCardList(id, gameDbName);
-    const { gameCardList, reserveCardList } = oldData;
+    const newSelectedCardList = selectedCardList.concat(list);
     const newCardList = gameCardList.filter(
-      (item) => !inList(selectedCardList, item)
+      (item) => !inList(newSelectedCardList, item)
     );
 
     const fillN = 12 - newCardList.length;
-    const maxLoopSum = Math.ceil(reserveCardList.length / fillN);
+    const maxLoopSum =
+      fillN === 0 ? 0 : Math.ceil(reserveCardList.length / fillN);
     let loopSum = 0;
     let newReserveCardList = reserveCardList;
     let addList = [];
     let continueFlag = true;
     let end = false;
-    let winners = [];
     while (continueFlag) {
       addList = newReserveCardList.splice(0, fillN);
       const list = newCardList.concat(addList);
@@ -314,35 +319,24 @@ async function submitSet(
     let i = 0;
     gameCardList.forEach((item, index) => {
       if (i >= fillN) return;
-      if (inList(selectedCardList, item)) {
+      if (inList(newSelectedCardList, item)) {
         gameCardList[index] = addList[i] || {};
         i++;
       }
     });
 
-    // 被选过的卡片
-    const newestSelectedCardList = await getSelectedCardList(id, gameDbName);
-    if (!isEqual(newestSelectedCardList, selectedCardList)) {
-      await submitSet(
-        list,
-        players,
-        playerIndex,
-        oldData,
-        id,
-        gameDbName,
-        true
-      );
-      return;
-    } else {
-      if (end) {
-        winners = getWinners(players);
-      }
-
+    // 本次Set提交，是否是最后一次提交
+    const { _submitTime } = await findOne(gameDbName, id);
+    if (+_submitTime === +submitTime) {
+      const endData = end ? handleEndData(players) : {};
       return {
+        ...endData,
         gameCardList,
-        reserveCardList,
-        end,
-        winners,
+        reserveCardList: newReserveCardList,
+        [`players.${playerIndex}`]: player,
+      };
+    } else {
+      return {
         [`players.${playerIndex}`]: player,
       };
     }
@@ -356,7 +350,15 @@ async function submitSet(
   }
 }
 
-async function updateSelectedCardList(list, id, gameDbName) {
+async function updateSubmitRecord(
+  submitTime,
+  openid,
+  submitList,
+  success,
+  gameCardList,
+  id,
+  gameDbName
+) {
   const db = cloud.database();
   const _ = db.command;
   return await db
@@ -364,18 +366,26 @@ async function updateSelectedCardList(list, id, gameDbName) {
     .doc(id)
     .update({
       data: {
-        selectedCardList: _.push(list),
+        selectedCardList: _.push(submitList),
+        recordList: _.push({
+          openid,
+          submitList,
+          success,
+          gameCardList,
+        }),
+        _submitTime: submitTime,
       },
     });
 }
-async function getSelectedCardList(id, gameDbName) {
-  const db = cloud.database();
-  const { selectedCardList } = await db
-    .collection(gameDbName)
-    .doc(id)
-    .get()
-    .then((res) => res.data);
-  return selectedCardList;
+
+async function judgeSubmitValid(_openid, _submitList, id, gameDbName) {
+  const { recordList } = await findOne(gameDbName, id);
+  const L = recordList.length;
+  for (let index = 0; index < L; index++) {
+    const { openid, submitList } = recordList[index];
+    if (openid === _openid && isEqual(submitList, _submitList)) return false;
+  }
+  return true;
 }
 
 function inList(list, item) {
@@ -384,12 +394,12 @@ function inList(list, item) {
 
 function isEqual(list, list2) {
   return (
-    list.map((item) => item.index).join("") ===
-    list2.map((item) => item.index).join("")
+    list.map((item) => item.index).join(",") ===
+    list2.map((item) => item.index).join(",")
   );
 }
 
-function getWinners(players) {
+function handleEndData(players) {
   const list = players
     .concat()
     .sort((item, item2) => item2.sumScore - item.sumScore);
@@ -404,5 +414,12 @@ function getWinners(players) {
     }
   });
 
-  return winners;
+  // 更新玩家成就
+  updatePlayer(players, "set");
+
+  return {
+    winners,
+    end: true,
+    endTime: new Date(),
+  };
 }

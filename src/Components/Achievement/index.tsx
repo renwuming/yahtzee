@@ -47,6 +47,9 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
     if (initGameIndex < 0 || initGameIndex === AchievementGameIndex.cantstop) {
       list.push({ title: "欲罢不能" });
     }
+    if (initGameIndex < 0 || initGameIndex === AchievementGameIndex.set) {
+      list.push({ title: "形色牌" });
+    }
     if (realShowGift) {
       list.push({
         title: "礼物",
@@ -74,7 +77,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
   });
 
   const { achievement, wealth } = playerData || {};
-  const { yahtzee, martian, cantstop } = achievement || {};
+  const { yahtzee, martian, cantstop, set } = achievement || {};
   const { gold } = wealth || {};
 
   function handleAchievementValue(value) {
@@ -258,6 +261,41 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
                   <Text className="left">单人局总数</Text>
                   <Text className="info">
                     {handleAchievementValue(cantstop?.singleNum)}
+                  </Text>
+                </View>
+              </AtTabsPane>
+            )}
+            {(initGameIndex < 0 ||
+              initGameIndex === AchievementGameIndex.set) && (
+              <AtTabsPane current={tabIndex} index={getTabIndex("形色牌")}>
+                <View className="detail-row">
+                  <Text className="left red">最高分</Text>
+                  <Text className="red">
+                    {handleAchievementValue(set?.highScore)}
+                  </Text>
+                </View>
+                <View className="detail-row">
+                  <Text className="left">多人局胜率</Text>
+                  <Text className="info">
+                    {handleAchievementValue(set?.multiWinRate)}
+                  </Text>
+                </View>
+                <View className="detail-row">
+                  <Text className="left">多人局胜利</Text>
+                  <Text className="info">
+                    {handleAchievementValue(set?.multiWinSum)}
+                  </Text>
+                </View>
+                <View className="detail-row">
+                  <Text className="left">多人局总数</Text>
+                  <Text className="info">
+                    {handleAchievementValue(set?.multiNum)}
+                  </Text>
+                </View>
+                <View className="detail-row">
+                  <Text className="left">单人局总数</Text>
+                  <Text className="info">
+                    {handleAchievementValue(set?.singleNum)}
                   </Text>
                 </View>
               </AtTabsPane>

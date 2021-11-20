@@ -90,8 +90,8 @@ export default function Index() {
 
   const showGameCardList = start ? gameCardList : new Array(12).fill({});
   const singlePlayer = players.length === 1;
-  const timerGameTxt = singlePlayer ? "单人竞技" : "多人竞技";
-  const noTimerGameTxt = "单人练习";
+  const timerGameTxt = singlePlayer ? "单人计时模式" : "多人模式";
+  const noTimerGameTxt = "单人练习模式";
 
   const [selectedCardList, setSelectedCardList] = useState<Set.SetCardData[]>(
     []
@@ -302,7 +302,7 @@ export default function Index() {
                   startBtnClick();
                 }}
               >
-                {timerGameTxt}
+                开始 - {timerGameTxt}
               </AtButton>
               {singlePlayer && (
                 <AtButton
@@ -311,7 +311,7 @@ export default function Index() {
                     startBtnClick(false);
                   }}
                 >
-                  {noTimerGameTxt}
+                  开始 - {noTimerGameTxt}
                 </AtButton>
               )}
             </View>

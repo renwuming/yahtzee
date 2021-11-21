@@ -256,8 +256,15 @@ function shuffle(arr) {
   return arr;
 }
 
-async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
-  const player = players[playerIndex];
+async function submitSet(
+  list,
+  oldPlayers,
+  playerIndex,
+  oldData,
+  id,
+  gameDbName
+) {
+  let player = oldPlayers[playerIndex];
   const success = judgeSet(list);
   const submitTime = new Date();
 
@@ -280,10 +287,9 @@ async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
     gameDbName
   );
   // 获取最新游戏数据
-  const { gameCardList, reserveCardList, selectedCardList } = await findOne(
-    gameDbName,
-    id
-  );
+  const { gameCardList, reserveCardList, selectedCardList, players } =
+    await findOne(gameDbName, id);
+  player = players[playerIndex];
 
   if (success) {
     player.successSum += 1;
@@ -301,7 +307,7 @@ async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
     let newReserveCardList = reserveCardList;
     let addList = [];
     let continueFlag = true;
-    let end = false;
+    let shouldEnd = false;
     while (continueFlag) {
       addList = newReserveCardList.splice(0, fillN);
       const list = newCardList.concat(addList);
@@ -309,7 +315,7 @@ async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
         continueFlag = false;
       } else if (loopSum >= maxLoopSum) {
         continueFlag = false;
-        end = true;
+        shouldEnd = true;
       } else {
         newReserveCardList = newReserveCardList.concat(addList);
       }
@@ -325,10 +331,10 @@ async function submitSet(list, players, playerIndex, oldData, id, gameDbName) {
       }
     });
 
-    // 本次Set提交，是否是最后一次提交
-    const { _submitTime } = await findOne(gameDbName, id);
-    if (+_submitTime === +submitTime) {
-      const endData = end ? handleEndData(players) : {};
+    // 本次Set提交，是最后一次提交 && 游戏未结束
+    const { _submitTime, end } = await findOne(gameDbName, id);
+    if (+_submitTime === +submitTime && !end) {
+      const endData = shouldEnd ? handleEndData(players) : {};
       return {
         ...endData,
         gameCardList,

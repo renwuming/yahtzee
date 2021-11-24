@@ -4,6 +4,7 @@ import Achievement from "../../Components/Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import { MARTIAN_SHOW_ROUND_TIME_LIMIT, PlayerContext } from "../../const";
+import { navigateTo } from "@/utils";
 
 interface IProps {
   data: CantStop.CantStopPlayer;
@@ -19,8 +20,14 @@ export default function Index({
   showAchievement = true,
 }: IProps) {
   const playerContext = useContext(PlayerContext);
-  const { showSetting, showOffline, showActive, roundCountDown, kickPlayer } =
-    playerContext;
+  const {
+    showSetting,
+    showOffline,
+    showActive,
+    roundCountDown,
+    kickPlayer,
+    showGift,
+  } = playerContext;
 
   const realShowSetting = index !== 0 && showSetting;
   const { avatarUrl, nickName, inRound, timeStamp, openid } = data;
@@ -41,7 +48,9 @@ export default function Index({
       <View
         className={`player-info ${offline ? "offline" : ""}`}
         onClick={() => {
-          doShowAchievement();
+          showGift
+            ? doShowAchievement()
+            : navigateTo("", `homepage/index?openid=${openid}`);
         }}
       >
         <Image

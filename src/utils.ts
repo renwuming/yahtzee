@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.7.2";
+export const VERSION = "v4.8.0";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -84,6 +84,17 @@ export function getUserProfile(callback = () => {}) {
   } else {
     callback();
   }
+}
+
+export async function getPlayerByOpenid(openid: string) {
+  const [player] = (await DB.collection("players")
+    .where({
+      openid,
+    })
+    .get()
+    .then((res) => res.data)) as Player[];
+
+  return player;
 }
 
 export function isMe(openid): boolean {

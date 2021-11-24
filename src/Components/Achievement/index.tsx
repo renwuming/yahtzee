@@ -125,10 +125,6 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
     setWaiting(false);
   }
 
-  function gotoWealthPage() {
-    navigateTo("wealth", "index");
-  }
-
   return (
     <View className="achievement-box">
       <AtModal isOpened={isOpened} onClose={onClose}>
@@ -142,7 +138,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               <AtButton
                 type="primary"
                 onClick={() => {
-                  gotoWealthPage();
+                  navigateTo("wealth", "index");
                 }}
               >
                 <Image className="icon" src={GoldIcon} mode="aspectFit" />

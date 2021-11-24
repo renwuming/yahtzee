@@ -21,10 +21,10 @@ import {
   ROUND_TIME_LIMIT,
   SHOW_ROUND_TIME_LIMIT,
 } from "../../../const";
-import PlayerList from "../../../Components/PlayerList";
+import PlayerList from "../../../Components/YahtzeePlayerList";
 import DiceList from "../../../Components/YahtzeeDiceList";
 import RatingTable from "../../../Components/YahtzeeRatingTable";
-import Player from "../../../Components/Player";
+import Player from "@/Components/HallPlayer";
 import LoadPage from "../../../Components/LoadPage";
 
 import {

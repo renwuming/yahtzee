@@ -1,9 +1,10 @@
 import { View, Image, Text } from "@tarojs/components";
 import "./index.scss";
-import Achievement from "../../Components/Achievement";
+import Achievement from "../Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import { PlayerContext } from "../../const";
+import { navigateTo } from "@/utils";
 
 interface IProps {
   data: Player;
@@ -19,8 +20,14 @@ export default function Index({
   showAchievement = true,
 }: IProps) {
   const playerContext = useContext(PlayerContext);
-  const { showScore, showSetting, showOffline, showActive, kickPlayer } =
-    playerContext;
+  const {
+    showScore,
+    showSetting,
+    showOffline,
+    showActive,
+    kickPlayer,
+    showGift,
+  } = playerContext;
 
   const realShowSetting = index !== 0 && showSetting;
   const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
@@ -41,7 +48,9 @@ export default function Index({
       <View
         className={`player-info ${offline ? "offline" : ""}`}
         onClick={() => {
-          doShowAchievement();
+          showGift
+            ? doShowAchievement()
+            : navigateTo("", `homepage/index?openid=${openid}`);
         }}
       >
         <Image

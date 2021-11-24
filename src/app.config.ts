@@ -1,6 +1,7 @@
 export default {
   pages: [
     "pages/home/index",
+    "pages/homepage/index",
     "pages/wealth/index",
     "pages/seasonRank/index",
     // 快艇骰子

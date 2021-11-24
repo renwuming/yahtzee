@@ -1,0 +1,41 @@
+.achievement-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #eef5ff;
+  .title {
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .detail-box {
+    justify-content: center;
+    align-items: center;
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 180px;
+      border-right: 1px solid #797a7f;
+      &:last-of-type {
+        border-right: none;
+      }
+      .text {
+        font-size: 28px;
+        color: #797a7f;
+        margin-bottom: 6px;
+      }
+      .value {
+        font-size: 36px;
+        height: 80px;
+        line-height: 80px;
+        color: #333;
+        font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
+          Arial, sans-serif;
+      }
+    }
+  }
+}

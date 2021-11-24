@@ -34,10 +34,10 @@ function CharmItem({ index, data }: CharmItemProps) {
     <View key="rank" className="rank-item-2">
       <Text className={"index " + (index < 3 ? "top" : "")}>{index + 1}</Text>
       <View className="user-box">
-        <PlayerItem2 data={data}></PlayerItem2>
+        <PlayerItem data={data}></PlayerItem>
       </View>
       <View className="column-right">
-        <Text className="score-title">🌹</Text>
+        <View className="icon">{Rose()}</View>
         <Text className="score">{roseSum}</Text>
       </View>
     </View>
@@ -58,8 +58,7 @@ import {
   AtModalContent,
 } from "taro-ui";
 import "./index.scss";
-import PlayerItem from "../../Components/SeasonRankPlayer";
-import PlayerItem2 from "../../Components/Player";
+import PlayerItem from "@/Components/HallPlayer";
 import { RANKING_LEN, PAGE_LEN } from "../../const";
 import {
   applySeasonRank_Database,
@@ -67,6 +66,7 @@ import {
   getSeasonRankList_Database,
 } from "./rankApi";
 import { TabItem } from "taro-ui/types/tabs";
+import { Rose } from "@/Components/Gifts";
 
 export default function Index() {
   const [tabList, setTabList] = useState<TabItem[]>([

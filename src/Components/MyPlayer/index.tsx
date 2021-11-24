@@ -15,11 +15,7 @@ export default function Index({}: IProps) {
   const [userInfo, setUserInfo] = useState<any>(
     Taro.getStorageSync("userInfo")
   );
-  const { wealth, nickName } = userInfo || {};
-
-  function gotoWealthPage() {
-    navigateTo("wealth", "index");
-  }
+  const { wealth } = userInfo || {};
 
   useDidShow(() => {
     setUserInfo(Taro.getStorageSync("userInfo"));
@@ -48,7 +44,7 @@ export default function Index({}: IProps) {
         <AtButton
           onClick={() => {
             getUserProfile(() => {
-              gotoWealthPage();
+              navigateTo("wealth", "index");
             });
           }}
         >

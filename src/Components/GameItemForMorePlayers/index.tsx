@@ -2,9 +2,8 @@ import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import "./index.scss";
 
-import PlayerItem from "../MartianPlayer";
 import { navigateTo } from "../../utils";
-import { PlayerContext } from "../../const";
+import PlayerItem from "@/Components/HallPlayer";
 
 interface IProps {
   index: number;
@@ -50,13 +49,11 @@ export default function Index({
       <Text className="index">{index + 1}</Text>
       <View className="user-box">
         {players.map((item) => (
-          <PlayerContext.Provider
-            value={{
-              showOffline: !historyType,
-            }}
-          >
-            <PlayerItem data={item} showAchievement={false}></PlayerItem>
-          </PlayerContext.Provider>
+          <PlayerItem
+            data={item}
+            clickable={false}
+            showOffline={!historyType}
+          ></PlayerItem>
         ))}
       </View>
       <View className="column-right">

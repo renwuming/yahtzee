@@ -31,7 +31,7 @@ import {
   watchDataBase,
 } from "./gameApi";
 import PlayerList from "../../../Components/MartianPlayerList";
-import Player from "../../../Components/MartianPlayer";
+import Player from "@/Components/HallPlayer";
 import { execGiftActions, watchEvents_DataBase } from "../../../utils_api";
 import { getUserProfile } from "@/utils";
 import LoadPage from "../../../Components/LoadPage";

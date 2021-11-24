@@ -1,27 +1,17 @@
 import { View, Image, Text } from "@tarojs/components";
 import "./index.scss";
-import Achievement from "../../Components/Achievement";
-import { useState } from "react";
+import { navigateTo } from "@/utils";
 
 interface IProps {
   data: Player;
   colorType?: string;
-  showAchievement?: boolean;
 }
 
-export default function Index({
-  data,
-  colorType = "white",
-  showAchievement = true,
-}: IProps) {
-  const { avatarUrl, nickName, sumScore, inRound, timeStamp, openid } = data;
-  const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
+export default function Index({ data, colorType = "white" }: IProps) {
+  const { avatarUrl, nickName, openid } = data;
 
-  function doShowAchievement() {
-    showAchievement && setAchievementOpened(true);
-  }
-  function hideAchievement() {
-    setAchievementOpened(false);
+  function gotoHomePage() {
+    navigateTo("", `homepage/index?openid=${openid}`);
   }
 
   return (
@@ -29,17 +19,12 @@ export default function Index({
       <View
         className={`player-info`}
         onClick={() => {
-          doShowAchievement();
+          gotoHomePage();
         }}
       >
         <Image className={`avatar`} src={avatarUrl}></Image>
         <Text className={colorType}>{nickName}</Text>
       </View>
-      <Achievement
-        data={data}
-        isOpened={isAchievementOpened}
-        onClose={hideAchievement}
-      ></Achievement>
     </View>
   );
 }

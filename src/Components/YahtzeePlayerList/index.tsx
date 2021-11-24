@@ -1,6 +1,6 @@
 import { View } from "@tarojs/components";
 import "./index.scss";
-import Player from "../Player";
+import Player from "../YahtzeePlayer";
 
 interface IProps {
   players: Player[];

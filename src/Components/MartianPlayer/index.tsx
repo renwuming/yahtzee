@@ -4,6 +4,7 @@ import Achievement from "../../Components/Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import { AchievementGameIndex, PlayerContext } from "../../const";
+import { navigateTo } from "@/utils";
 
 interface IProps {
   data: AnyPlayer;
@@ -27,6 +28,7 @@ export default function Index({
     noNickName,
     kickPlayer,
     initGameIndex,
+    showGift,
   } = playerContext;
 
   const realShowSetting = index !== 0 && showSetting;
@@ -60,7 +62,9 @@ export default function Index({
         <View
           className={`player-info ${offline ? "offline" : ""}`}
           onClick={() => {
-            doShowAchievement();
+            showGift
+              ? doShowAchievement()
+              : navigateTo("", `homepage/index?openid=${openid}`);
           }}
         >
           <Image
@@ -68,7 +72,7 @@ export default function Index({
             id={`player-${index}-avatar`}
             src={avatarUrl}
           ></Image>
-          {!noNickName && <Text className={colorType}>{nickName}</Text>}
+          {noNickName ? null : <Text className={colorType}>{nickName}</Text>}
         </View>
         {showScore && (
           <View className="score">

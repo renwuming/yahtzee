@@ -45,7 +45,7 @@
         {
           "name": "火星骰多人2",
           "pathName": "pages/Martian/game/index",
-          "query": "id=859059a5616b803a0065f577211ff6bf",
+          "query": "id=9e7190f16175057701c39be21a05b127",
           "scene": null
         },
         {
@@ -100,6 +100,18 @@
           "name": "Set2",
           "pathName": "pages/Set/game/index",
           "query": "id=9e7190f16198bd6406e3f3de743403b1",
+          "scene": null
+        },
+        {
+          "name": "个人主页",
+          "pathName": "pages/homepage/index",
+          "query": "openid=oqWgm5fO6WmeIflXZZJusUBmWPB0",
+          "scene": null
+        },
+        {
+          "name": "个人主页2",
+          "pathName": "pages/homepage/index",
+          "query": "openid=oqWgm5b36pHkbm6JY2nutZChE170",
           "scene": null
         }
       ]

@@ -31,7 +31,7 @@ import { ScrollView, View, Text } from "@tarojs/components";
 import { useEffect, useState } from "react";
 import { AtDivider, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
 import "./index.scss";
-import PlayerItem from "../../../Components/Player";
+import PlayerItem from "@/Components/HallPlayer";
 import { PAGE_LEN, RANKING_LEN } from "../../../const";
 import { CallCloudFunction } from "../../../utils";
 

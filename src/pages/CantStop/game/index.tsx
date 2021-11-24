@@ -9,7 +9,7 @@ import { AtButton, AtModal } from "taro-ui";
 import "./index.scss";
 import { useEffect, useRef, useState } from "react";
 import PlayerList from "../../../Components/CantStopPlayerList";
-import Player from "../../../Components/CantStopPlayer";
+import Player from "@/Components/HallPlayer";
 import { getUserProfile } from "@/utils";
 import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
 import Board from "../../../Components/CantStopBoard";

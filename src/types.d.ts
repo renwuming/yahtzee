@@ -100,10 +100,41 @@ interface Player {
   sumScore?: number;
   inRound?: boolean;
   timeStamp?: number;
-  achievement?: any;
-  gift?: any;
+  achievement?: Achievement;
+  gift?: Gift;
   wealth?: any;
   wealthRecord?: any;
+}
+
+interface Gift {
+  receive: {
+    [Name: string]: number;
+  };
+  send: {
+    [Name: string]: number;
+  };
+  receiveFrom: {
+    [Name: string]: {
+      [Openid: string]: number;
+    };
+  };
+  sendTo: {
+    [Name: string]: {
+      [Openid: string]: number;
+    };
+  };
+}
+
+interface Achievement {
+  [T: string]: AchievementItem;
+}
+interface AchievementItem {
+  highScore: number;
+  singleNum: number;
+  multiNum: number;
+  multiWinSum: number;
+  multiWinRate: number;
+  minRoundSum?: number;
 }
 
 declare namespace Martian {

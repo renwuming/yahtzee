@@ -5,6 +5,9 @@
   align-items: center;
   padding: 20px 0;
   border-bottom: 1px solid #eef5ff;
+  &:last-of-type {
+    border-bottom: none;
+  }
   .title {
     font-size: 30px;
     color: #333;
@@ -24,7 +27,7 @@
         border-right: none;
       }
       .text {
-        font-size: 28px;
+        font-size: 26px;
         color: #797a7f;
         margin-bottom: 6px;
       }

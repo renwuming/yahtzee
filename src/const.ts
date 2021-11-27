@@ -1,4 +1,5 @@
 import { Context, createContext } from "react";
+import { Bomb, Praise, Rose } from "@/Components/Gifts";
 
 export const PlayerContext: Context<{
   gameID?: string;
@@ -35,6 +36,25 @@ export enum AchievementGameIndex {
   set,
 }
 
+export const GIFT_LIST: GiftItem[] = [
+  {
+    type: "rose",
+    icon: Rose,
+    price: 10,
+  },
+  {
+    type: "bomb",
+    icon: Bomb,
+    price: 10,
+  },
+  {
+    type: "praise",
+    icon: Praise,
+    price: 10,
+  },
+];
+
+export const OFFLINE_DELAY = 5000;
 export const ACTION_DELAY = 5000;
 export const ANIMATION_BACKUP_SUM = 10;
 export const ANIMATION_BACKUP_LIST = new Array(ANIMATION_BACKUP_SUM).fill(0);

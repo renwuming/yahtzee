@@ -42,7 +42,7 @@ export default function Index({ giftName, data }: IProps) {
       });
   }, [receiveFrom, sendTo]);
   return (
-    <View className="achievement-item">
+    <View className="gift-achievement-item">
       <View className="title">{icon()}</View>
       <View className="at-row detail-box">
         <View className="detail-item">

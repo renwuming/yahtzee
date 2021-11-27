@@ -1,10 +1,13 @@
-.achievement-item {
+.gift-achievement-item {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 20px 0;
   border-bottom: 1px solid #eef5ff;
+  &:last-of-type {
+    border-bottom: none;
+  }
   .title {
     font-size: 30px;
     color: #333;

@@ -40,7 +40,7 @@ export default function Index() {
   const [userInfo, setUserInfo] = useState<Player>(null);
 
   const { wealth, gift, avatarUrl, nickName, achievement } = userInfo || {};
-  const { yahtzee, martian, cantstop } = achievement || {};
+  const { yahtzee, martian, cantstop, set } = achievement || {};
 
   const me = isMe(openid);
 
@@ -83,6 +83,7 @@ export default function Index() {
             gameName="cantstop"
             data={cantstop}
           ></AchievementItem>
+          <AchievementItem gameName="set" data={set}></AchievementItem>
         </AtTabsPane>
         <AtTabsPane current={tabIndex} index={1}>
           <GiftAchievementItem

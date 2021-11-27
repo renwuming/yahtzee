@@ -129,12 +129,13 @@ interface Achievement {
   [T: string]: AchievementItem;
 }
 interface AchievementItem {
-  highScore: number;
+  bestTime?: number;
+  minRoundSum?: number;
+  highScore?: number;
   singleNum: number;
   multiNum: number;
   multiWinSum: number;
   multiWinRate: number;
-  minRoundSum?: number;
 }
 
 declare namespace Martian {

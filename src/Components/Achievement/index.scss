@@ -67,28 +67,34 @@
   .at-tabs__body {
     padding-top: 10px;
   }
-  .at-modal__content {
-    min-height: 400px;
-  }
   .at-modal__header::after {
     border: 0;
   }
   // 礼物
-  .gift-tab {
-    padding: 20px;
-    padding-top: 10px;
+  .gift-container {
+    padding: 0 20px;
+    padding-bottom: 16px;
     background-color: #2b3131;
     border-radius: 8px;
+  }
+  .reserved-gold {
+    display: block;
+    margin-top: 30px;
+    width: 100%;
+    text-align: center;
+    line-height: 24px;
+    font-size: 22px;
+    color: #aaa;
   }
   .gift-box {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    padding-bottom: 10px;
+    margin-top: 20px;
     .item-box {
       display: flex;
       justify-content: center;
-      margin-top: 10px;
+      margin-top: 20px;
     }
     .item {
       display: flex;
@@ -120,5 +126,8 @@
         }
       }
     }
+  }
+  .achievement-item {
+    border-bottom: none;
   }
 }

@@ -5,6 +5,7 @@ import "./index.scss";
 interface IProps {
   gameName: string;
   data: AchievementItem;
+  noTitle?: boolean;
 }
 
 const dataMap = {
@@ -20,17 +21,33 @@ const dataMap = {
     title: "欲罢不能",
     rows: ["minRoundSum", "multiWinRate", "multiNum", "singleNum"],
   },
+  set: {
+    title: "神奇形色牌",
+    rows: ["bestTime", "highScore", "multiWinRate", "multiNum"],
+  },
 };
 
-export default function Index({ gameName, data }: IProps) {
-  const { minRoundSum, highScore, multiWinRate, multiNum, singleNum } =
-    data || {};
+export default function Index({ gameName, data, noTitle = false }: IProps) {
+  const {
+    bestTime,
+    minRoundSum,
+    highScore,
+    multiWinRate,
+    multiNum,
+    singleNum,
+  } = data || {};
 
   const { title, rows } = dataMap[gameName];
   return (
     <View className="achievement-item">
-      <Text className="title">{title}</Text>
+      {noTitle ? null : <Text className="title">{title}</Text>}
       <View className="at-row detail-box">
+        {rows.includes("bestTime") && (
+          <View className="detail-item">
+            <Text className="text">最短时间</Text>
+            <Text className="value">{bestTime ? `${bestTime}s` : "-"}</Text>
+          </View>
+        )}
         {rows.includes("minRoundSum") && (
           <View className="detail-item">
             <Text className="text">最少回合</Text>

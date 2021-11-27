@@ -1,6 +1,7 @@
 import { View, Image, Text } from "@tarojs/components";
 import "./index.scss";
 import { navigateTo } from "@/utils";
+import { OFFLINE_DELAY } from "@/const";
 
 interface IProps {
   data: Player;
@@ -19,14 +20,14 @@ export default function Index({
 }: IProps) {
   const { avatarUrl, nickName, openid, timeStamp } = data;
 
-  const offline = showOffline && Date.now() - (timeStamp || 0) > 5000;
+  const offline = showOffline && Date.now() - (timeStamp || 0) > OFFLINE_DELAY;
 
   function gotoHomePage() {
     navigateTo("", `homepage/index?openid=${openid}`);
   }
 
   return (
-    <View className={`player`}>
+    <View className="hall-player">
       <View
         className={`player-info ${offline ? "offline" : ""}`}
         onClick={() => {

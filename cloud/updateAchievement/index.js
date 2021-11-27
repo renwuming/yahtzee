@@ -223,26 +223,30 @@ async function handleSetAchievement(db, openid) {
 
   let multiWinSum = 0;
   let highScore = 0;
+  let bestTime = Infinity;
 
   singleGames.forEach((item) => {
     const {
       timer,
       players: [player],
+      endTime,
+      startTime,
     } = item;
-    timer && (highScore = Math.max(player.sumScore, highScore));
+
+    if (timer) {
+      highScore = Math.max(player.sumScore, highScore);
+      bestTime = Math.min(((endTime || Infinity) - startTime) / 1000, bestTime);
+    }
   });
 
   multiGames.forEach((item) => {
-    const {
-      timer,
-      players,
-      players: [player],
-      winners,
-    } = item;
-    const index = players.map((item) => item.openid).indexOf(openid);
-    if (winners.includes(index)) multiWinSum++;
+    const { timer, players, winners } = item;
 
-    timer && (highScore = Math.max(player.sumScore, highScore));
+    if (timer) {
+      const index = players.map((item) => item.openid).indexOf(openid);
+      if (winners.includes(index)) multiWinSum++;
+      highScore = Math.max(players[index].sumScore, highScore);
+    }
   });
 
   const multiWinRateValue =
@@ -256,5 +260,6 @@ async function handleSetAchievement(db, openid) {
     multiWinRateValue,
     multiWinRate,
     highScore,
+    bestTime: bestTime === Infinity ? null : Math.min(bestTime, 300).toFixed(1),
   };
 }

@@ -15,7 +15,7 @@ export default function Index({ data, colorType = "white" }: IProps) {
   }
 
   return (
-    <View className={`home-player`}>
+    <View className="home-player">
       <View
         className={`player-info`}
         onClick={() => {

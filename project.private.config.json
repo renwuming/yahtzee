@@ -39,7 +39,7 @@
         {
           "name": "火星骰多人",
           "pathName": "pages/Martian/game/index",
-          "query": "id=cd045e75612e6db40956624d5d7f5981",
+          "query": "id=9e7190f1617d566102dad5a703ed0a39",
           "scene": null
         },
         {
@@ -63,7 +63,7 @@
         {
           "name": "欲罢不能",
           "pathName": "pages/CantStop/game/index",
-          "query": "id=859059a5617218030148718b0927800e",
+          "query": "id=9e7190f1618a81dd049f7c8827dc9064",
           "scene": null
         },
         {
@@ -93,7 +93,7 @@
         {
           "name": "Set",
           "pathName": "pages/Set/game/index",
-          "query": "id=18ed0968617d7848029d945427e23ddc",
+          "query": "id=fa4fe87261a10873003fb6776b073c0b",
           "scene": null
         },
         {

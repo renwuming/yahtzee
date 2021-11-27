@@ -3,41 +3,36 @@ import "./index.scss";
 import Achievement from "../../Components/Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
-import { MARTIAN_SHOW_ROUND_TIME_LIMIT, PlayerContext } from "../../const";
-import { navigateTo } from "@/utils";
+import {
+  MARTIAN_SHOW_ROUND_TIME_LIMIT,
+  OFFLINE_DELAY,
+  PlayerContext,
+} from "../../const";
 
 interface IProps {
   data: CantStop.CantStopPlayer;
   index?: number;
   colorType?: string;
-  showAchievement?: boolean;
 }
 
 export default function Index({
   data,
   index = -1,
   colorType = "white",
-  showAchievement = true,
 }: IProps) {
   const playerContext = useContext(PlayerContext);
-  const {
-    showSetting,
-    showOffline,
-    showActive,
-    roundCountDown,
-    kickPlayer,
-    showGift,
-  } = playerContext;
+  const { showSetting, showOffline, showActive, roundCountDown, kickPlayer } =
+    playerContext;
 
   const realShowSetting = index !== 0 && showSetting;
   const { avatarUrl, nickName, inRound, timeStamp, openid } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
   const [isActionSheetOpened, setActionSheetOpened] = useState<boolean>(false);
 
-  const offline = showOffline && Date.now() - (timeStamp || 0) > 5000;
+  const offline = showOffline && Date.now() - (timeStamp || 0) > OFFLINE_DELAY;
 
   function doShowAchievement() {
-    showAchievement && setAchievementOpened(true);
+    setAchievementOpened(true);
   }
   function hideAchievement() {
     setAchievementOpened(false);
@@ -48,9 +43,7 @@ export default function Index({
       <View
         className={`player-info ${offline ? "offline" : ""}`}
         onClick={() => {
-          showGift
-            ? doShowAchievement()
-            : navigateTo("", `homepage/index?openid=${openid}`);
+          doShowAchievement();
         }}
       >
         <Image

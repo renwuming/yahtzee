@@ -244,3 +244,9 @@ export function gotoCantStopGuide() {
     path: "pages/video/video?__preload_=163387572245513&__key_=163387572245514&avid=929195716",
   });
 }
+export function gotoSetGuide() {
+  Taro.navigateToMiniProgram({
+    appId: "wx7564fd5313d24844",
+    path: "pages/video/video?__preload_=16380298343941&__key_=16380298343942&avid=542623920",
+  });
+}

@@ -29,10 +29,7 @@ export default function Index() {
       name: "神奇形色牌",
       imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover2.png",
       pageType: "Set",
-      // pagePath: `game/index`,
-      navigateFn() {
-        createGame();
-      },
+      pagePath: `hall/index`,
     },
     {
       name: "快艇骰子",

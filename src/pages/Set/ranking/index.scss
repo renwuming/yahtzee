@@ -1,0 +1,96 @@
+page {
+  background-color: #eef5ff;
+}
+.set-ranking {
+  height: 100%;
+  background-color: #eef5ff;
+  & > .at-tabs > .at-tabs__header {
+    background-color: #eef5ff;
+  }
+  .at-tabs {
+    height: 100%;
+  }
+  .at-tabs__item-underline {
+    bottom: -2px;
+  }
+  .at-tabs__body {
+    height: calc(100% - 86px);
+  }
+  .at-tabs-pane {
+    height: 100%;
+  }
+  .scroll-view {
+    box-sizing: border-box;
+    height: 100%;
+    padding-bottom: 40px;
+  }
+  .scroll-view2 .achievement-box .at-modal {
+    left: 100%;
+  }
+  .divider {
+    .at-divider__content {
+      background-color: #eef5ff;
+    }
+    .at-divider__line {
+      left: 5%;
+      width: 90%;
+    }
+  }
+  .loading {
+    margin: 30px 0;
+  }
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 20px;
+  background-color: #aaa;
+  &:nth-child(odd) {
+    background-color: #333;
+  }
+  &:first-child {
+    border-top: 0;
+  }
+  .index {
+    position: absolute;
+    left: 20px;
+    display: block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    &.top {
+      background-color: #ffcc00;
+    }
+  }
+  .user-box {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+  }
+  .column-right {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 130px;
+    .score-title,
+    .score {
+      color: #fff;
+      font-family: yansong;
+    }
+    .score {
+      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+        sans-serif;
+    }
+  }
+}

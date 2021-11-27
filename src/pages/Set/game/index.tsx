@@ -17,6 +17,8 @@ import {
 } from "./gameApi";
 import "./index.scss";
 import { getUserProfile } from "@/utils";
+import { GameGift } from "@/Components/Gifts";
+import LoadPage from "@/Components/LoadPage";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -82,6 +84,7 @@ export default function Index() {
     winners,
     canJoin,
     timer,
+    playerIndex,
   } = gameData || {};
 
   const reserveCardsSum =
@@ -155,13 +158,15 @@ export default function Index() {
     });
   }
 
-  return gameData ? (
+  return (
     <View className="set-game">
+      <LoadPage></LoadPage>
+      <GameGift />
       <PlayerContext.Provider
         value={{
           gameID: id,
           players,
-          playerIndex: 0,
+          playerIndex,
           kickPlayer,
           initGameIndex: AchievementGameIndex.set,
           showScore: start,
@@ -225,125 +230,126 @@ export default function Index() {
           </View>
         )}
       </View>
-
-      {end ? (
-        singlePlayer ? (
-          <View className="result-box">
-            <Text className="text">游戏结束</Text>
-          </View>
-        ) : winners.length > 0 ? (
-          <View className="result-box">
-            <Text className="text">获胜者</Text>
-            {winners.map((index) => {
-              const data = players[index];
-              return <Player data={data}></Player>;
-            })}
-          </View>
-        ) : (
-          <View className="result-box">
-            <Text className="text">游戏超时</Text>
-          </View>
-        )
-      ) : start ? (
-        <View className="ctrl-box">
-          <View className="card-box at-row at-row__align--center">
-            {selectedCardList.map((item) => {
-              const { color, shape, fill, n } = item;
-              const nlist = new Array(n).fill(0);
-              return (
-                <View className={`card-item`}>
-                  <AtButton
-                    onClick={() => {
-                      if (end) return;
-                      selectCard(item);
-                    }}
-                  >
-                    <View className={`img-row row-${n}`}>
-                      {nlist.map((_) => (
-                        <Image
-                          className="card-img"
-                          mode="aspectFit"
-                          src={`https://cdn.renwuming.cn/static/set/imgs/${color}-${shape}-${fill}.jpg`}
-                        ></Image>
-                      ))}
-                    </View>
-                  </AtButton>
-                </View>
-              );
-            })}
-          </View>
-          <AtButton
-            type="primary"
-            onClick={() => {
-              submitSet();
-            }}
-            disabled={selectedCardList.length !== 3}
-          >
-            SET ！
-          </AtButton>
-          {timer ? null : (
+      {gameData ? (
+        end ? (
+          singlePlayer ? (
+            <View className="result-box">
+              <Text className="text">游戏结束</Text>
+            </View>
+          ) : winners.length > 0 ? (
+            <View className="result-box">
+              <Text className="text">获胜者</Text>
+              {winners.map((index) => {
+                const data = players[index];
+                return <Player data={data}></Player>;
+              })}
+            </View>
+          ) : (
+            <View className="result-box">
+              <Text className="text">游戏超时</Text>
+            </View>
+          )
+        ) : start ? (
+          <View className="ctrl-box">
+            <View className="card-box at-row at-row__align--center">
+              {selectedCardList.map((item) => {
+                const { color, shape, fill, n } = item;
+                const nlist = new Array(n).fill(0);
+                return (
+                  <View className={`card-item`}>
+                    <AtButton
+                      onClick={() => {
+                        if (end) return;
+                        selectCard(item);
+                      }}
+                    >
+                      <View className={`img-row row-${n}`}>
+                        {nlist.map((_) => (
+                          <Image
+                            className="card-img"
+                            mode="aspectFit"
+                            src={`https://cdn.renwuming.cn/static/set/imgs/${color}-${shape}-${fill}.jpg`}
+                          ></Image>
+                        ))}
+                      </View>
+                    </AtButton>
+                  </View>
+                );
+              })}
+            </View>
             <AtButton
-              type="secondary"
+              type="primary"
               onClick={() => {
-                showTips();
+                submitSet();
               }}
+              disabled={selectedCardList.length !== 3}
             >
-              提示
+              SET ！
             </AtButton>
-          )}
-        </View>
-      ) : (
-        <View className="ctrl-box before-start">
-          {own ? (
-            <View>
+            {timer ? null : (
               <AtButton
-                type="primary"
+                type="secondary"
                 onClick={() => {
-                  startBtnClick();
+                  showTips();
                 }}
               >
-                开始 - {timerGameTxt}
+                提示
               </AtButton>
-              {singlePlayer && (
+            )}
+          </View>
+        ) : (
+          <View className="ctrl-box before-start">
+            {own ? (
+              <View>
                 <AtButton
                   type="primary"
                   onClick={() => {
-                    startBtnClick(false);
+                    startBtnClick();
                   }}
                 >
-                  开始 - {noTimerGameTxt}
+                  开始 - {timerGameTxt}
                 </AtButton>
-              )}
-            </View>
-          ) : inGame ? (
-            <AtButton
-              type="secondary"
-              onClick={() => {
-                getUserProfile(() => {
-                  handleGameAction(id, "leaveGame");
-                });
-              }}
-            >
-              离开
+                {singlePlayer && (
+                  <AtButton
+                    type="primary"
+                    onClick={() => {
+                      startBtnClick(false);
+                    }}
+                  >
+                    开始 - {noTimerGameTxt}
+                  </AtButton>
+                )}
+              </View>
+            ) : inGame ? (
+              <AtButton
+                type="secondary"
+                onClick={() => {
+                  getUserProfile(() => {
+                    handleGameAction(id, "leaveGame");
+                  });
+                }}
+              >
+                离开
+              </AtButton>
+            ) : (
+              <AtButton
+                type="secondary"
+                onClick={() => {
+                  getUserProfile(() => {
+                    handleGameAction(id, "joinGame");
+                  });
+                }}
+                disabled={!canJoin}
+              >
+                加入
+              </AtButton>
+            )}
+            <AtButton type="secondary" openType="share">
+              邀请朋友
             </AtButton>
-          ) : (
-            <AtButton
-              type="secondary"
-              onClick={() => {
-                getUserProfile(() => {
-                  handleGameAction(id, "joinGame");
-                });
-              }}
-              disabled={!canJoin}
-            >
-              加入
-            </AtButton>
-          )}
-          <AtButton type="secondary" openType="share">
-            邀请朋友
-          </AtButton>
-        </View>
-      )}
+          </View>
+        )
+      ) : null}
     </View>
-  ) : null;
+  );
 }

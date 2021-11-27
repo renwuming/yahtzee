@@ -20,21 +20,11 @@ exports.main = async (event) => {
     .collection("martian_games")
     .where(
       _.and([
-        // 最近3小时的
+        // 最近3小时的，未结束的
         {
           _updateTime: _.gt(TIME),
+          end: _.neq(true),
         },
-        _.or([
-          // 未开始的
-          {
-            start: _.neq(true),
-          },
-          // 或已经开始的、未结束的、多人游戏
-          {
-            end: _.neq(true),
-            "players.1": _.exists(1),
-          },
-        ]),
       ])
     )
     .orderBy("_updateTime", "desc")

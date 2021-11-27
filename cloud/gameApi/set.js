@@ -429,3 +429,54 @@ function handleEndData(players) {
     endTime: new Date(),
   };
 }
+
+exports.getRanking = async function getRanking(data) {
+  const db = cloud.database();
+  const _ = db.command;
+  const { type, skip, pageLength } = data;
+
+  const _skip = +(skip || 0);
+  const _pageLength = +(pageLength || 10);
+
+  if (type === "score") {
+    const list = await db
+      .collection("players")
+      .where({
+        "achievement.set.highScore": _.exists(1),
+      })
+      .orderBy("achievement.set.highScore", "desc")
+      .field({
+        avatarUrl: 1,
+        nickName: 1,
+        achievement: 1,
+        openid: 1,
+      })
+      .skip(_skip)
+      .limit(_pageLength)
+      .get()
+      .then((res) => res.data);
+
+    return list;
+  } else if (type === "time") {
+    const list = await db
+      .collection("players")
+      .where({
+        "achievement.set.bestTime": _.exists(1),
+      })
+      .orderBy("achievement.set.bestTime", "asc")
+      .field({
+        avatarUrl: 1,
+        nickName: 1,
+        achievement: 1,
+        openid: 1,
+      })
+      .skip(_skip)
+      .limit(_pageLength)
+      .get()
+      .then((res) => res.data);
+
+    return list;
+  }
+
+  return [];
+};

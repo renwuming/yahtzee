@@ -10,7 +10,7 @@ interface IProps {
 }
 
 export default function Index({ setUserInfo = () => {} }: IProps) {
-  const [isOpened, setOpened] = useState<boolean>(true);
+  const [isOpened, setOpened] = useState<boolean>(false);
 
   useDidShow(() => {
     setOpened(true);

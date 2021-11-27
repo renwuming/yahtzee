@@ -39,17 +39,17 @@ export enum AchievementGameIndex {
 export const GIFT_LIST: GiftItem[] = [
   {
     type: "rose",
-    icon: Rose,
+    icon: () => Rose(),
     price: 10,
   },
   {
     type: "bomb",
-    icon: Bomb,
+    icon: () => Bomb(),
     price: 10,
   },
   {
     type: "praise",
-    icon: Praise,
+    icon: () => Praise(),
     price: 10,
   },
 ];

@@ -54,7 +54,7 @@ export default function Index() {
   });
 
   const [pageShow, setPageShow] = useState<boolean>(true);
-  const [gameData, setGameData] = useState<Martian.GameData>(null);
+  const [gameData, setGameData] = useState<Martian.MartianGameData>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [showConfirmStartModal, setShowConfirmStartModal] =
     useState<boolean>(false);
@@ -75,7 +75,7 @@ export default function Index() {
     setPageShow(true);
   });
   // 更新游戏数据
-  const init = async (data: Martian.GameBaseData) => {
+  const init = async (data: Martian.MartianGameBaseData) => {
     const gameData = handleGameData(data);
     const { players } = gameData;
     setPlayers(players);

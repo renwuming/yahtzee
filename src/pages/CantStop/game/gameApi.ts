@@ -2,7 +2,9 @@ import Taro from "@tarojs/taro";
 import { MAX_PLAYERS } from "../../../const";
 import { CallCloudFunction, DB, navigateTo } from "../../../utils";
 
-export async function getGameData(id: string): Promise<CantStop.GameBaseData> {
+export async function getGameData(
+  id: string
+): Promise<CantStop.CantStopGameBaseData> {
   const data = await CallCloudFunction({
     name: "cantstopGetGame",
     data: {
@@ -30,7 +32,9 @@ export async function startGame(id: string) {
   });
 }
 
-export function handleGameData(data: CantStop.GameBaseData): CantStop.GameData {
+export function handleGameData(
+  data: CantStop.CantStopGameBaseData
+): CantStop.CantStopGameData {
   const { openid } = Taro.getStorageSync("userInfo");
   const { owner, players, roundPlayer } = data;
 
@@ -138,7 +142,9 @@ export async function kickFromGame(id: string, openid: string) {
   });
 }
 
-export async function updatePlayerOnline_Database(game: CantStop.GameData) {
+export async function updatePlayerOnline_Database(
+  game: CantStop.CantStopGameData
+) {
   if (!game) return;
   const { _id, playerIndex, inGame } = game;
   if (!inGame) return;

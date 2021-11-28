@@ -3,7 +3,7 @@ import Dice from "../YahtzeeDice";
 import "./index.scss";
 
 interface IProps {
-  diceList: DiceData[];
+  diceList: Yahtzee.YahtzeeDiceData[];
   freezeDice: (index: number) => void;
   inRound: boolean;
   dicing: boolean;

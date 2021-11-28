@@ -7,7 +7,7 @@ import { CallCloudFunction } from "../../../utils";
 import GameItem from "../../../Components/GameItemForMorePlayers";
 
 export default function Index() {
-  const [list1, setList1] = useState<Martian.GameData[]>([]);
+  const [list1, setList1] = useState<CantStop.CantStopGameData[]>([]);
   const [pageNum1, setPageNum1] = useState<number>(0);
   const [page1End, setPage1End] = useState<boolean>(false);
 

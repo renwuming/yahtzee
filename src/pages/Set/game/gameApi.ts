@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { MAX_PLAYERS } from "@/const";
 import { CallCloudFunction, navigateTo, shuffle } from "@/utils";
 
-export async function getGameData(id: string): Promise<Set.GameBaseData> {
+export async function getGameData(id: string): Promise<Set.SetGameBaseData> {
   return await CallCloudFunction({
     name: "gameApi",
     data: {
@@ -43,7 +43,7 @@ export async function submitSetCloud(id: string, list: Set.SetCardData[]) {
   });
 }
 
-export function handleGameData(data: Set.GameBaseData): Set.GameData {
+export function handleGameData(data: Set.SetGameBaseData): Set.SetGameData {
   const { openid } = Taro.getStorageSync("userInfo");
   const { owner, players, startTime } = data;
 
@@ -63,7 +63,7 @@ export function handleGameData(data: Set.GameBaseData): Set.GameData {
     inGame,
     playerIndex,
     canJoin,
-    startTime: startTime ? new Date(startTime) : Infinity,
+    startTime: startTime ? new Date(startTime) : new Date(),
   };
 }
 
@@ -149,7 +149,7 @@ export function judgeSet(list: Set.SetCardData[]): boolean {
   return true;
 }
 
-function getKinds(list: any[], key: string): number {
+function getKinds(list: Set.SetCardData[], key: string): number {
   if (list.some((item) => !item.color)) return 0;
   return Array.from(new Set(list.map((item) => item[key]))).length;
 }

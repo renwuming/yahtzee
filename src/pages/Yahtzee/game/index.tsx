@@ -64,14 +64,15 @@ export default function Index() {
   });
 
   const [waiting, setWaiting] = useState<boolean>(false);
-  const [gameData, setGameData] = useState<GameData>(null);
+  const [gameData, setGameData] = useState<Yahtzee.YahtzeeGameData>(null);
   const [pageShow, setPageShow] = useState<boolean>(true);
   const [dicing, setDicing] = useState<boolean>(false);
   const [showDicing, setShowDicing] = useState<boolean>(false);
   const [confirmFlag, setConfirmFlag] = useState<boolean>(false);
-  const [newScore, setNewScore] = useState<NewScore>(null);
+  const [newScore, setNewScore] = useState<Yahtzee.NewScore>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [diceList, setDiceList] = useState<DiceData[]>(DEFAULT_DICE_LIST);
+  const [diceList, setDiceList] =
+    useState<Yahtzee.YahtzeeDiceData[]>(DEFAULT_DICE_LIST);
   const [showConfirmStartModal, setShowConfirmStartModal] =
     useState<boolean>(false);
   const [roundCountDown, setRoundCountDown] = useState<number | string>(100);
@@ -88,6 +89,7 @@ export default function Index() {
     roundTimeStamp,
     roundScores: scores,
     playerIndex,
+    canJoin,
   } = gameData || {
     otherScores: DEFAULT_SCORES,
   };
@@ -174,13 +176,12 @@ export default function Index() {
     };
   }, [end, pageShow, roundTimeStamp, gameData]);
 
-  const canJoin = players.length <= 1;
   const noDices = chances === DICE_CHANCES_NUM;
   const allFreezing = diceList.filter((e) => e.freezing).length === DICE_NUM;
   const canDice = inRound && chances > 0 && !showDicing && !end && !allFreezing;
 
   // 更新游戏数据
-  const init = async (data: GameBaseData) => {
+  const init = async (data: Yahtzee.YahtzeeGameBaseData) => {
     const gameData = handleGameData(data);
     const { players, diceList } = gameData;
     setGameData(gameData);
@@ -212,7 +213,7 @@ export default function Index() {
     setWaiting(false);
   }
 
-  function randomDiceList(): DiceData[] {
+  function randomDiceList(): Yahtzee.YahtzeeDiceData[] {
     const newDiceList = [];
     diceList.forEach((dice) => {
       const { freezing } = dice;

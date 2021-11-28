@@ -7,7 +7,7 @@ import { CallCloudFunction } from "../../../utils";
 import GameItem from "../../../Components/GameItem";
 
 export default function Index() {
-  const [list1, setList1] = useState<GameData[]>([]);
+  const [list1, setList1] = useState<Yahtzee.YahtzeeGameData[]>([]);
   const [pageNum1, setPageNum1] = useState<number>(0);
   const [page1End, setPage1End] = useState<boolean>(false);
 

@@ -16,14 +16,14 @@ exports.main = async (event) => {
   const ONE_DAYS = 1 * 24 * 60 * 60 * 1000;
   const TIME = new Date(Date.now() - ONE_DAYS);
   const list = await db
-    .collection("martian_games")
+    .collection("set_games")
     .where({
-      // _updateTime: _.lt(TIME),
+      _updateTime: _.lt(TIME),
       end: _.neq(true),
       //       winner: -1,
     })
-    //     .limit(1000)
-    //     .get()
+    // .limit(1000)
+    // .get();
     //     .then((res) => res.data);
     // .update({
     //   data: {

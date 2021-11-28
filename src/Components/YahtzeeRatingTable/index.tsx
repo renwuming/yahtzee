@@ -9,12 +9,12 @@ import {
 } from "./scoreRatings";
 
 interface IProps {
-  diceList: DiceData[];
+  diceList: Yahtzee.YahtzeeDiceData[];
   selectScore: (type: string, score: number) => void;
-  newScore: NewScore;
+  newScore: Yahtzee.NewScore;
   noDices: boolean;
   inRound: boolean;
-  players: Player[];
+  players: Yahtzee.YahtzeePlayer[];
   roundPlayer: number;
 }
 

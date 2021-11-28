@@ -2,7 +2,9 @@ import Taro from "@tarojs/taro";
 import { DEFAULT_SCORES } from "../../../const";
 import { CallCloudFunction, DB, navigateTo } from "../../../utils";
 
-export async function getGameData(id: string): Promise<GameBaseData> {
+export async function getGameData(
+  id: string
+): Promise<Yahtzee.YahtzeeGameBaseData> {
   const data = await CallCloudFunction({
     name: "yahtzeeGetGame",
     data: {
@@ -13,11 +15,14 @@ export async function getGameData(id: string): Promise<GameBaseData> {
   return data;
 }
 
-export function handleGameData(data: GameBaseData): GameData {
+export function handleGameData(
+  data: Yahtzee.YahtzeeGameBaseData
+): Yahtzee.YahtzeeGameData {
   const { openid } = Taro.getStorageSync("userInfo");
   const { owner, players, roundPlayer, start } = data;
 
   const own = owner.openid === openid;
+  const canJoin = players.length <= 1;
   const openids = players.map((item) => item.openid);
   const playerIndex = openids.indexOf(openid);
   const inGame = playerIndex >= 0;
@@ -39,6 +44,7 @@ export function handleGameData(data: GameBaseData): GameData {
   return {
     ...data,
     own,
+    canJoin,
     inGame,
     inRound,
     roundScores,

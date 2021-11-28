@@ -2,7 +2,9 @@ import Taro from "@tarojs/taro";
 import { MartianDiceMap, MartianStage, MAX_PLAYERS } from "../../../const";
 import { CallCloudFunction, DB, navigateTo } from "../../../utils";
 
-export async function getGameData(id: string): Promise<Martian.GameBaseData> {
+export async function getGameData(
+  id: string
+): Promise<Martian.MartianGameBaseData> {
   const data = await CallCloudFunction({
     name: "martianGetGame",
     data: {
@@ -30,7 +32,9 @@ export async function startGame(id: string) {
   });
 }
 
-export function handleGameData(data: Martian.GameBaseData): Martian.GameData {
+export function handleGameData(
+  data: Martian.MartianGameBaseData
+): Martian.MartianGameData {
   const { openid } = Taro.getStorageSync("userInfo");
   const { owner, players, roundPlayer, round } = data;
 
@@ -153,15 +157,15 @@ function calculateScore(round: Martian.Round): number {
 }
 
 function getCanSelectList(
-  diceList: Martian.DiceData[],
-  awardList: Martian.DiceData[]
-): Martian.DiceData[] {
+  diceList: Martian.MartianDiceData[],
+  awardList: Martian.MartianDiceData[]
+): Martian.MartianDiceData[] {
   const awardValueList = awardList.map((item) => item.value);
 
   return diceList.filter(({ value }) => !awardValueList.includes(value));
 }
 
-function getKindsNum(list: Martian.DiceData[]): number {
+function getKindsNum(list: Martian.MartianDiceData[]): number {
   return Array.from(new Set(list.map((item) => item.value))).length;
 }
 
@@ -198,7 +202,9 @@ export async function kickFromGame(id: string, openid: string) {
   });
 }
 
-export async function updatePlayerOnline_Database(game: Martian.GameData) {
+export async function updatePlayerOnline_Database(
+  game: Martian.MartianGameData
+) {
   if (!game) return;
   const { _id, playerIndex, inGame } = game;
   if (!inGame) return;

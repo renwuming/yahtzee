@@ -2,7 +2,7 @@ import { View } from "@tarojs/components";
 import "./index.scss";
 
 interface IProps {
-  diceData: DiceData;
+  diceData: Yahtzee.YahtzeeDiceData;
   freezeDice: () => void;
   inRound: boolean;
   dicing: boolean;

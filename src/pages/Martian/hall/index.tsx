@@ -11,9 +11,11 @@ import { gotoMartianGuide, navigateTo } from "../../../utils";
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
   const tabList = [{ title: "大厅" }, { title: "我的房间" }];
-  const [hallGameList, setHallGameList] = useState<Martian.GameData[]>([]);
+  const [hallGameList, setHallGameList] = useState<Martian.MartianGameData[]>(
+    []
+  );
   const [hallPageNum, setHallPageNum] = useState<number>(0);
-  const [myGameList, setMyGameList] = useState<Martian.GameData[]>([]);
+  const [myGameList, setMyGameList] = useState<Martian.MartianGameData[]>([]);
   const [myPageNum, setMyPageNum] = useState<number>(0);
   const [hallPageEnd, setHallPageEnd] = useState<boolean>(false);
   const [myPageEnd, setMyPageEnd] = useState<boolean>(false);

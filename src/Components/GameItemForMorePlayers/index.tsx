@@ -7,7 +7,7 @@ import PlayerItem from "@/Components/HallPlayer";
 
 interface IProps {
   index: number;
-  game: any;
+  game: AnyGameData;
   gameType: string;
   type?: "history" | "hall";
 }

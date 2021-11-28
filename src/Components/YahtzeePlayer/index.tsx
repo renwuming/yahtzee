@@ -6,7 +6,7 @@ import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import { OFFLINE_DELAY, PlayerContext } from "../../const";
 
 interface IProps {
-  data: Player;
+  data: Yahtzee.YahtzeePlayer;
   index?: number;
   colorType?: string;
 }

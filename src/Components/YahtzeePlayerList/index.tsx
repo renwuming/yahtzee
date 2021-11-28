@@ -3,7 +3,7 @@ import "./index.scss";
 import Player from "../YahtzeePlayer";
 
 interface IProps {
-  players: Player[];
+  players: Yahtzee.YahtzeePlayer[];
 }
 
 export default function Index({ players }: IProps) {

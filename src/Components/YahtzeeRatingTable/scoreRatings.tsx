@@ -18,14 +18,14 @@ export const scoreRatings = [
     {
       name: "ones",
       iconComponent: Dice1,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return getSmallScore(toValues(diceList), 1);
       },
     },
     {
       name: "sum",
       iconComponent: Sum,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return sum(toValues(diceList));
       },
     },
@@ -34,14 +34,14 @@ export const scoreRatings = [
     {
       name: "twos",
       iconComponent: Dice2,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return getSmallScore(toValues(diceList), 2);
       },
     },
     {
       name: "fourOfKind",
       iconComponent: FourOfKind,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         const values = toValues(diceList);
         return isNOfKind(values, 4) ? sum(values) : 0;
       },
@@ -51,14 +51,14 @@ export const scoreRatings = [
     {
       name: "threes",
       iconComponent: Dice3,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return getSmallScore(toValues(diceList), 3);
       },
     },
     {
       name: "fullhouse",
       iconComponent: FullHouse,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         const values = toValues(diceList);
         return isFullHouse(values) ? sum(values) : 0;
       },
@@ -68,14 +68,14 @@ export const scoreRatings = [
     {
       name: "fours",
       iconComponent: Dice4,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return getSmallScore(toValues(diceList), 4);
       },
     },
     {
       name: "miniStraight",
       iconComponent: MiniStraight,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         const values = toValues(diceList);
         return isMiniStraight(values) ? 15 : 0;
       },
@@ -85,14 +85,14 @@ export const scoreRatings = [
     {
       name: "fives",
       iconComponent: Dice5,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return getSmallScore(toValues(diceList), 5);
       },
     },
     {
       name: "straight",
       iconComponent: Straight,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         const values = toValues(diceList);
         return isStraight(values) ? 30 : 0;
       },
@@ -102,14 +102,14 @@ export const scoreRatings = [
     {
       name: "sixes",
       iconComponent: Dice6,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         return getSmallScore(toValues(diceList), 6);
       },
     },
     {
       name: "fiveOfKind",
       iconComponent: FiveOfKind,
-      rating: (diceList: DiceData[]): number => {
+      rating: (diceList: Yahtzee.YahtzeeDiceData[]): number => {
         const values = toValues(diceList);
         return isNOfKind(values, 5) ? 50 : 0;
       },
@@ -117,7 +117,7 @@ export const scoreRatings = [
   ],
 ];
 
-function toValues(diceList: DiceData[]): number[] {
+function toValues(diceList: Yahtzee.YahtzeeDiceData[]): number[] {
   return diceList.map((dice) => dice.value);
 }
 
@@ -169,7 +169,7 @@ function isFullHouse(values: number[]): boolean {
 export const BONUS_NEED = 63;
 export const BONUS_SCORE = 35;
 
-export function getBonusScore(scores: Scores): number {
+export function getBonusScore(scores: Yahtzee.Scores): number {
   const types = ["ones", "twos", "threes", "fours", "fives", "sixes"];
   const bonusScore = sum(types.map((type) => scores[type]));
   return bonusScore;

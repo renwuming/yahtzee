@@ -1,5 +1,6 @@
 import PlayerList from "@/Components/MartianPlayerList";
 import Player from "@/Components/MartianPlayer";
+import HallPlayer from "@/Components/HallPlayer";
 import { AchievementGameIndex, PlayerContext, SET_TIME_LIMIT } from "@/const";
 import { useGameApi } from "@/utils_api";
 import { View, Image, Text } from "@tarojs/components";
@@ -33,7 +34,7 @@ export default function Index() {
   });
 
   const [players, setPlayers] = useState<Set.SetPlayer[]>([]);
-  const [gameData, setGameData] = useState<Set.GameData>(null);
+  const [gameData, setGameData] = useState<Set.SetGameData>(null);
   const [roundCountDown, setRoundCountDown] = useState<number | string>(
     Infinity
   );
@@ -46,9 +47,19 @@ export default function Index() {
     getGameData,
     gameData,
     setRoundCountDown,
+    getCountDown,
   });
 
-  function initFn(data: Set.GameBaseData) {
+  function getCountDown(data: any) {
+    const { startTime } = data;
+    const timeStamp = Date.now();
+    const roundCountDown = Math.floor(
+      SET_TIME_LIMIT - (timeStamp - +startTime) / 1000
+    );
+    return roundCountDown;
+  }
+
+  function initFn(data: Set.SetGameBaseData) {
     const gameData = handleGameData(data);
     const { players } = gameData;
     setPlayers(players);
@@ -241,7 +252,7 @@ export default function Index() {
               <Text className="text">获胜者</Text>
               {winners.map((index) => {
                 const data = players[index];
-                return <Player data={data}></Player>;
+                return <HallPlayer data={data}></HallPlayer>;
               })}
             </View>
           ) : (

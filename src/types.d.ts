@@ -1,109 +1,22 @@
-interface GiftAction {
-  index?: number;
-  createdAt: Date;
-  sender: string;
-  receiver: string;
-  type: string;
-}
-interface GiftItem {
-  type: string;
-  icon: () => {};
-  price: number;
-}
+type AnyGameData =
+  | Yahtzee.YahtzeeGameData
+  | Martian.MartianGameData
+  | CantStop.CantStopGameData
+  | Set.SetGameData;
+type AnyPlayer = Yahtzee.YahtzeePlayer &
+  CantStop.CantStopPlayer &
+  Set.SetPlayer;
+
 interface SeasonRank {
   name: string;
   list: SeasonRankPlayer[];
   desTitle: string;
   desContent: string;
 }
-
 interface SeasonRankPlayer extends Player {
   rankType: string;
   rankLevel: number;
   rankImgUrl?: string;
-}
-
-interface Wealth {
-  _id: string;
-  type: string;
-  amount: number;
-  intro: string;
-  maxTimes: number;
-  needVideo: boolean;
-  online: boolean;
-  remainingTimes: number;
-}
-
-interface DiceData {
-  value: number;
-  freezing?: boolean;
-}
-
-interface Scores {
-  ones: number;
-  twos: number;
-  threes: number;
-  fours: number;
-  fives: number;
-  sixes: number;
-  sum: number;
-  fourOfKind: number;
-  fullhouse: number;
-  miniStraight: number;
-  straight: number;
-  fiveOfKind: number;
-}
-
-interface NewScore {
-  type: string;
-  score: number;
-}
-
-interface GameBaseData {
-  _id: string;
-  owner: Player;
-  players: Player[];
-  start?: boolean;
-  roundPlayer?: number;
-  chances?: number;
-  diceList?: DiceData[];
-  winner?: number;
-  end?: boolean;
-  roundTimeStamp?: number;
-
-  _createTime: Date;
-  _updateTime: Date;
-}
-
-interface GameData extends GameBaseData {
-  own: boolean;
-  inGame: boolean;
-  inRound?: boolean;
-  roundScores?: Scores;
-  otherScores?: Scores;
-  playerIndex: number;
-}
-
-type AnyGameData = GameData &
-  Martian.GameData &
-  CantStop.GameData &
-  Set.GameData;
-type AnyPlayer = Player & CantStop.CantStopPlayer & Set.SetPlayer;
-
-interface Player {
-  nickName: string;
-  avatarUrl: string;
-  openid?: string;
-  lastScoreType?: string;
-  scores?: Scores;
-  default?: boolean;
-  sumScore?: number;
-  inRound?: boolean;
-  timeStamp?: number;
-  achievement?: Achievement;
-  gift?: Gift;
-  wealth?: any;
-  wealthRecord?: any;
 }
 
 interface Gift {
@@ -124,6 +37,18 @@ interface Gift {
     };
   };
 }
+interface GiftAction {
+  index?: number;
+  createdAt: Date;
+  sender: string;
+  receiver: string;
+  type: string;
+}
+interface GiftItem {
+  type: string;
+  icon: () => {};
+  price: number;
+}
 
 interface Achievement {
   [T: string]: AchievementItem;
@@ -138,83 +63,133 @@ interface AchievementItem {
   multiWinRate: number;
 }
 
+interface Wealth {
+  _id: string;
+  type: string;
+  amount: number;
+  intro: string;
+  maxTimes: number;
+  needVideo: boolean;
+  online: boolean;
+  remainingTimes: number;
+}
+
+interface Player {
+  nickName: string;
+  avatarUrl: string;
+  openid?: string;
+  lastScoreType?: string;
+  default?: boolean;
+  sumScore?: number;
+  inRound?: boolean;
+  timeStamp?: number;
+  achievement?: Achievement;
+  gift?: Gift;
+  wealth?: any;
+  wealthRecord?: any;
+}
+interface GameBaseData {
+  _id: string;
+  owner: Player;
+  start?: boolean;
+  roundPlayer?: number;
+  end?: boolean;
+  roundTimeStamp?: number;
+
+  _createTime: Date;
+  _updateTime: Date;
+}
+interface GameData extends GameBaseData {
+  own: boolean;
+  inGame: boolean;
+  inRound?: boolean;
+  playerIndex: number;
+  canJoin: boolean;
+}
+
+declare namespace Yahtzee {
+  interface YahtzeeGameBaseData extends GameBaseData {
+    players: YahtzeePlayer[];
+    winner?: number;
+    chances?: number;
+    diceList?: YahtzeeDiceData[];
+  }
+  interface YahtzeeGameData extends GameData, YahtzeeGameBaseData {
+    roundScores?: Scores;
+    otherScores?: Scores;
+  }
+  interface YahtzeePlayer extends Player {
+    scores?: Scores;
+  }
+  interface YahtzeeDiceData {
+    value: number;
+    freezing?: boolean;
+  }
+  interface Scores {
+    ones: number;
+    twos: number;
+    threes: number;
+    fours: number;
+    fives: number;
+    sixes: number;
+    sum: number;
+    fourOfKind: number;
+    fullhouse: number;
+    miniStraight: number;
+    straight: number;
+    fiveOfKind: number;
+  }
+  interface NewScore {
+    type: string;
+    score: number;
+  }
+}
+
 declare namespace Martian {
-  interface DiceData {
+  interface MartianPlayer extends Player {}
+  interface MartianGameBaseData extends GameBaseData {
+    players: MartianPlayer[];
+    winners?: number[];
+    round?: Round;
+    roundSum?: number;
+  }
+  interface MartianGameData extends GameData, MartianGameBaseData {}
+  interface MartianDiceData {
     value: number;
   }
-  interface GameBaseData {
-    _id: string;
-    owner: Player;
-    players: Player[];
-    start?: boolean;
-    roundPlayer?: number;
-    round: Round;
-    winners?: number[];
-    end?: boolean;
-    roundSum?: number;
-    roundTimeStamp: number;
-
-    _createTime: Date;
-    _updateTime: Date;
-  }
-
-  interface GameData extends GameBaseData {
-    own: boolean;
-    inGame: boolean;
-    inRound: boolean;
-    playerIndex: number;
-    canJoin: boolean;
-  }
-
   interface Round {
     roundTimeStamp: number;
     stage: number;
-    diceNum: number;
-    diceList: DiceData[];
-    tankList: DiceData[];
-    ufoList: DiceData[];
-    awardList: DiceData[];
-    roundScore: number;
-    ufoCanWin: boolean;
-    shouldRetreat: boolean;
-    canSelect: boolean;
-    cantSelectAnyUfo: boolean;
-    allToSelectIsUfo: boolean;
-    ufoWin: boolean;
+    diceList: MartianDiceData[];
+    diceNum?: number;
+    tankList?: MartianDiceData[];
+    ufoList?: MartianDiceData[];
+    awardList?: MartianDiceData[];
+    roundScore?: number;
+    ufoCanWin?: boolean;
+    shouldRetreat?: boolean;
+    canSelect?: boolean;
+    cantSelectAnyUfo?: boolean;
+    allToSelectIsUfo?: boolean;
+    ufoWin?: boolean;
   }
 }
 
 declare namespace CantStop {
-  type DiceData = number;
-  interface GameBaseData {
-    _id: string;
-    owner: Player;
+  type CantStopDiceData = number;
+  interface CantStopGameBaseData extends GameBaseData {
     players: CantStopPlayer[];
-    start?: boolean;
-    roundPlayer?: number;
-    round: Round;
     winner?: number;
-    end?: boolean;
+    round?: Round;
     roundSum?: number;
-    roundTimeStamp: number;
-
-    _createTime: Date;
-    _updateTime: Date;
   }
-
-  interface GameData extends GameBaseData {
-    own: boolean;
-    inGame: boolean;
-    inRound: boolean;
-    playerIndex: number;
-    canJoin: boolean;
-  }
+  interface CantStopGameData extends GameData, CantStopGameBaseData {}
   interface Round {
     roundTimeStamp: number;
     stage: number;
-    diceList: DiceData[];
-    roundProgress: number[];
-    roundRoad: number[];
+    diceList: CantStopDiceData[];
+    roundProgress?: number[];
+    roundRoad?: number[];
   }
   interface CantStopPlayer extends Player {
     progress?: number[];
@@ -229,22 +204,17 @@ declare namespace Set {
     fill: string;
     n: number;
   }
-  interface GameBaseData {
-    _id: string;
-    owner: Player;
-    players: Player[];
-    start?: boolean;
-    startTime?: Date | number;
+  interface SetGameBaseData extends GameBaseData {
+    startTime?: Date;
+    endTime?: Date;
+    players: SetPlayer[];
     winners?: number[];
-    end?: boolean;
     gameCardList?: SetCardData[];
     reserveCardList?: SetCardData[];
+    selectedCardList?: SetCardData[];
     timer?: boolean;
-
-    _createTime: Date;
-    _updateTime: Date;
   }
-  interface GameData extends GameBaseData {
+  interface SetGameData extends GameData, SetGameBaseData {
     own: boolean;
     inGame: boolean;
     playerIndex: number;

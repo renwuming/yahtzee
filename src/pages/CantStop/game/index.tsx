@@ -57,7 +57,7 @@ export default function Index() {
   const [pageShow, setPageShow] = useState<boolean>(true);
   const [canSelectDiceNum, setCanSelectDiceNum] = useState<number>(0);
   const [players, setPlayers] = useState<CantStop.CantStopPlayer[]>([]);
-  const [gameData, setGameData] = useState<CantStop.GameData>(null);
+  const [gameData, setGameData] = useState<CantStop.CantStopGameData>(null);
   const [showConfirmStartModal, setShowConfirmStartModal] =
     useState<boolean>(false);
   const [showConfirmEndModal, setShowConfirmEndModal] =
@@ -78,7 +78,7 @@ export default function Index() {
     setPageShow(true);
   });
   // 更新游戏数据
-  const init = async (data: CantStop.GameBaseData) => {
+  const init = async (data: CantStop.CantStopGameBaseData) => {
     const gameData = handleGameData(data);
     const { players, round } = gameData || {};
     const { roundTimeStamp } = round || {};

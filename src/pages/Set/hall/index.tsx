@@ -11,9 +11,9 @@ import { gotoSetGuide, navigateTo } from "@/utils";
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
   const tabList = [{ title: "大厅" }, { title: "我的房间" }];
-  const [hallGameList, setHallGameList] = useState<Set.GameData[]>([]);
+  const [hallGameList, setHallGameList] = useState<Set.SetGameData[]>([]);
   const [hallPageNum, setHallPageNum] = useState<number>(0);
-  const [myGameList, setMyGameList] = useState<Set.GameData[]>([]);
+  const [myGameList, setMyGameList] = useState<Set.SetGameData[]>([]);
   const [myPageNum, setMyPageNum] = useState<number>(0);
   const [hallPageEnd, setHallPageEnd] = useState<boolean>(false);
   const [myPageEnd, setMyPageEnd] = useState<boolean>(false);

@@ -5,7 +5,7 @@ import Taro, {
   useDidShow,
 } from "@tarojs/taro";
 import { useEffect, useRef, useState } from "react";
-import { ACTION_DELAY, ANIMATION_BACKUP_SUM, SET_TIME_LIMIT } from "./const";
+import { ACTION_DELAY, ANIMATION_BACKUP_SUM } from "./const";
 import { DB } from "./utils";
 
 interface GameApiData {
@@ -14,8 +14,9 @@ interface GameApiData {
   initFn: any;
   gameDataWatchCb: any;
   getGameData: any;
-  gameData: any;
+  gameData: AnyGameData;
   setRoundCountDown: any;
+  getCountDown: any;
 }
 
 export function useGameApi(data: GameApiData) {
@@ -27,8 +28,9 @@ export function useGameApi(data: GameApiData) {
     getGameData,
     gameData,
     setRoundCountDown,
+    getCountDown,
   } = data;
-  const { players, end, startTime } = gameData || {};
+  const { players, end } = gameData || {};
 
   const [pageShow, setPageShow] = useState<boolean>(true);
 
@@ -75,10 +77,7 @@ export function useGameApi(data: GameApiData) {
     }, 2000);
 
     const roundTimer = setInterval(() => {
-      const timeStamp = Date.now();
-      const roundCountDown = Math.floor(
-        SET_TIME_LIMIT - (timeStamp - +startTime) / 1000
-      );
+      const roundCountDown = getCountDown(gameData);
       const showRoundCountDown = (roundCountDown >= 0 ? roundCountDown : 0)
         .toString()
         .padStart(2, "0");
@@ -89,7 +88,7 @@ export function useGameApi(data: GameApiData) {
       clearInterval(timer);
       clearInterval(roundTimer);
     };
-  }, [end, pageShow, gameData, startTime]);
+  }, [end, pageShow, gameData]);
 }
 
 async function updatePlayerOnline_Database(game: GameData, gameDbName: string) {

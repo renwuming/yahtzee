@@ -6,7 +6,7 @@ import Taro, {
 } from "@tarojs/taro";
 import { useEffect, useRef, useState } from "react";
 import { ACTION_DELAY, ANIMATION_BACKUP_SUM } from "./const";
-import { DB } from "./utils";
+import { DB, SLEEP } from "./utils";
 
 interface GameApiData {
   id: string;
@@ -60,11 +60,14 @@ export function useGameApi(data: GameApiData) {
   // 监听数据库变化
   useEffect(() => {
     if (!pageShow) return;
-    const watcher = watchDataBase(id, gameDbName, cb);
-    const eventsWatcher = watchEvents_DataBase(id, eventCb);
+    let watcher, eventsWatcher;
+    SLEEP(500).then(() => {
+      watcher = watchDataBase(id, gameDbName, cb);
+      eventsWatcher = watchEvents_DataBase(id, eventCb);
+    });
     return () => {
-      watcher.close();
-      eventsWatcher.close();
+      watcher?.close();
+      eventsWatcher?.close();
     };
   }, [pageShow]);
 

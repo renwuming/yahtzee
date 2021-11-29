@@ -15,24 +15,21 @@ exports.main = async (event) => {
   // 删除旧数据
   const ONE_DAYS = 1 * 24 * 60 * 60 * 1000;
   const TIME = new Date(Date.now() - ONE_DAYS);
-  const list = await db
-    .collection("set_games")
-    .where({
-      _updateTime: _.lt(TIME),
-      end: _.neq(true),
-      //       winner: -1,
-    })
-    // .limit(1000)
-    // .get();
-    //     .then((res) => res.data);
-    // .update({
-    //   data: {
-    //     maxMultiSum: db.command.remove(),
-    //     maxSingleSum: db.command.remove(),
-    //     multiWinRateValue: db.command.remove(),
-    //   },
-    // });
-    .remove();
+  const list = await db.collection("players").where({
+    "achievement.set": _.exists(1),
+    // _updateTime: _.lt(TIME),
+    // end: _.neq(true),
+    //       winner: -1,
+  });
+  // .limit(1000)
+  // .get();
+  //     .then((res) => res.data);
+  // .update({
+  //   data: {
+  //     "achievement.set": _.remove(),
+  //   },
+  // });
+  // .remove();
 
   return list;
 };

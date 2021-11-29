@@ -253,13 +253,18 @@ async function handleSetAchievement(db, openid) {
     multiWinSum === 0 ? 0 : +((multiWinSum / multiNum) * 100).toFixed(0);
   const multiWinRate = `${multiWinRateValue}%`;
 
-  return {
+  const resData = {
     singleNum,
     multiNum,
     multiWinSum,
     multiWinRateValue,
     multiWinRate,
     highScore,
-    bestTime: bestTime === Infinity ? null : Math.min(bestTime, 300).toFixed(1),
   };
+
+  if (bestTime < 300) {
+    resData.bestTime = bestTime;
+  }
+
+  return resData;
 }

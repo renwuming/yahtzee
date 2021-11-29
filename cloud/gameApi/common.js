@@ -71,6 +71,14 @@ async function findHallGames(gameDbName, data) {
       ])
     )
     .orderBy("_updateTime", "desc")
+    .field({
+      _id: 1,
+      players: 1,
+      start: 1,
+      end: 1,
+      winner: 1,
+      winners: 1,
+    })
     .skip(_skip)
     .limit(_pageLength)
     .get()
@@ -98,6 +106,14 @@ async function findMyGames(gameDbName, data, end) {
     })
     .orderBy("endTime", "desc")
     .orderBy("_createTime", "desc")
+    .field({
+      _id: 1,
+      players: 1,
+      start: 1,
+      end: 1,
+      winner: 1,
+      winners: 1,
+    })
     .skip(_skip)
     .limit(_pageLength)
     .get()

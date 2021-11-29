@@ -461,7 +461,7 @@ exports.getRanking = async function getRanking(data) {
     const list = await db
       .collection("players")
       .where({
-        "achievement.set.bestTime": _.exists(1),
+        "achievement.set.bestTime": _.lt(300),
       })
       .orderBy("achievement.set.bestTime", "asc")
       .field({

@@ -26,6 +26,12 @@ export default function Index() {
 
   const gameList = [
     {
+      name: "拉密牌",
+      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover2.png",
+      pageType: "Rummy",
+      pagePath: `game/index`,
+    },
+    {
       name: "神奇形色牌",
       imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover2.png",
       pageType: "Set",
@@ -58,6 +64,7 @@ export default function Index() {
       navigateFn() {
         Taro.navigateToMiniProgram({
           appId: "wxfe74b714bde12b3f",
+          path: "pages/hall/index",
         });
       },
     },
@@ -68,7 +75,7 @@ export default function Index() {
       navigateFn() {
         Taro.navigateToMiniProgram({
           appId: "wxfe74b714bde12b3f",
-          path: "pages/WaveLength/home/index",
+          path: "pages/WaveLength/hall/index",
         });
       },
     },

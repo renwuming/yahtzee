@@ -1,0 +1,171 @@
+page {
+  min-height: 100%;
+  height: 100%;
+  background-color: #4b6d8d;
+}
+movable-area {
+  width: 100%;
+  height: 100%;
+}
+.rummy-game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 32px;
+  .rummy-game-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .rummy-game-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .player-list {
+      width: 100px;
+      height: 244px;
+    }
+    .round-btn-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100px;
+      height: 72px;
+      .round-ctrl-btn {
+        width: 36px;
+        height: 46px;
+        margin: 4px;
+        line-height: 46px;
+        padding: 0;
+        border-radius: 0;
+        border: none;
+      }
+    }
+  }
+  .playground {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 574px;
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:first-child .playground-box {
+        border-top-width: 2px;
+      }
+      &:last-child .playground-box {
+        border-bottom-width: 2px;
+      }
+    }
+    .playground-box {
+      &:first-child {
+        border-left-width: 2px;
+      }
+      &:last-child {
+        border-right-width: 2px;
+      }
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      width: 25px;
+      height: 31px;
+      background-color: #3f4f5e;
+      border: 1px solid #8a99ab;
+      color: #a6b5ca;
+      font-size: 14px;
+      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+        sans-serif;
+    }
+  }
+  .playboard-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #9b5d1d;
+    width: 574px;
+    .playboard-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 4px solid #010306;
+      padding: 2px 0;
+      &.right {
+        border-right: none;
+        border-left: 4px solid #010306;
+      }
+      .ctrl-btn {
+        width: 50px;
+        height: 34px;
+        line-height: 31px;
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+        border: none;
+      }
+    }
+    .playboard-wrapper {
+      padding: 3px;
+    }
+    .playboard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:last-child {
+          margin-top: 3px;
+        }
+      }
+      .playground-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        width: 25px;
+        height: 31px;
+      }
+    }
+  }
+  .card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 31px;
+    background-color: #f8f6d1;
+    border-radius: 1px;
+    box-shadow: 0.5px 0.5px 1px 1px #b2a27d;
+    font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+      sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    &.red {
+      color: #c2302f;
+    }
+    &.yellow {
+      color: #f4870b;
+    }
+    &.black {
+      color: #0d0812;
+    }
+    &.blue {
+      color: #4272a6;
+    }
+    &.active {
+      z-index: 100;
+    }
+  }
+}

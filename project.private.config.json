@@ -113,6 +113,12 @@
           "pathName": "pages/homepage/index",
           "query": "openid=oqWgm5b36pHkbm6JY2nutZChE170",
           "scene": null
+        },
+        {
+          "name": "拉密",
+          "pathName": "pages/Rummy/game/index",
+          "query": "",
+          "scene": null
         }
       ]
     }

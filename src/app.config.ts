@@ -24,6 +24,8 @@ export default {
     "pages/Set/hall/index",
     "pages/Set/history/index",
     "pages/Set/ranking/index",
+    // 拉密
+    "pages/Rummy/game/index",
   ],
   window: {
     backgroundTextStyle: "light",

@@ -69,11 +69,13 @@ export const ROUND_TIME_LIMIT = 65;
 export const SHOW_ROUND_TIME_LIMIT = 60;
 export const DICE_NUM = 5;
 export const DICE_CHANCES_NUM = 3;
-export const DEFAULT_DICE_LIST: DiceData[] = new Array(DICE_NUM).fill({
+export const DEFAULT_DICE_LIST: Yahtzee.YahtzeeDiceData[] = new Array(
+  DICE_NUM
+).fill({
   value: 0,
 });
 
-export const DEFAULT_SCORES: Scores = {
+export const DEFAULT_SCORES: Yahtzee.Scores = {
   ones: null,
   twos: null,
   threes: null,
@@ -125,3 +127,14 @@ export function getRoadNum(road) {
 // Set
 export const INIT_CARD_SUM = 12;
 export const SET_TIME_LIMIT = 5 * 60;
+
+// 拉密
+export enum RUMMY_AREA_STATUS {
+  other,
+  playground,
+  playboard,
+}
+export enum RUMMY_SET_TYPE {
+  straight,
+  samevalue,
+}

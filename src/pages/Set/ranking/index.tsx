@@ -15,7 +15,9 @@ function RankItem({ index, data, type }: RankItemProps) {
       {type === "time" ? (
         <View className="column-right">
           <Text className="score-title">最短时间</Text>
-          <Text className="score">{`${achievement?.set?.bestTime} s`}</Text>
+          <Text className="score">{`${achievement?.set?.bestTime.toFixed(
+            2
+          )} s`}</Text>
         </View>
       ) : (
         <View className="column-right">

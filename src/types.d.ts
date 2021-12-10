@@ -225,3 +225,35 @@ declare namespace Set {
     failSum?: number;
   }
 }
+
+declare namespace Rummy {
+  interface RummyCardData {
+    id: number;
+    value: number;
+    color: string;
+    x?: number;
+    y?: number;
+    areaStatus?: number;
+    inGround?: boolean;
+  }
+  // interface SetGameBaseData extends GameBaseData {
+  //   startTime?: Date;
+  //   endTime?: Date;
+  //   players: SetPlayer[];
+  //   winners?: number[];
+  //   gameCardList?: SetCardData[];
+  //   reserveCardList?: SetCardData[];
+  //   selectedCardList?: SetCardData[];
+  //   timer?: boolean;
+  // }
+  // interface SetGameData extends GameData, SetGameBaseData {
+  //   own: boolean;
+  //   inGame: boolean;
+  //   playerIndex: number;
+  //   canJoin: boolean;
+  // }
+  // interface SetPlayer extends Player {
+  //   successSum?: number;
+  //   failSum?: number;
+  // }
+}

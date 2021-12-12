@@ -1,6 +1,6 @@
 const cloud = require("wx-server-sdk");
 
-const { updatePlayer, findOne } = require("./common");
+const { updatePlayer, getPlayer, findOne, shuffle } = require("./common");
 
 const MAX_PLAYERS = 4;
 const COLORS = ["red", "green", "purple"];
@@ -49,12 +49,7 @@ exports.create = async function create(gameDbName) {
 
   if (game) return game;
 
-  const { result: player } = await cloud.callFunction({
-    name: "getPlayers",
-    data: {
-      openid: OPENID,
-    },
-  });
+  const player = await getPlayer(OPENID);
 
   const [gameCardList, reserveCardList] = initCardList();
   const date = new Date();
@@ -145,12 +140,8 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
   // 加入游戏
   else if (action === "joinGame" && !inGame && players.length < MAX_PLAYERS) {
     // 获取用户数据
-    const { result: player } = await cloud.callFunction({
-      name: "getPlayers",
-      data: {
-        openid: OPENID,
-      },
-    });
+    const player = await getPlayer(OPENID);
+
     players.push(player);
     return {
       players,
@@ -239,21 +230,6 @@ function judgeSet(list) {
 function getKinds(list, key) {
   if (list.some((item) => !item.color)) return 0;
   return Array.from(new Set(list.map((item) => item[key]))).length;
-}
-
-function shuffle(arr) {
-  var length = arr.length,
-    temp,
-    random;
-  while (0 != length) {
-    random = Math.floor(Math.random() * length);
-    length--;
-    // swap
-    temp = arr[length];
-    arr[length] = arr[random];
-    arr[random] = temp;
-  }
-  return arr;
 }
 
 async function submitSet(

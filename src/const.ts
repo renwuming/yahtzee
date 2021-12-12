@@ -34,6 +34,7 @@ export enum AchievementGameIndex {
   martian,
   cantstop,
   set,
+  rummy,
 }
 
 export const GIFT_LIST: GiftItem[] = [
@@ -129,6 +130,8 @@ export const INIT_CARD_SUM = 12;
 export const SET_TIME_LIMIT = 5 * 60;
 
 // 拉密
+export const RUMMY_ROUND_TIME_LIMIT = 65;
+export const RUMMY_SHOW_ROUND_TIME_LIMIT = 60;
 export enum RUMMY_AREA_STATUS {
   other,
   playground,

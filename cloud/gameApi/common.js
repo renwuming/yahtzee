@@ -28,6 +28,23 @@ exports.updatePlayer = function (players, gameName) {
   });
 };
 
+exports.getPlayer = async function (_openid) {
+  const { result: player } = await cloud.callFunction({
+    name: "getPlayers",
+    data: {
+      openid: _openid,
+    },
+  });
+
+  const { nickName, avatarUrl, openid, _id } = player;
+  return {
+    nickName,
+    avatarUrl,
+    openid,
+    _id,
+  };
+};
+
 exports.findOne = async function findOne(gameDbName, id) {
   const db = cloud.database();
   const data = await db
@@ -121,3 +138,22 @@ async function findMyGames(gameDbName, data, end) {
 
   return list;
 }
+
+exports.shuffle = function (arr) {
+  var length = arr.length,
+    temp,
+    random;
+  while (0 != length) {
+    random = Math.floor(Math.random() * length);
+    length--;
+    // swap
+    temp = arr[length];
+    arr[length] = arr[random];
+    arr[random] = temp;
+  }
+  return arr;
+};
+
+const flat = (arr) =>
+  arr.reduce((a, b) => a.concat(Array.isArray(b) ? flat(b) : b), []);
+exports.flat = flat;

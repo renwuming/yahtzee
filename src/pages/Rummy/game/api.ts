@@ -1,74 +1,133 @@
 import Taro from "@tarojs/taro";
-import { RUMMY_AREA_STATUS, RUMMY_SET_TYPE } from "@/const";
-import { shuffle } from "@/utils";
+import { MAX_PLAYERS, RUMMY_AREA_STATUS, RUMMY_SET_TYPE } from "@/const";
+import { CallCloudFunction, navigateTo, shuffle } from "@/utils";
 
-export const GROUND_COL_LEN = 8;
-export const GROUND_ROW_LEN = 23;
-export const BOARD_COL_LEN = 2;
-export const BOARD_ROW_LEN = 18;
-export const BOARD_SUM = BOARD_COL_LEN * BOARD_ROW_LEN;
-
-export const sameValueIndexList = [
-  161, 166, 138, 143, 115, 120, 92, 97, 69, 74, 46, 51, 23, 28, 0, 5,
-];
-
-export function getStraightIndexListByValue(value) {
-  let colIndex = GROUND_COL_LEN - 1;
-  const res = [];
-  for (let i = colIndex; i >= 0; i--) {
-    res.push(i * 23 + 9 + value);
-  }
-  return res;
+export async function handleGameAction(
+  id: string,
+  action: string,
+  data: any = {}
+) {
+  return await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: action,
+      gameDbName: "rummy_games",
+      id,
+      data,
+    },
+  });
 }
 
-const RUMMY_JOKERS = [
-  { color: "red", value: 0 },
-  { color: "black", value: 0 },
-];
-export const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
-export const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-const RUMMY_CARD_LIBRARY = [0, 1]
-  .reduce((list) => {
-    return list.concat(
-      RUMMY_COLORS.reduce((list2, color) => {
-        return list2.concat(
-          RUMMY_VALUES.reduce((list3, value) => {
-            return list3.concat({
-              color,
-              value,
-            });
-          }, [])
-        );
-      }, [])
-    );
-  }, [])
-  // .concat(RUMMY_JOKERS)
-  .map((item, id) => ({
-    ...item,
-    id,
-  }));
-
-export const INIT_PLAY_GROUND = () =>
-  new Array(GROUND_COL_LEN).fill(1).map((_) => {
-    return new Array(GROUND_ROW_LEN);
+export async function createGame() {
+  const { _id } = await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: "create",
+      gameDbName: "rummy_games",
+    },
   });
+  navigateTo("Rummy", `game/index?id=${_id}`);
+}
 
-export const INIT_PLAY_BOARD = () =>
-  new Array(BOARD_COL_LEN).fill(1).map((_) => {
-    return new Array(BOARD_ROW_LEN);
+export async function getGameData(
+  id: string
+): Promise<Rummy.RummyGameBaseData> {
+  return await CallCloudFunction({
+    name: "gameApi",
+    data: {
+      action: "findOne",
+      gameDbName: "rummy_games",
+      id,
+    },
   });
+}
 
-export async function getGameData() {
-  const initList = shuffle(RUMMY_CARD_LIBRARY);
+export function handleGameData(
+  data: Rummy.RummyGameBaseData
+): Rummy.RummyGameData {
+  const { openid } = Taro.getStorageSync("userInfo");
+  const { start, owner, players, playgroundData, roundPlayer } = data;
+
+  const own = owner.openid === openid;
+  const canJoin = players.length < MAX_PLAYERS;
+  const openids = players.map((item) => item.openid);
+  const playerIndex = openids.indexOf(openid);
+  const inGame = playerIndex >= 0;
+
+  let myCardList = [];
+  if (start) {
+    const { cardList } = players[playerIndex];
+    myCardList = handleCardList(cardList);
+  }
 
   return {
-    playgroundCardList: [],
-    cardList: initList.slice(0, 14),
-    cardLibrary: initList.slice(14),
+    ...data,
+    own,
+    inGame,
+    inRound: roundPlayer === playerIndex,
+    playerIndex,
+    canJoin,
+    playgroundCardList: groundData2List(playgroundData),
+    myCardList,
   };
 }
 
-export function getNewCardPosOnBoard(playboardData) {
+function groundData2List(
+  playgroundData: Rummy.RummyCardData[][]
+): Rummy.RummyCardData[] {
+  const resList = [];
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      if (card) {
+        const { x, y } = getAreaPos(
+          {
+            colIndex: i,
+            rowIndex: j,
+          },
+          RUMMY_AREA_STATUS.playground
+        );
+        card.x = x;
+        card.y = y;
+        card.inGround = true;
+        resList.push(card);
+      }
+    }
+  }
+  return resList;
+}
+
+export const GROUND_COL_LEN = 16;
+export const GROUND_ROW_LEN = 13;
+export const BOARD_COL_LEN = 4;
+export const BOARD_ROW_LEN = 14;
+export const BOARD_SUM = BOARD_COL_LEN * BOARD_ROW_LEN;
+
+const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
+const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+
+const sameValueIndexList: number[] = new Array(16).fill(1).map((_, index) => {
+  if (index % 2 === 0) return (index / 2) * GROUND_ROW_LEN + 2;
+  else return Math.ceil(index / 2) * GROUND_ROW_LEN - 6;
+});
+
+function getStraightIndexListByValue(value: number): number[] {
+  let colIndex = GROUND_COL_LEN - 1;
+  const res = [];
+  for (let i = colIndex; i >= 0; i--) {
+    res.push(i * GROUND_ROW_LEN + value - 1);
+  }
+  return res;
+}
+export function initPlayboard() {
+  return new Array(BOARD_COL_LEN).fill(1).map((_) => {
+    return new Array(BOARD_ROW_LEN);
+  });
+}
+
+export function getNewCardPosOnBoard(
+  playboardData: Rummy.RummyCardData[][]
+): Rummy.Position {
   for (let i = BOARD_COL_LEN - 1; i >= 0; i--) {
     for (let j = BOARD_ROW_LEN - 1; j >= 0; j--) {
       const card = playboardData[i][j];
@@ -84,7 +143,33 @@ export function getNewCardPosOnBoard(playboardData) {
   }
 }
 
-export function handleCardList(cardList, setList = []) {
+export function getResetCardPosOnBoard(
+  playboardData: Rummy.RummyCardData[][],
+  L: number
+): Rummy.Position[] {
+  const resList = [];
+  for (let i = 0; i < BOARD_COL_LEN; i++) {
+    for (let j = 0; j < BOARD_ROW_LEN; j++) {
+      const card = playboardData[i][j];
+      if (!card) {
+        const pos = getAreaPos(
+          {
+            colIndex: i,
+            rowIndex: j,
+          },
+          RUMMY_AREA_STATUS.playboard
+        );
+        resList.push(pos);
+        if (resList.length >= L) return resList;
+      }
+    }
+  }
+}
+
+function handleCardList(
+  cardList: Rummy.RummyCardData[],
+  setList: Rummy.RummyCardData[][] = []
+) {
   let resList = [];
   let setIndex = 0;
   setList.forEach((set) => {
@@ -118,16 +203,19 @@ export function handleCardList(cardList, setList = []) {
   return resList.concat(cardList);
 }
 
-export function getAreaPos(cross, areaStatus) {
+export function getAreaPos(
+  cross: Rummy.CrossData,
+  areaStatus: number
+): Rummy.Position {
   const { playgroundPosData, playboardPosData, cardW, cardH } =
     getRummyDeviceData();
   const inGround = areaStatus === RUMMY_AREA_STATUS.playground;
   const areaPos = inGround ? playgroundPosData : playboardPosData;
   const { rowIndex, colIndex } = cross;
-  const boardExtraCol = inGround ? 0 : colIndex * 3;
+  const boardExtraCol = inGround ? 0 : colIndex * 1.5;
 
   const { x, y } = areaPos;
-  const _x = rowIndex * cardW + x;
+  const _x = rowIndex * cardW + x + 1;
   const _y = colIndex * cardH + y + boardExtraCol;
   return {
     x: _x,
@@ -135,7 +223,7 @@ export function getAreaPos(cross, areaStatus) {
   };
 }
 
-export function getGroundCrossByIndex(index) {
+function getGroundCrossByIndex(index: number): Rummy.CrossData {
   const rowIndex = index % GROUND_ROW_LEN;
   const colIndex = Math.floor(index / GROUND_ROW_LEN);
   return {
@@ -144,7 +232,7 @@ export function getGroundCrossByIndex(index) {
   };
 }
 
-export function getCrossByCardPos(card) {
+export function getCrossByCardPos(card: Rummy.RummyCardData): Rummy.CrossData {
   const { playgroundPosData, playboardPosData, cardW, cardH } =
     getRummyDeviceData();
   const { x, y, areaStatus } = card;
@@ -162,7 +250,7 @@ export function getCrossByCardPos(card) {
   };
 }
 
-export function getBoardCrossByIndex(index) {
+function getBoardCrossByIndex(index: number): Rummy.CrossData {
   const rowIndex = index % BOARD_ROW_LEN;
   const colIndex = Math.floor(index / BOARD_ROW_LEN);
   return {
@@ -171,17 +259,7 @@ export function getBoardCrossByIndex(index) {
   };
 }
 
-export function getGroundPosByIndex(index) {
-  const { rowIndex, colIndex } = getGroundCrossByIndex(index);
-  return getAreaPos(
-    {
-      rowIndex,
-      colIndex,
-    },
-    RUMMY_AREA_STATUS.playground
-  );
-}
-export function getBoardPosByIndex(index) {
+function getBoardPosByIndex(index: number): Rummy.Position {
   const { rowIndex, colIndex } = getBoardCrossByIndex(index);
   return getAreaPos(
     {
@@ -192,7 +270,7 @@ export function getBoardPosByIndex(index) {
   );
 }
 
-export function judgeIn(pos, areaStatus) {
+export function judgeIn(pos: Rummy.Position, areaStatus: number): boolean {
   const { playgroundPosData, playboardPosData, cardW, cardH } =
     getRummyDeviceData();
 
@@ -218,7 +296,10 @@ export function judgeIn(pos, areaStatus) {
   );
 }
 
-export function getBoxCross(pos, areaStatus) {
+export function getBoxCross(
+  pos: Rummy.Position,
+  areaStatus: number
+): Rummy.CrossData {
   const { playgroundPosData, playboardPosData, cardW, cardH } =
     getRummyDeviceData();
 
@@ -250,7 +331,10 @@ const COLOR_VALUE_MAP = {
   blue: 2,
   black: 3,
 };
-export function cardSortStraightFn(a, b) {
+function cardSortStraightFn(
+  a: Rummy.RummyCardData,
+  b: Rummy.RummyCardData
+): number {
   const { color, value } = a;
   const { color: color2, value: value2 } = b;
   if (color !== color2) {
@@ -259,7 +343,7 @@ export function cardSortStraightFn(a, b) {
     return value - value2;
   }
 }
-export function cardSortFn(a, b) {
+function cardSortFn(a: Rummy.RummyCardData, b: Rummy.RummyCardData): number {
   const { color, value } = a;
   const { color: color2, value: value2 } = b;
   if (value !== value2) {
@@ -269,7 +353,10 @@ export function cardSortFn(a, b) {
   }
 }
 
-export function getCardIndexByID(list, id) {
+export function getCardIndexByID(
+  list: Rummy.RummyCardData[],
+  id: number
+): number {
   const L = list.length;
   for (let i = 0; i < L; i++) {
     const item = list[i];
@@ -280,19 +367,25 @@ export function getCardIndexByID(list, id) {
   return -1;
 }
 
-export function sortCardList(cardList) {
+export function sortCardList(
+  cardList: Rummy.RummyCardData[]
+): Rummy.RummyCardData[] {
   const setList = [];
   const IDMap = {};
 
   const inGroundCardList = cardList.filter(
     (item) => item.areaStatus === RUMMY_AREA_STATUS.playground
   );
-  cardList = cardList
-    .filter((item) => item.areaStatus !== RUMMY_AREA_STATUS.playground)
-    .sort(cardSortFn);
+
+  cardList = cardList.filter(
+    (item) => item.areaStatus !== RUMMY_AREA_STATUS.playground
+  );
+  // 顺序不要变
+  const jokerList = cardList.filter((item) => item.value === 0);
+  cardList = cardList.filter((item) => item.value !== 0).sort(cardSortFn);
 
   RUMMY_COLORS.forEach((color) => {
-    const list = cardList.filter((item) => item.color === color);
+    const list = cardList.filter((item) => item.color === color).reverse();
     if (list.length === 0) return;
     let loopFlag = true;
     while (loopFlag) {
@@ -307,52 +400,31 @@ export function sortCardList(cardList) {
           continue;
         } else if (
           tempList.length === 0 ||
-          tempList[l - 1]?.value === item.value - 1
+          tempList[l - 1]?.value === item.value + 1
         ) {
           tempList.push(item);
-        } else {
-          if (tempList.length >= 3) {
-            setList.push(tempList);
-            tempList.forEach(({ id }) => {
-              IDMap[id] = true;
-            });
-            tempList = [];
-            break;
-          }
-          tempList = [item];
-        }
-      }
-      if (tempList.length >= 3) {
-        setList.push(tempList);
-        tempList.forEach(({ id }) => {
-          IDMap[id] = true;
-        });
-      }
-    }
-  });
-
-  RUMMY_VALUES.forEach((value) => {
-    const list = cardList.filter((item) => item.value === value);
-    if (list.length === 0) return;
-    let loopFlag = true;
-    while (loopFlag) {
-      let tempList = [];
-      for (let i = 0; i < list.length; i++) {
-        if (i === list.length - 1) {
-          loopFlag = false;
-        }
-        const item = list[i];
-        const l = tempList.length;
-        if (IDMap[item.id] || tempList[l - 1]?.color === item.color) {
-          continue;
         } else if (
-          tempList.length === 0 ||
-          tempList[l - 1]?.color !== item.color
+          jokerList.length > 0 &&
+          tempList[l - 1]?.value === item.value + 2
         ) {
-          tempList.push(item);
+          const [joker] = jokerList.splice(0, 1);
+          tempList.push(joker, item);
         } else {
           if (tempList.length >= 3) {
-            setList.push(tempList);
+            setList.push(tempList.reverse());
+            tempList.forEach(({ id }) => {
+              IDMap[id] = true;
+            });
+            tempList = [];
+            break;
+          } else if (jokerList.length > 0 && tempList.length === 2) {
+            const [joker] = jokerList.splice(0, 1);
+            if (tempList[0].value === 13) {
+              tempList.push(joker);
+            } else {
+              tempList.unshift(joker);
+            }
+            setList.push(tempList.reverse());
             tempList.forEach(({ id }) => {
               IDMap[id] = true;
             });
@@ -363,7 +435,18 @@ export function sortCardList(cardList) {
         }
       }
       if (tempList.length >= 3) {
-        setList.push(tempList);
+        setList.push(tempList.reverse());
+        tempList.forEach(({ id }) => {
+          IDMap[id] = true;
+        });
+      } else if (jokerList.length > 0 && tempList.length === 2) {
+        const [joker] = jokerList.splice(0, 1);
+        if (tempList[0].value === 13) {
+          tempList.push(joker);
+        } else {
+          tempList.unshift(joker);
+        }
+        setList.push(tempList.reverse());
         tempList.forEach(({ id }) => {
           IDMap[id] = true;
         });
@@ -371,83 +454,95 @@ export function sortCardList(cardList) {
     }
   });
 
-  const _cardList = cardList.filter(({ id }) => !IDMap[id]);
+  RUMMY_VALUES.concat()
+    .reverse()
+    .forEach((value) => {
+      const list = cardList.filter((item) => item.value === value);
+      if (list.length === 0) return;
+      let loopFlag = true;
+      while (loopFlag) {
+        let tempList = [];
+        for (let i = 0; i < list.length; i++) {
+          if (i === list.length - 1) {
+            loopFlag = false;
+          }
+          const item = list[i];
+          const l = tempList.length;
+          if (IDMap[item.id] || tempList[l - 1]?.color === item.color) {
+            continue;
+          } else if (
+            tempList.length === 0 ||
+            tempList[l - 1]?.color !== item.color
+          ) {
+            tempList.push(item);
+          }
+        }
+        if (tempList.length >= 3) {
+          setList.push(tempList);
+          tempList.forEach(({ id }) => {
+            IDMap[id] = true;
+          });
+        } else if (jokerList.length > 0 && tempList.length === 2) {
+          const [joker] = jokerList.splice(0, 1);
+          tempList.push(joker);
+          setList.push(tempList);
+          tempList.forEach(({ id }) => {
+            IDMap[id] = true;
+          });
+        }
+      }
+    });
+
+  const _cardList = jokerList.concat(cardList.filter(({ id }) => !IDMap[id]));
 
   const showCardList = handleCardList(_cardList, setList);
 
   return showCardList.concat(inGroundCardList);
 }
 
-export function judgeListIsSet(list): boolean {
+function judgeListIsSet(list: Rummy.RummyCardData[]): boolean {
   if (list.length < 3) return false;
-  const colorN = new Set(list.map((item) => item.color)).size;
+  const noJokerList = list.filter((item) => item.value !== 0);
+  const colorN = new Set(noJokerList.map((item) => item.color)).size;
   const isStraight = colorN === 1;
-  const isSameValue = colorN === list.length;
+  const isSameValue = colorN === noJokerList.length;
   if (isStraight) {
-    const exp = new RegExp(list.map((item) => item.value).join("-"));
+    const exp = new RegExp(
+      list
+        .map((item, index) => {
+          if (item.value === 0)
+            return list[index - 1]
+              ? list[index - 1].value + 1
+              : list[index + 1].value - 1;
+          else return item.value;
+        })
+        .join("-")
+    );
     return exp.test("1-2-3-4-5-6-7-8-9-10-11-12-13");
   } else if (isSameValue) {
-    return new Set(list.map((item) => item.value)).size === 1;
+    if (list.length > 4) return false;
+    return new Set(noJokerList.map((item) => item.value)).size === 1;
   }
   return false;
 }
 
-export function tidyPlayground(
-  playgroundData,
-  cardList,
-  setPlaygroundData,
-  setCardList
-) {
-  const rowColorMap = [];
-  let tempList = [];
-  for (let i = GROUND_COL_LEN - 1; i >= 0; i--) {
-    for (let j = 0; j < GROUND_ROW_LEN; j++) {
-      const card = playgroundData[i][j];
-      // console.log(card, ">>>>>");
-      // 中断 或者 新的一行
-      if ((!card || j === 0) && tempList.length >= 3) {
-        // console.log(i, j);
-        handleSetToProperPos(
-          tempList,
-          playgroundData,
-          cardList,
-          setPlaygroundData,
-          setCardList,
-          rowColorMap
-        );
-        tempList = [];
-      }
-      if (card) {
-        tempList.push(card);
-      }
-    }
-  }
-}
-
 function handleSetToProperPos(
-  list,
-  playgroundData,
-  cardList,
+  list: Rummy.RummyCardData[],
+  playgroundData: Rummy.RummyCardData[][],
+  cardList: Rummy.RummyCardData[],
   setPlaygroundData,
   setCardList,
-  rowColorMap
+  rowColorMap: Rummy.rowColorMap
 ) {
-  // console.log("list", list, "handleSetToProperPos");
-  const [card] = list;
+  const L = list.length;
   const type = judgeSetType(list);
   if (type === RUMMY_SET_TYPE.samevalue) {
     for (let i = 0; i < sameValueIndexList.length; i++) {
       const index = sameValueIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
-      const { x, y } = getAreaPos(
-        { colIndex, rowIndex },
-        RUMMY_AREA_STATUS.playground
-      );
-
       const placeCard = playgroundData[colIndex][rowIndex];
       const hasPlace = !placeCard || getCardIndexByID(list, placeCard.id) >= 0;
       if (hasPlace) {
-        // console.log(list, index);
         placeSetToGroundByIndex(
           list,
           index,
@@ -460,25 +555,25 @@ function handleSetToProperPos(
       }
     }
   } else {
-    const L = list.length;
-    const straightIndexList = getStraightIndexListByValue(card.value);
+    let firstCardValue, firstCardColor;
+    list.forEach((card, index) => {
+      if (card.value === 0) return;
+      firstCardValue = card.value - index;
+      firstCardColor = card.color;
+    });
+    const straightIndexList = getStraightIndexListByValue(firstCardValue);
     for (let i = 0; i < straightIndexList.length; i++) {
       const index = straightIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
-      const { x, y } = getAreaPos(
-        { colIndex, rowIndex },
-        RUMMY_AREA_STATUS.playground
-      );
       const hasPlace = new Array(L).fill(1).every((_, index) => {
         const card = playgroundData[colIndex][rowIndex + index];
         if (!card) return true;
         return getCardIndexByID(list, card.id) >= 0;
       });
       const rowColor = rowColorMap[colIndex];
-      if (!rowColor) rowColorMap[colIndex] = card.color;
-      const sameColor = !rowColor || card.color === rowColor;
+      if (!rowColor) rowColorMap[colIndex] = firstCardColor;
+      const sameColor = !rowColor || firstCardColor === rowColor;
 
-      // console.log(rowColorMap, rowColor, sameColor, hasPlace);
       if (sameColor && hasPlace) {
         placeSetToGroundByIndex(
           list,
@@ -494,11 +589,11 @@ function handleSetToProperPos(
   }
 }
 
-export function placeSetToGroundByIndex(
-  list,
-  index,
-  playgroundData,
-  cardList,
+function placeSetToGroundByIndex(
+  list: Rummy.RummyCardData[],
+  index: number,
+  playgroundData: Rummy.RummyCardData[][],
+  cardList: Rummy.RummyCardData[],
   setPlaygroundData,
   setCardList
 ) {
@@ -516,10 +611,10 @@ export function placeSetToGroundByIndex(
 }
 
 function moveCardToGroundIndex(
-  card,
-  index,
-  playgroundData,
-  cardList,
+  card: Rummy.RummyCardData,
+  index: number,
+  playgroundData: Rummy.RummyCardData[][],
+  cardList: Rummy.RummyCardData[],
   setPlaygroundData,
   setCardList
 ) {
@@ -532,7 +627,6 @@ function moveCardToGroundIndex(
       }
     });
   });
-  // console.log("colIndex,rowIndex", colIndex, rowIndex);
   playgroundData[colIndex][rowIndex] = card;
 
   const { x, y } = getAreaPos(
@@ -548,20 +642,21 @@ function moveCardToGroundIndex(
   setPlaygroundData(playgroundData);
 }
 
-function judgeSetType(list) {
-  const colorN = new Set(list.map((item) => item.color)).size;
+function judgeSetType(list: Rummy.RummyCardData[]): number {
+  const noJokerList = list.filter((item) => item.value !== 0);
+  const colorN = new Set(noJokerList.map((item) => item.color)).size;
   const isStraight = colorN === 1;
   return isStraight ? RUMMY_SET_TYPE.straight : RUMMY_SET_TYPE.samevalue;
 }
 
-export function getRummyDeviceData() {
+function getRummyDeviceData() {
   return Taro.getStorageSync("rummy_device_data");
 }
 
 export function placeSetFromBoardToGround(
-  playboardData,
-  playgroundData,
-  cardList,
+  playboardData: Rummy.RummyCardData[][],
+  playgroundData: Rummy.RummyCardData[][],
+  cardList: Rummy.RummyCardData[],
   setPlaygroundData,
   setCardList
 ) {
@@ -593,12 +688,14 @@ export function placeSetFromBoardToGround(
   }
 }
 
-function getRowColorMap(playgroundData) {
+function getRowColorMap(
+  playgroundData: Rummy.RummyCardData[][]
+): Rummy.rowColorMap {
   const rowColorMap = [];
   for (let i = 0; i < GROUND_COL_LEN; i++) {
-    for (let j = 10; j < GROUND_ROW_LEN; j++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
       const card = playgroundData[i][j];
-      if (card) {
+      if (card && card.value !== 0) {
         rowColorMap[i] = card.color;
         break;
       }
@@ -607,7 +704,9 @@ function getRowColorMap(playgroundData) {
   return rowColorMap;
 }
 
-export function judgePlaygroundPerfect(playgroundData): boolean {
+export function judgePlaygroundPerfect(
+  playgroundData: Rummy.RummyCardData[][]
+): boolean {
   let tempList = [];
   for (let i = 0; i < GROUND_COL_LEN; i++) {
     for (let j = 0; j < GROUND_ROW_LEN; j++) {

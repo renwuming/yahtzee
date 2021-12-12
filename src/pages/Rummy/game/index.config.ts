@@ -1,5 +1,6 @@
 export default {
-  pageOrientation: "landscape",
-  navigationStyle: "custom",
+  navigationBarTitleText: "拉密牌",
+  navigationBarTextStyle: "white",
+  navigationBarBackgroundColor: "#4b6d8d",
   disableScroll: true,
 };

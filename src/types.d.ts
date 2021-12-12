@@ -2,10 +2,12 @@ type AnyGameData =
   | Yahtzee.YahtzeeGameData
   | Martian.MartianGameData
   | CantStop.CantStopGameData
-  | Set.SetGameData;
+  | Set.SetGameData
+  | Rummy.RummyGameData;
 type AnyPlayer = Yahtzee.YahtzeePlayer &
   CantStop.CantStopPlayer &
-  Set.SetPlayer;
+  Set.SetPlayer &
+  Rummy.RummyPlayer;
 
 interface SeasonRank {
   name: string;
@@ -92,9 +94,13 @@ interface GameBaseData {
   _id: string;
   owner: Player;
   start?: boolean;
-  roundPlayer?: number;
   end?: boolean;
+  startTime?: Date;
+  endTime?: Date;
   roundTimeStamp?: number;
+  roundPlayer?: number;
+  startPlayer?: number;
+  roundSum?: number;
 
   _createTime: Date;
   _updateTime: Date;
@@ -102,9 +108,9 @@ interface GameBaseData {
 interface GameData extends GameBaseData {
   own: boolean;
   inGame: boolean;
-  inRound?: boolean;
   playerIndex: number;
   canJoin: boolean;
+  inRound?: boolean;
 }
 
 declare namespace Yahtzee {
@@ -151,7 +157,6 @@ declare namespace Martian {
     players: MartianPlayer[];
     winners?: number[];
     round?: Round;
-    roundSum?: number;
   }
   interface MartianGameData extends GameData, MartianGameBaseData {}
   interface MartianDiceData {
@@ -181,7 +186,6 @@ declare namespace CantStop {
     players: CantStopPlayer[];
     winner?: number;
     round?: Round;
-    roundSum?: number;
   }
   interface CantStopGameData extends GameData, CantStopGameBaseData {}
   interface Round {
@@ -205,8 +209,6 @@ declare namespace Set {
     n: number;
   }
   interface SetGameBaseData extends GameBaseData {
-    startTime?: Date;
-    endTime?: Date;
     players: SetPlayer[];
     winners?: number[];
     gameCardList?: SetCardData[];
@@ -214,12 +216,7 @@ declare namespace Set {
     selectedCardList?: SetCardData[];
     timer?: boolean;
   }
-  interface SetGameData extends GameData, SetGameBaseData {
-    own: boolean;
-    inGame: boolean;
-    playerIndex: number;
-    canJoin: boolean;
-  }
+  interface SetGameData extends GameData, SetGameBaseData {}
   interface SetPlayer extends Player {
     successSum?: number;
     failSum?: number;
@@ -227,6 +224,11 @@ declare namespace Set {
 }
 
 declare namespace Rummy {
+  type rowColorMap = string[];
+  interface Position {
+    x: number;
+    y: number;
+  }
   interface RummyCardData {
     id: number;
     value: number;
@@ -236,24 +238,21 @@ declare namespace Rummy {
     areaStatus?: number;
     inGround?: boolean;
   }
-  // interface SetGameBaseData extends GameBaseData {
-  //   startTime?: Date;
-  //   endTime?: Date;
-  //   players: SetPlayer[];
-  //   winners?: number[];
-  //   gameCardList?: SetCardData[];
-  //   reserveCardList?: SetCardData[];
-  //   selectedCardList?: SetCardData[];
-  //   timer?: boolean;
-  // }
-  // interface SetGameData extends GameData, SetGameBaseData {
-  //   own: boolean;
-  //   inGame: boolean;
-  //   playerIndex: number;
-  //   canJoin: boolean;
-  // }
-  // interface SetPlayer extends Player {
-  //   successSum?: number;
-  //   failSum?: number;
-  // }
+  interface CrossData {
+    rowIndex: number;
+    colIndex: number;
+  }
+  interface RummyGameBaseData extends GameBaseData {
+    players: RummyPlayer[];
+    winner?: number;
+    cardLibrary: RummyCardData[];
+    playgroundData: RummyCardData[][];
+  }
+  interface RummyGameData extends GameData, RummyGameBaseData {
+    playgroundCardList: RummyCardData[];
+    myCardList: RummyCardData[];
+  }
+  interface RummyPlayer extends Player {
+    cardList?: RummyCardData[];
+  }
 }

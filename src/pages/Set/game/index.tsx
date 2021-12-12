@@ -1,5 +1,4 @@
 import PlayerList from "@/Components/MartianPlayerList";
-import Player from "@/Components/MartianPlayer";
 import HallPlayer from "@/Components/HallPlayer";
 import { AchievementGameIndex, PlayerContext, SET_TIME_LIMIT } from "@/const";
 import { useGameApi } from "@/utils_api";
@@ -50,7 +49,7 @@ export default function Index() {
     getCountDown,
   });
 
-  function getCountDown(data: any) {
+  function getCountDown(data: Set.SetGameBaseData) {
     const { startTime } = data;
     const timeStamp = Date.now();
     const roundCountDown = Math.floor(
@@ -66,7 +65,7 @@ export default function Index() {
     setGameData(gameData);
   }
 
-  function gameDataWatchCb(data, updatedFields = []) {
+  function gameDataWatchCb(data: Set.SetGameBaseData, updatedFields = []) {
     if (!data) return;
     const gameDataChange =
       updatedFields.filter(

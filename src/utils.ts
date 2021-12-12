@@ -26,6 +26,9 @@ export async function CallCloudFunction(params) {
   return res.result;
 }
 
+export const flat = (arr) =>
+  arr.reduce((a, b) => a.concat(Array.isArray(b) ? flat(b) : b), []);
+
 export function shuffle(arr) {
   var length = arr.length,
     temp,

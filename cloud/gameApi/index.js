@@ -3,8 +3,10 @@ const cloud = require("wx-server-sdk");
 
 const { findOne, find } = require("./common");
 const setHandleFn = require("./set");
+const rummyHandleFn = require("./rummy");
 const handleFnMap = {
   set_games: setHandleFn,
+  rummy_games: rummyHandleFn,
 };
 
 const ENV = "prod-0gjpxr644f6d941d";

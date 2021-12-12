@@ -11,7 +11,7 @@ import RankIcon from "../../assets/imgs/rank.png";
 import WechatIcon from "../../assets/imgs/wechat.png";
 // @ts-ignore
 import RewardIcon from "../../assets/imgs/reward.png";
-import { createGame } from "../Set/game/gameApi";
+import { createGame } from "../Rummy/game/api";
 
 export default function Index() {
   // 设置分享
@@ -27,9 +27,12 @@ export default function Index() {
   const gameList = [
     {
       name: "拉密牌",
-      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover2.png",
-      pageType: "Rummy",
-      pagePath: `game/index`,
+      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/rummy-cover.png",
+      // pageType: "Rummy",
+      // pagePath: `game/index`,
+      navigateFn() {
+        createGame();
+      },
     },
     {
       name: "神奇形色牌",

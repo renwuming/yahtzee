@@ -18,7 +18,7 @@ export default function Index({
   clickable = true,
   showOffline = false,
 }: IProps) {
-  const { avatarUrl, nickName, openid, timeStamp } = data;
+  const { avatarUrl, nickName, openid, timeStamp } = data || {};
 
   const offline = showOffline && Date.now() - (timeStamp || 0) > OFFLINE_DELAY;
 

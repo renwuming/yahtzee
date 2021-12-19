@@ -7,7 +7,7 @@ export async function handleGameAction(
   action: string,
   data: any = {}
 ) {
-  const { errCode, errMsg } = await CallCloudFunction({
+  const res = await CallCloudFunction({
     name: "gameApi",
     data: {
       action: action,
@@ -17,12 +17,15 @@ export async function handleGameAction(
     },
   });
 
-  if (errCode === 400) {
-    Taro.showToast({
-      title: errMsg,
-      icon: "none",
-      duration: 1000,
-    });
+  if (res) {
+    const { errCode, errMsg } = res;
+    if (errCode === 400) {
+      Taro.showToast({
+        title: errMsg,
+        icon: "none",
+        duration: 1000,
+      });
+    }
   }
 }
 

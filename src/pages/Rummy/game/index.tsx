@@ -6,7 +6,7 @@ import {
   MovableArea,
   Image,
 } from "@tarojs/components";
-import { AtButton, AtIcon } from "taro-ui";
+import { AtButton, AtIcon, AtProgress } from "taro-ui";
 import "./index.scss";
 import { useEffect, useRef, useState } from "react";
 import { flat, getUserProfile, SLEEP } from "@/utils";
@@ -106,13 +106,13 @@ export default function Index() {
   });
 
   function getCountDown(data: Rummy.RummyGameBaseData) {
-    // const { startTime } = data;
-    // const timeStamp = Date.now();
-    // const roundCountDown = Math.floor(
-    //   RUMMY_ROUND_TIME_LIMIT - (timeStamp - +startTime) / 1000
-    // );
-    // return roundCountDown;
-    return 66666;
+    const { roundTimeStamp } = data || {};
+    if (!roundTimeStamp) return Infinity;
+    const timeStamp = Date.now();
+    const roundCountDown = Math.floor(
+      RUMMY_ROUND_TIME_LIMIT - (timeStamp - +new Date(roundTimeStamp)) / 1000
+    );
+    return roundCountDown;
   }
 
   function initFn(data: Rummy.RummyGameBaseData) {
@@ -479,7 +479,11 @@ export default function Index() {
                     gameID: id,
                     players,
                     playerIndex,
-                    kickPlayer: () => {},
+                    kickPlayer(openid) {
+                      handleGameAction(id, "kickPlayer", {
+                        openid,
+                      });
+                    },
                     initGameIndex: AchievementGameIndex.rummy,
                     showScore: start,
                     showSetting: own && !start,
@@ -528,6 +532,16 @@ export default function Index() {
                 </View>
               )}
             </View>
+          </View>
+          <View className="count-down-box">
+            {gaming &&
+              !singlePlayer &&
+              roundCountDown <= RUMMY_SHOW_ROUND_TIME_LIMIT && (
+                <AtProgress
+                  percent={(+roundCountDown / 60) * 100}
+                  status="error"
+                />
+              )}
           </View>
           <View
             className={clsx(

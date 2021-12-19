@@ -15,6 +15,8 @@ const {
 } = require("./cantstop");
 const { execHandleTimerSet, execHandleExceptionSet } = require("./set");
 
+const { execHandleTimerRummy, execHandleExceptionRummy } = require("./rummy");
+
 const ENV = "prod-0gjpxr644f6d941d";
 // 云函数入口函数
 exports.main = async (event) => {
@@ -35,4 +37,7 @@ exports.main = async (event) => {
   // Set
   execHandleTimerSet(db);
   execHandleExceptionSet(db);
+  // Rummy
+  execHandleTimerRummy(db);
+  execHandleExceptionRummy(db);
 };

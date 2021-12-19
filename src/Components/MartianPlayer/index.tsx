@@ -93,7 +93,7 @@ export default function Index({
             className="setting"
             value="settings"
             size="18"
-            color="#176999"
+            color={isRummyPlayer ? "#fff" : "#176999"}
             onClick={() => {
               setActionSheetOpened(true);
             }}

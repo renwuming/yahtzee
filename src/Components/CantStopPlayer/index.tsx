@@ -4,7 +4,7 @@ import Achievement from "../../Components/Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import {
-  MARTIAN_SHOW_ROUND_TIME_LIMIT,
+  CANTSTOP_SHOW_ROUND_TIME_LIMIT,
   OFFLINE_DELAY,
   PlayerContext,
 } from "../../const";
@@ -75,7 +75,7 @@ export default function Index({
       {/* 倒计时小于一定时间再显示，避免回合切换时的突兀 */}
       {showActive &&
         inRound &&
-        roundCountDown <= MARTIAN_SHOW_ROUND_TIME_LIMIT && (
+        roundCountDown <= CANTSTOP_SHOW_ROUND_TIME_LIMIT && (
           <View className="at-row at-row__align--center count-down-box">
             <View
               className={`count-down ${roundCountDown < 10 ? "error" : ""}`}

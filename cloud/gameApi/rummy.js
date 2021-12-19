@@ -234,11 +234,20 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
       ...newRoundData,
     };
   }
+  // 超时，通过定时器，结束回合，并抽牌
+  else if (action === "endRoundByTimer") {
+    const { cardLibrary, roundSum } = oldData;
+    const { cardList } = players[roundPlayer];
+    const [newCard] = cardLibrary.splice(0, 1);
+    if (newCard) cardList.unshift(newCard);
 
-  // else if (action === "endByTimer") {
-  //   const endData = handleEndData(players);
-  //   return endData;
-  // }
+    const newRoundData = newRound(roundPlayer, players, roundSum);
+    return {
+      [`players.${roundPlayer}.cardList`]: cardList,
+      cardLibrary,
+      ...newRoundData,
+    };
+  }
 
   return null;
 }

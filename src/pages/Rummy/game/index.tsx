@@ -45,6 +45,7 @@ import JokerIcon from "@/assets/imgs/rummy-joker.png";
 import HallPlayer from "@/Components/HallPlayer";
 import LoadPage from "@/Components/LoadPage";
 import clsx from "clsx";
+import { GameGift } from "@/Components/Gifts";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -443,6 +444,7 @@ export default function Index() {
   return (
     <MovableArea>
       <LoadPage></LoadPage>
+      <GameGift />
       <View className="rummy-game">
         <View className="rummy-game-wrapper">
           <View className="rummy-game-top">

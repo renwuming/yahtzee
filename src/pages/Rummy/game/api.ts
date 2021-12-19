@@ -7,7 +7,7 @@ export async function handleGameAction(
   action: string,
   data: any = {}
 ) {
-  return await CallCloudFunction({
+  const { errCode, errMsg } = await CallCloudFunction({
     name: "gameApi",
     data: {
       action: action,
@@ -16,6 +16,14 @@ export async function handleGameAction(
       data,
     },
   });
+
+  if (errCode === 400) {
+    Taro.showToast({
+      title: errMsg,
+      icon: "none",
+      duration: 1000,
+    });
+  }
 }
 
 export async function createGame() {
@@ -54,10 +62,20 @@ export function handleGameData(
   const playerIndex = openids.indexOf(openid);
   const inGame = playerIndex >= 0;
 
+  const singlePlayer = players.length === 1;
+
   let myCardList = [];
   if (start) {
-    const { cardList } = players[playerIndex];
-    myCardList = handleCardList(cardList);
+    players[roundPlayer].inRound = true;
+
+    // 单人游戏时，公开手牌信息
+    if (singlePlayer) {
+      const { cardList } = players[0];
+      myCardList = handleCardList(cardList);
+    } else if (inGame) {
+      const { cardList } = players[playerIndex];
+      myCardList = handleCardList(cardList);
+    }
   }
 
   return {
@@ -80,17 +98,16 @@ function groundData2List(
     for (let j = 0; j < GROUND_ROW_LEN; j++) {
       const card = playgroundData[i][j];
       if (card) {
-        const { x, y } = getAreaPos(
+        const pos = getAreaPos(
           {
             colIndex: i,
             rowIndex: j,
           },
           RUMMY_AREA_STATUS.playground
         );
-        card.x = x;
-        card.y = y;
+
         card.inGround = true;
-        resList.push(card);
+        resList.push(updateCardPos(card, pos));
       }
     }
   }
@@ -107,8 +124,8 @@ const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
 const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 const sameValueIndexList: number[] = new Array(16).fill(1).map((_, index) => {
-  if (index % 2 === 0) return (index / 2) * GROUND_ROW_LEN + 2;
-  else return Math.ceil(index / 2) * GROUND_ROW_LEN - 6;
+  if (index % 2 === 0) return (7 - index / 2) * GROUND_ROW_LEN + 2;
+  else return (8 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
 });
 
 function getStraightIndexListByValue(value: number): number[] {
@@ -540,8 +557,11 @@ function handleSetToProperPos(
     for (let i = 0; i < sameValueIndexList.length; i++) {
       const index = sameValueIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
-      const placeCard = playgroundData[colIndex][rowIndex];
-      const hasPlace = !placeCard || getCardIndexByID(list, placeCard.id) >= 0;
+      const hasPlace = new Array(L).fill(1).every((_, index) => {
+        const card = playgroundData[colIndex][rowIndex + index];
+        if (!card) return true;
+        return getCardIndexByID(list, card.id) >= 0;
+      });
       if (hasPlace) {
         placeSetToGroundByIndex(
           list,
@@ -629,14 +649,10 @@ function moveCardToGroundIndex(
   });
   playgroundData[colIndex][rowIndex] = card;
 
-  const { x, y } = getAreaPos(
-    { colIndex, rowIndex },
-    RUMMY_AREA_STATUS.playground
-  );
+  const pos = getAreaPos({ colIndex, rowIndex }, RUMMY_AREA_STATUS.playground);
   const cardIndex = getCardIndexByID(cardList, id);
-
-  cardList[cardIndex].x = x;
-  cardList[cardIndex].y = y;
+  const newCard = updateCardPos(cardList[cardIndex], pos);
+  cardList[cardIndex] = newCard;
   cardList[cardIndex].areaStatus = RUMMY_AREA_STATUS.playground;
   setCardList(cardList.concat());
   setPlaygroundData(playgroundData);
@@ -717,8 +733,8 @@ export function judgePlaygroundPerfect(
           if (!judgeRes) {
             return false;
           }
+          tempList = [];
         }
-        tempList = [];
       }
       if (card) {
         tempList.push(card);
@@ -727,4 +743,11 @@ export function judgePlaygroundPerfect(
   }
 
   return true;
+}
+
+export function updateCardPos(card, pos) {
+  const { x, y } = pos;
+  card.x = x || 0.1;
+  card.y = y || 0.1;
+  return card;
 }

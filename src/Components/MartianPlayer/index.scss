@@ -1,4 +1,10 @@
-.martian-player {
+.rummy-player {
+  margin-top: 30px;
+  &.active {
+    background-color: rgba($color: #eee, $alpha: 0.7) !important;
+  }
+}
+.common-game-player {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -42,6 +48,12 @@
       color: #f4fcfe;
       font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
         sans-serif;
+    }
+    &.rummy-card-num {
+      width: 44px;
+      text {
+        color: #0d0812;
+      }
     }
   }
   .set-game-info {

@@ -2,6 +2,7 @@ const cloud = require("wx-server-sdk");
 
 const { updatePlayer, getPlayer, findOne, shuffle, flat } = require("./common");
 
+const MAX_PLAYERS = 4;
 const PLAYER_START_CARD_NUM = 14;
 const GROUND_COL_LEN = 16;
 const GROUND_ROW_LEN = 13;
@@ -11,8 +12,8 @@ const RUMMY_SET_TYPE = {
 };
 
 const sameValueIndexList = new Array(16).fill(1).map((_, index) => {
-  if (index % 2 === 0) return (index / 2) * GROUND_ROW_LEN + 2;
-  else return Math.ceil(index / 2) * GROUND_ROW_LEN - 6;
+  if (index % 2 === 0) return (7 - index / 2) * GROUND_ROW_LEN + 2;
+  else return (8 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
 });
 
 function getStraightIndexListByValue(value) {
@@ -114,30 +115,38 @@ exports.handleGame = async function handleGame(
   // 先读旧数据
   const { _id, ...oldData } = await findOne(gameDbName, id);
 
-  const newData = await handleUpdateData(
-    action,
-    oldData,
-    data,
-    id,
-    gameDbName,
-    openid
-  );
-
-  if (newData) {
-    const date = new Date();
-    // 增量更新数据
-    await db
-      .collection(gameDbName)
-      .doc(id)
-      .update({
-        data: {
-          ...newData,
-          _updateTime: date,
-        },
-      });
+  try {
+    const newData = await handleUpdateData(
+      action,
+      oldData,
+      data,
+      id,
+      gameDbName,
+      openid
+    );
+    if (newData) {
+      const date = new Date();
+      // 增量更新数据
+      await db
+        .collection(gameDbName)
+        .doc(id)
+        .update({
+          data: {
+            ...newData,
+            _updateTime: date,
+          },
+        });
+    }
+    return null;
+  } catch (err) {
+    const [errCode, errMsg] = err.message.split("-");
+    if (+errCode === 400) {
+      return {
+        errCode: +errCode,
+        errMsg,
+      };
+    }
   }
-
-  return null;
 };
 
 async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
@@ -150,11 +159,13 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
   const inGame = playerIndex >= 0;
   const inRound = roundPlayer === playerIndex;
   const own = OPENID === owner.openid;
+
   // 开始游戏
   if (action === "startGame" && own) {
     const { cardLibrary } = oldData;
     players.forEach((player) => {
       player.cardList = cardLibrary.splice(0, PLAYER_START_CARD_NUM);
+      player.icebreaking = false;
     });
     const startIndex = Math.floor(Math.random() * players.length);
     const now = new Date();
@@ -205,7 +216,6 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
       currentPlayer,
       playerIndex
     );
-    if (!newData) return null;
 
     const newRoundData = newRound(roundPlayer, players, roundSum);
     return { ...newData, ...newRoundData };
@@ -239,11 +249,15 @@ function handleEndRoundPerfect(
   currentPlayer,
   playerIndex
 ) {
+  const isPerfect = judgePlaygroundPerfect(newPlaygroundData);
+  if (!isPerfect) {
+    throw new Error("400-出牌失败");
+  }
   oldPlaygroundDataIDList = flat(oldPlaygroundData)
     .filter((item) => item)
     .map((card) => card.id);
   newPlaygroundDataList = flat(newPlaygroundData).filter((item) => item);
-  const { cardList } = currentPlayer;
+  const { cardList, icebreaking } = currentPlayer;
   const playerCardIDList = cardList.map((card) => card.id);
   const newPlaygroundDataIDList = newPlaygroundDataList.map((card) => card.id);
 
@@ -253,14 +267,34 @@ function handleEndRoundPerfect(
   const newList = newPlaygroundDataList.filter(
     (card) => !oldPlaygroundDataIDList.includes(card.id)
   );
-
   const lastBoardList = newList.filter((card) =>
     playerCardIDList.includes(card.id)
   );
 
-  if (newList.length === 0) return null;
-  if (oldList.length !== oldPlaygroundDataIDList.length) return null;
-  if (lastBoardList.length !== newList.length) return null;
+  if (newList.length === 0) {
+    throw new Error("400-请出牌");
+  }
+  if (
+    oldList.length !== oldPlaygroundDataIDList.length ||
+    lastBoardList.length !== newList.length
+  ) {
+    throw new Error("400-禁止作弊");
+  }
+  // 如果未破冰，则必须总合>=30，并且不能使用公共牌
+  if (!icebreaking) {
+    const newSetList = selectNewListFromPlayground(
+      newPlaygroundData,
+      oldPlaygroundDataIDList
+    );
+    const newListValueSum = newSetList.reduce(
+      (sum, set) => sum + getListValueSum(set),
+      0
+    );
+    const allSet = newSetList.every((list) => judgeListIsSet(list));
+    if (!allSet || newListValueSum < 30) {
+      throw new Error("400-破冰失败");
+    }
+  }
   // 整理playgroundData
   tidyPlayground(newPlaygroundData);
 
@@ -273,6 +307,7 @@ function handleEndRoundPerfect(
 
   return {
     playgroundData: newPlaygroundData,
+    [`players.${playerIndex}.icebreaking`]: true,
     [`players.${playerIndex}.cardList`]: newCardList,
     ...endData,
   };
@@ -325,8 +360,11 @@ function handleSetToProperPos(list, playgroundData, rowColorMap) {
     for (let i = 0; i < sameValueIndexList.length; i++) {
       const index = sameValueIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
-      const placeCard = playgroundData[colIndex][rowIndex];
-      const hasPlace = !placeCard || getCardIndexByID(list, placeCard.id) >= 0;
+      const hasPlace = new Array(L).fill(1).every((_, index) => {
+        const card = playgroundData[colIndex][rowIndex + index];
+        if (!card) return true;
+        return getCardIndexByID(list, card.id) >= 0;
+      });
       if (hasPlace) {
         placeSetToGroundByIndex(list, index, playgroundData);
         break;
@@ -403,4 +441,104 @@ function getCardIndexByID(list, id) {
     }
   }
   return -1;
+}
+
+function selectNewListFromPlayground(
+  newPlaygroundData,
+  oldPlaygroundDataIDList
+) {
+  const resList = [];
+  let tempList = [];
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      let card = newPlaygroundData[i][j];
+      // 剔除之前公共区存在的card
+      if (card && oldPlaygroundDataIDList.includes(card.id)) {
+        card = null;
+      }
+      if (!card || j === 0) {
+        if (tempList.length > 0) {
+          resList.push(tempList);
+          tempList = [];
+        }
+      }
+      if (card) {
+        tempList.push(card);
+      }
+    }
+  }
+
+  return resList;
+}
+
+function judgePlaygroundPerfect(playgroundData) {
+  let tempList = [];
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      if (!card || j === 0) {
+        if (tempList.length > 0) {
+          const judgeRes = judgeListIsSet(tempList);
+          if (!judgeRes) {
+            return false;
+          }
+          tempList = [];
+        }
+      }
+      if (card) {
+        tempList.push(card);
+      }
+    }
+  }
+
+  return true;
+}
+
+function judgeListIsSet(list) {
+  if (list.length < 3) return false;
+  const noJokerList = list.filter((item) => item.value !== 0);
+  const colorN = new Set(noJokerList.map((item) => item.color)).size;
+  const isStraight = colorN === 1;
+  const isSameValue = colorN === noJokerList.length;
+  if (isStraight) {
+    const exp = new RegExp(
+      list
+        .map((item, index) => {
+          if (item.value === 0)
+            return list[index - 1]
+              ? list[index - 1].value + 1
+              : list[index + 1].value - 1;
+          else return item.value;
+        })
+        .join("-")
+    );
+    return exp.test("1-2-3-4-5-6-7-8-9-10-11-12-13");
+  } else if (isSameValue) {
+    if (list.length > 4) return false;
+    return new Set(noJokerList.map((item) => item.value)).size === 1;
+  }
+  return false;
+}
+
+function getListValueSum(list) {
+  let sum = 0;
+  const L = list.length;
+  for (let i = 0; i < L; i++) {
+    const { value } = list[i];
+    if (value !== 0) {
+      sum += value;
+    } else {
+      const isStraight = judgeSetType(list) === RUMMY_SET_TYPE.straight;
+      if (isStraight) {
+        sum +=
+          (list[i - 1] && list[i - 1].value + 1) ||
+          (list[i + 1] && list[i + 1].value - 1);
+      } else {
+        sum +=
+          (list[i - 1] && list[i - 1].value) ||
+          (list[i + 1] && list[i + 1].value);
+      }
+    }
+  }
+  return sum;
 }

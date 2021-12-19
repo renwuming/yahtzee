@@ -29,6 +29,7 @@ movable-area {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 26%;
     height: 920px;
     .player-list {
       flex: 1;
@@ -118,6 +119,9 @@ movable-area {
     justify-content: center;
     width: 100%;
     background-color: #9b5d1d;
+    &.hidden {
+      visibility: hidden;
+    }
     .before-start-btn-box {
       position: absolute;
       top: 0;

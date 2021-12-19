@@ -254,5 +254,6 @@ declare namespace Rummy {
   }
   interface RummyPlayer extends Player {
     cardList?: RummyCardData[];
+    icebreaking?: boolean;
   }
 }

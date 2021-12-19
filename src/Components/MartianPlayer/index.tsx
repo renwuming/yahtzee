@@ -8,6 +8,7 @@ import {
   OFFLINE_DELAY,
   PlayerContext,
 } from "../../const";
+import clsx from "clsx";
 
 interface IProps {
   data: AnyPlayer;
@@ -41,6 +42,7 @@ export default function Index({
     openid,
     successSum,
     failSum,
+    cardList,
   } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
   const [isActionSheetOpened, setActionSheetOpened] = useState<boolean>(false);
@@ -54,10 +56,19 @@ export default function Index({
     setAchievementOpened(false);
   }
 
+  const isMartianPlayer = initGameIndex === AchievementGameIndex.martian;
   const isSetPlayer = initGameIndex === AchievementGameIndex.set;
+  const isRummyPlayer = initGameIndex === AchievementGameIndex.rummy;
 
   return (
-    <View className={`martian-player ${showActive && inRound ? "active" : ""}`}>
+    <View
+      className={clsx(
+        "common-game-player",
+        isMartianPlayer && "martian-player",
+        isRummyPlayer && "rummy-player",
+        showActive && inRound && "active"
+      )}
+    >
       <View className="at-row at-row__align--center">
         <View
           className={`player-info ${offline ? "offline" : ""}`}
@@ -72,7 +83,7 @@ export default function Index({
           ></Image>
           {noNickName ? null : <Text className={colorType}>{nickName}</Text>}
         </View>
-        {showScore && (
+        {showScore && !isRummyPlayer && (
           <View className="score">
             <Text>{sumScore}</Text>
           </View>
@@ -87,6 +98,11 @@ export default function Index({
               setActionSheetOpened(true);
             }}
           ></AtIcon>
+        )}
+        {isRummyPlayer && cardList && (
+          <View className="score rummy-card-num">
+            <Text>{cardList.length}</Text>
+          </View>
         )}
       </View>
       {isSetPlayer && showScore && (

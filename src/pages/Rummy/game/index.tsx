@@ -29,6 +29,7 @@ import {
   judgePlaygroundPerfect,
   placeSetFromBoardToGround,
   sortCardList,
+  updateCardPos,
 } from "./api";
 import {
   AchievementGameIndex,
@@ -42,6 +43,8 @@ import PlayerList from "@/Components/MartianPlayerList";
 // @ts-ignore
 import JokerIcon from "@/assets/imgs/rummy-joker.png";
 import HallPlayer from "@/Components/HallPlayer";
+import LoadPage from "@/Components/LoadPage";
+import clsx from "clsx";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -71,14 +74,23 @@ export default function Index() {
   const [playgroundCardList, setPlaygroundCardList] = useState<
     Rummy.RummyCardData[]
   >([]);
-  // 前端
+  // client端
   const [tinyCorrection, setTinyCorrection] = useState<number>(0.1);
   const [activeCardID, setActiveCardID] = useState<number>(-1);
   const crossData = useRef<Rummy.CrossData>(null);
   const cardAreaStatus = useRef<number>(RUMMY_AREA_STATUS.other);
 
-  const { playerIndex, start, end, own, inGame, canJoin, roundSum, winner } =
-    gameData || {};
+  const {
+    playerIndex,
+    start,
+    end,
+    own,
+    inGame,
+    canJoin,
+    roundSum,
+    winner,
+    inRound,
+  } = gameData || {};
   const singlePlayer = players.length === 1;
   const gaming = start && !end;
 
@@ -112,7 +124,7 @@ export default function Index() {
     setPlaygroundData(playgroundData);
     setPlaygroundCardList(playgroundCardList);
 
-    updateCardList(myCardList, cardList);
+    updateCardList(myCardList, cardList, playgroundData);
   }
 
   function gameDataWatchCb(data: Rummy.RummyGameBaseData, updatedFields = []) {
@@ -144,7 +156,6 @@ export default function Index() {
 
   useEffect(() => {
     SLEEP(200).then(() => {
-      if (!gameData) return;
       const query = Taro.createSelectorQuery();
       query.select("#playground").boundingClientRect();
       query.select("#playboard").boundingClientRect();
@@ -168,9 +179,12 @@ export default function Index() {
           cardW: Math.floor(width / GROUND_ROW_LEN),
           cardH: Math.floor(height / GROUND_COL_LEN),
         });
+        getGameData(id).then((data) => {
+          initFn(data);
+        });
       });
     });
-  }, [gameData]);
+  }, []);
 
   function onTouchStart(id) {
     setActiveCardID(id);
@@ -239,9 +253,7 @@ export default function Index() {
         setTinyCorrection(-tinyCorrection);
       }
 
-      const { x, y } = pos;
-      playgroundCardList[index].x = x;
-      playgroundCardList[index].y = y;
+      playgroundCardList[index] = updateCardPos(playgroundCardList[index], pos);
       setPlaygroundCardList(playgroundCardList.concat());
     }
     // 拖动玩家手牌
@@ -269,16 +281,15 @@ export default function Index() {
         setTinyCorrection(-tinyCorrection);
       }
 
-      const { x, y } = pos;
-      cardList[index].x = x;
-      cardList[index].y = y;
+      cardList[index] = updateCardPos(cardList[index], pos);
       setCardList(cardList.concat());
     }
   }
 
   function updateCardList(
     cardList: Rummy.RummyCardData[],
-    oldCardList: Rummy.RummyCardData[] = []
+    oldCardList: Rummy.RummyCardData[] = [],
+    playgroundData: Rummy.RummyCardData[][] = null
   ) {
     // 排除公共区的牌
     const groundCardIDList = [];
@@ -301,14 +312,12 @@ export default function Index() {
       );
 
       cardList.forEach((card) => {
-        const { x, y } = getNewCardPosOnBoard(playboardData);
-        card.x = x;
-        card.y = y;
+        const pos = getNewCardPosOnBoard(playboardData);
+        updateCardPos(card, pos);
       });
 
       cardList = cardList.concat(oldCardList);
     }
-
     setCardList(cardList);
     cardList.forEach((card) => {
       const cross = getCrossByCardPos(card);
@@ -356,16 +365,10 @@ export default function Index() {
         duration: 1000,
       });
     } else if (perfect) {
-      Taro.showToast({
-        title: "成功",
-        icon: "success",
-        duration: 1000,
-      });
-
       await handleGameAction(id, "endRoundPerfect", { playgroundData });
     } else {
       Taro.showToast({
-        title: "失败",
+        title: "出牌失败",
         icon: "none",
         duration: 1000,
       });
@@ -409,9 +412,8 @@ export default function Index() {
     }
     const posList = getResetCardPosOnBoard(playboardData, resetList.length);
     resetList.forEach((card, index) => {
-      const { x, y } = posList[index];
-      card.x = x;
-      card.y = y;
+      const pos = posList[index];
+      updateCardPos(card, pos);
     });
     updateCardList(cardList.concat());
   }
@@ -440,229 +442,230 @@ export default function Index() {
 
   return (
     <MovableArea>
-      {gameData ? (
-        <View className="rummy-game">
-          <View className="rummy-game-wrapper">
-            <View className="rummy-game-top">
-              <View id="playground" className="playground">
-                {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
-                  const show4 = colIndex <= 7 && colIndex % 3 === 0;
-                  const showN = colIndex > 7 && (colIndex - 8) % 3 === 0;
-                  const showIndex = show4 || showN;
+      <LoadPage></LoadPage>
+      <View className="rummy-game">
+        <View className="rummy-game-wrapper">
+          <View className="rummy-game-top">
+            <View id="playground" className="playground">
+              {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
+                const show4 = colIndex <= 7 && colIndex % 3 === 0;
+                const showN = colIndex > 7 && (colIndex - 8) % 3 === 0;
+                const showIndex = show4 || showN;
+                return (
+                  <View className="row">
+                    {new Array(GROUND_ROW_LEN).fill(1).map((_, rowIndex) => {
+                      let indexValue;
+                      if (show4) {
+                        if (rowIndex >= 2 && rowIndex <= 10 && rowIndex !== 6) {
+                          indexValue = 4;
+                        }
+                      } else {
+                        indexValue = rowIndex + 1;
+                      }
+                      return (
+                        <View className="playground-box">
+                          {showIndex && indexValue}
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </View>
+            <View className="rummy-game-right">
+              <View className="player-list">
+                <PlayerContext.Provider
+                  value={{
+                    gameID: id,
+                    players,
+                    playerIndex,
+                    kickPlayer: () => {},
+                    initGameIndex: AchievementGameIndex.rummy,
+                    showScore: start,
+                    showSetting: own && !start,
+                    showActive: start,
+                    showOffline: !end,
+                    showGift: !end && inGame,
+                  }}
+                >
+                  <PlayerList players={players}></PlayerList>
+                </PlayerContext.Provider>
+                {singlePlayer && gaming && (
+                  <View className="round-sum">
+                    回合数
+                    <Text className="number">{roundSum}</Text>
+                  </View>
+                )}
+              </View>
+              {gaming && (
+                <View className="round-btn-box">
+                  <AtButton
+                    className="round-ctrl-btn card"
+                    onClick={() => {
+                      addCard();
+                    }}
+                    disabled={!inRound}
+                  >
+                    <AtIcon
+                      value="add-circle"
+                      size="22"
+                      color="#93d439"
+                    ></AtIcon>
+                  </AtButton>
+                  <AtButton
+                    className="round-ctrl-btn card"
+                    onClick={() => {
+                      endRound();
+                    }}
+                    disabled={!inRound}
+                  >
+                    <AtIcon
+                      value="check-circle"
+                      size="22"
+                      color="#93d439"
+                    ></AtIcon>
+                  </AtButton>
+                </View>
+              )}
+            </View>
+          </View>
+          <View
+            className={clsx(
+              "playboard-container",
+              (!start || end) && "not-start"
+            )}
+          >
+            <View className="playboard-col">
+              {gaming && (
+                <View>
+                  <AtButton
+                    className="ctrl-btn"
+                    onClick={() => {
+                      execPlaceSetFromBoardToGround();
+                    }}
+                  >
+                    <AtIcon value="chevron-up" size="18" color="#fff"></AtIcon>
+                  </AtButton>
+                  <AtButton
+                    className="ctrl-btn"
+                    onClick={() => {
+                      resetBoard();
+                    }}
+                  >
+                    <AtIcon
+                      value="chevron-down"
+                      size="18"
+                      color="#fff"
+                    ></AtIcon>
+                  </AtButton>
+                </View>
+              )}
+            </View>
+            <View
+              className={clsx(
+                "playboard-wrapper",
+                !inGame && !singlePlayer && "hidden"
+              )}
+            >
+              <View id="playboard" className="playboard">
+                {new Array(BOARD_COL_LEN).fill(1).map((_) => {
                   return (
                     <View className="row">
-                      {new Array(GROUND_ROW_LEN).fill(1).map((_, rowIndex) => {
-                        let indexValue;
-                        if (show4) {
-                          if (
-                            rowIndex >= 2 &&
-                            rowIndex <= 10 &&
-                            rowIndex !== 6
-                          ) {
-                            indexValue = 4;
-                          }
-                        } else {
-                          indexValue = rowIndex + 1;
-                        }
-                        return (
-                          <View className="playground-box">
-                            {showIndex && indexValue}
-                          </View>
-                        );
+                      {new Array(BOARD_ROW_LEN).fill(1).map((_) => {
+                        return <View className="playboard-box"></View>;
                       })}
                     </View>
                   );
                 })}
               </View>
-              <View className="rummy-game-right">
-                <View className="player-list">
-                  <PlayerContext.Provider
-                    value={{
-                      gameID: id,
-                      players,
-                      playerIndex,
-                      kickPlayer: () => {},
-                      initGameIndex: AchievementGameIndex.rummy,
-                      showScore: start,
-                      showSetting: own && !start,
-                      showActive: start,
-                      showOffline: !end,
-                      showGift: !end && inGame,
+            </View>
+            <View className="playboard-col right">
+              {gaming && (
+                <View>
+                  <AtButton
+                    className="ctrl-btn"
+                    onClick={() => {
+                      execSortCardList();
                     }}
                   >
-                    <PlayerList players={players}></PlayerList>
-                  </PlayerContext.Provider>
-                  {singlePlayer && gaming && (
-                    <View className="round-sum">
-                      回合数
-                      <Text className="number">{roundSum}</Text>
-                    </View>
-                  )}
-                </View>
-                {gaming && (
-                  <View className="round-btn-box">
-                    <AtButton
-                      className="round-ctrl-btn card"
-                      onClick={() => {
-                        addCard();
-                      }}
-                    >
-                      <AtIcon
-                        value="add-circle"
-                        size="22"
-                        color="#93d439"
-                      ></AtIcon>
-                    </AtButton>
-                    <AtButton
-                      className="round-ctrl-btn card"
-                      onClick={() => {
-                        endRound();
-                      }}
-                    >
-                      <AtIcon
-                        value="check-circle"
-                        size="22"
-                        color="#93d439"
-                      ></AtIcon>
-                    </AtButton>
-                  </View>
-                )}
-              </View>
-            </View>
-            <View
-              className={`playboard-container ${
-                !start || end ? "not-start" : ""
-              }`}
-            >
-              <View className="playboard-col">
-                {gaming && (
-                  <View>
-                    <AtButton
-                      className="ctrl-btn"
-                      onClick={() => {
-                        execPlaceSetFromBoardToGround();
-                      }}
-                    >
-                      <AtIcon
-                        value="chevron-up"
-                        size="18"
-                        color="#fff"
-                      ></AtIcon>
-                    </AtButton>
-                    <AtButton
-                      className="ctrl-btn"
-                      onClick={() => {
-                        resetBoard();
-                      }}
-                    >
-                      <AtIcon
-                        value="chevron-down"
-                        size="18"
-                        color="#fff"
-                      ></AtIcon>
-                    </AtButton>
-                  </View>
-                )}
-              </View>
-              <View className="playboard-wrapper">
-                <View id="playboard" className="playboard">
-                  {new Array(BOARD_COL_LEN).fill(1).map((_) => {
-                    return (
-                      <View className="row">
-                        {new Array(BOARD_ROW_LEN).fill(1).map((_) => {
-                          return <View className="playboard-box"></View>;
-                        })}
-                      </View>
-                    );
-                  })}
-                </View>
-              </View>
-              <View className="playboard-col right">
-                {gaming && (
-                  <View>
-                    <AtButton
-                      className="ctrl-btn"
-                      onClick={() => {
-                        execSortCardList();
-                      }}
-                    >
-                      <AtIcon
-                        value="numbered-list"
-                        size="18"
-                        color="#fff"
-                      ></AtIcon>
-                    </AtButton>
-                    <AtButton
-                      className="ctrl-btn"
-                      onClick={() => {
-                        restartRound();
-                      }}
-                    >
-                      <AtIcon value="reload" size="18" color="#fff"></AtIcon>
-                    </AtButton>
-                  </View>
-                )}
-              </View>
-              {!start && (
-                <View className="before-start-btn-box">
-                  {own ? (
-                    <View>
-                      <AtButton
-                        type="primary"
-                        onClick={() => {
-                          startBtnClick();
-                        }}
-                      >
-                        开始
-                      </AtButton>
-                    </View>
-                  ) : inGame ? (
-                    <AtButton
-                      type="secondary"
-                      onClick={() => {
-                        getUserProfile(() => {
-                          handleGameAction(id, "leaveGame");
-                        });
-                      }}
-                    >
-                      离开
-                    </AtButton>
-                  ) : (
-                    <AtButton
-                      type="secondary"
-                      onClick={() => {
-                        getUserProfile(() => {
-                          handleGameAction(id, "joinGame");
-                        });
-                      }}
-                      disabled={!canJoin}
-                    >
-                      加入
-                    </AtButton>
-                  )}
-                  <AtButton type="secondary" openType="share">
-                    邀请朋友
+                    <AtIcon
+                      value="numbered-list"
+                      size="18"
+                      color="#fff"
+                    ></AtIcon>
+                  </AtButton>
+                  <AtButton
+                    className="ctrl-btn"
+                    onClick={() => {
+                      restartRound();
+                    }}
+                  >
+                    <AtIcon value="reload" size="18" color="#fff"></AtIcon>
                   </AtButton>
                 </View>
               )}
-              {end && (
-                <View className="before-start-btn-box">
-                  {singlePlayer ? (
-                    <View className="result-box">
-                      <Text className="text">回合数</Text>
-                      <Text className="number">{roundSum}</Text>
-                    </View>
-                  ) : (
-                    <View className="result-box">
-                      <Text className="text">获胜者</Text>
-                      <HallPlayer data={players?.[winner]}></HallPlayer>
-                    </View>
-                  )}
-                </View>
-              )}
             </View>
+            {gameData && !start && (
+              <View className="before-start-btn-box">
+                {own ? (
+                  <View>
+                    <AtButton
+                      type="primary"
+                      onClick={() => {
+                        startBtnClick();
+                      }}
+                    >
+                      开始
+                    </AtButton>
+                  </View>
+                ) : inGame ? (
+                  <AtButton
+                    type="secondary"
+                    onClick={() => {
+                      getUserProfile(() => {
+                        handleGameAction(id, "leaveGame");
+                      });
+                    }}
+                  >
+                    离开
+                  </AtButton>
+                ) : (
+                  <AtButton
+                    type="secondary"
+                    onClick={() => {
+                      getUserProfile(() => {
+                        handleGameAction(id, "joinGame");
+                      });
+                    }}
+                    disabled={!canJoin}
+                  >
+                    加入
+                  </AtButton>
+                )}
+                <AtButton type="secondary" openType="share">
+                  邀请朋友
+                </AtButton>
+              </View>
+            )}
+            {end && (
+              <View className="before-start-btn-box">
+                {singlePlayer ? (
+                  <View className="result-box">
+                    <Text className="text">回合数</Text>
+                    <Text className="number">{roundSum}</Text>
+                  </View>
+                ) : (
+                  <View className="result-box">
+                    <Text className="text">获胜者</Text>
+                    <HallPlayer data={players?.[winner]}></HallPlayer>
+                  </View>
+                )}
+              </View>
+            )}
           </View>
-          {cardList?.map(({ color, value, x, y, id }) => {
+        </View>
+        {gaming &&
+          cardList?.map(({ color, value, x, y, id }) => {
             const isJoker = value === 0;
             return (
               <MovableView
@@ -693,42 +696,41 @@ export default function Index() {
               </MovableView>
             );
           })}
-          {playgroundCardList?.map((card) => {
-            const { color, value, x, y, id } = card;
-            const isJoker = value === 0;
-            return (
-              card && (
-                <MovableView
-                  key={id}
-                  className={`card ${color} ${
-                    id === activeCardID ? "active" : ""
-                  }`}
-                  direction="all"
-                  onChange={(event) => {
-                    onChange(event, id);
-                  }}
-                  onTouchStart={() => {
-                    onTouchStart(id);
-                  }}
-                  onTouchEnd={onTouchEnd}
-                  x={x}
-                  y={y}
-                >
-                  {isJoker ? (
-                    <Image
-                      className="card-img"
-                      mode="aspectFit"
-                      src={JokerIcon}
-                    ></Image>
-                  ) : (
-                    value
-                  )}
-                </MovableView>
-              )
-            );
-          })}
-        </View>
-      ) : null}
+        {playgroundCardList?.map((card) => {
+          const { color, value, x, y, id } = card;
+          const isJoker = value === 0;
+          return (
+            card && (
+              <MovableView
+                key={id}
+                className={`card ${color} ${
+                  id === activeCardID ? "active" : ""
+                }`}
+                direction="all"
+                onChange={(event) => {
+                  onChange(event, id);
+                }}
+                onTouchStart={() => {
+                  onTouchStart(id);
+                }}
+                onTouchEnd={onTouchEnd}
+                x={x}
+                y={y}
+              >
+                {isJoker ? (
+                  <Image
+                    className="card-img"
+                    mode="aspectFit"
+                    src={JokerIcon}
+                  ></Image>
+                ) : (
+                  value
+                )}
+              </MovableView>
+            )
+          );
+        })}
+      </View>
     </MovableArea>
   );
 }

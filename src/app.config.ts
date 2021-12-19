@@ -4,7 +4,7 @@ export default {
     "pages/homepage/index",
     "pages/wealth/index",
     "pages/seasonRank/index",
-    // 快艇骰子
+    // // 快艇骰子
     "pages/Yahtzee/game/index",
     "pages/Yahtzee/hall/index",
     "pages/Yahtzee/history/index",

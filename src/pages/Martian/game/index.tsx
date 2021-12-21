@@ -30,7 +30,7 @@ import {
   updatePlayerOnline_Database,
   watchDataBase,
 } from "./gameApi";
-import PlayerList from "../../../Components/MartianPlayerList";
+import PlayerList from "../../../Components/CommonPlayerList";
 import Player from "@/Components/HallPlayer";
 import { execGiftActions, watchEvents_DataBase } from "../../../utils_api";
 import { getUserProfile } from "@/utils";

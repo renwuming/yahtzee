@@ -50,8 +50,11 @@
         sans-serif;
     }
     &.rummy-card-num {
-      width: 44px;
+      width: 70px;
+      display: flex;
+      justify-content: center;
       text {
+        font-size: 36px;
         color: #0d0812;
       }
     }
@@ -73,5 +76,8 @@
   }
   .setting {
     margin-left: 10px;
+    &.rummy-setting {
+      font-size: 28px !important;
+    }
   }
 }

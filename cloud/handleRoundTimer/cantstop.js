@@ -1,6 +1,8 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const DEFAULT_PROGRESS = new Array(13).fill(0);
+
 async function execHandleExceptionCantStop(db) {
   const _ = db.command;
   // 处理【最近1小时的】【未结束的】游戏
@@ -22,13 +24,19 @@ async function execHandleExceptionCantStop(db) {
 }
 
 async function handleExceptionCantStop(db, game) {
-  const _ = db.command;
   const { _id, roundPlayer, players, start, roundSum } = game;
   const realPlayers = players.filter((item) => item && item.openid);
+  const gamingPlayers = realPlayers.filter((item) => item.progress);
   const redundantPlayers = realPlayers.length < players.length;
+  const bugPlayers = start && gamingPlayers.length < players.length;
   const updateData = {};
+
   // 纠正玩家离开房间后，更新了在线时间戳
-  if (redundantPlayers) {
+  // 纠正在开始游戏的瞬间，玩家进入了房间
+  if (bugPlayers || redundantPlayers) {
+    realPlayers.forEach((player) => {
+      if (!player.progress) player.progress = DEFAULT_PROGRESS;
+    });
     updateData.players = realPlayers;
   }
 

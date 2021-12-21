@@ -1,6 +1,6 @@
 import { View, Image, Text } from "@tarojs/components";
 import "./index.scss";
-import Achievement from "../../Components/Achievement";
+import Achievement from "../Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
 import {
@@ -82,6 +82,11 @@ export default function Index({
             src={avatarUrl}
           ></Image>
           {noNickName ? null : <Text className={colorType}>{nickName}</Text>}
+          {isRummyPlayer && cardList && (
+            <View className="score rummy-card-num">
+              <Text className="score rummy-card-num">{cardList.length}</Text>
+            </View>
+          )}
         </View>
         {showScore && !isRummyPlayer && (
           <View className="score">
@@ -90,7 +95,7 @@ export default function Index({
         )}
         {realShowSetting && (
           <AtIcon
-            className="setting"
+            className={clsx("setting", isRummyPlayer && "rummy-setting")}
             value="settings"
             size="18"
             color={isRummyPlayer ? "#fff" : "#176999"}
@@ -98,11 +103,6 @@ export default function Index({
               setActionSheetOpened(true);
             }}
           ></AtIcon>
-        )}
-        {isRummyPlayer && cardList && (
-          <View className="score rummy-card-num">
-            <Text>{cardList.length}</Text>
-          </View>
         )}
       </View>
       {isSetPlayer && showScore && (

@@ -117,19 +117,21 @@ function groundData2List(
   return resList;
 }
 
-export const GROUND_COL_LEN = 16;
-export const GROUND_ROW_LEN = 13;
-export const BOARD_COL_LEN = 4;
-export const BOARD_ROW_LEN = 14;
-export const BOARD_SUM = BOARD_COL_LEN * BOARD_ROW_LEN;
+export const GROUND_COL_LEN: number = 14;
+export const GROUND_ROW_LEN: number = 13;
+export const BOARD_COL_LEN: number = 3;
+export const BOARD_ROW_LEN: number = 14;
+export const BOARD_SUM: number = BOARD_COL_LEN * BOARD_ROW_LEN;
 
 const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
 const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
-const sameValueIndexList: number[] = new Array(16).fill(1).map((_, index) => {
-  if (index % 2 === 0) return (7 - index / 2) * GROUND_ROW_LEN + 2;
-  else return (8 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
-});
+const sameValueIndexList: number[] = new Array(GROUND_COL_LEN)
+  .fill(1)
+  .map((_, index) => {
+    if (index % 2 === 0) return (5 - index / 2) * GROUND_ROW_LEN + 2;
+    else return (6 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
+  });
 
 function getStraightIndexListByValue(value: number): number[] {
   let colIndex = GROUND_COL_LEN - 1;
@@ -557,8 +559,10 @@ function handleSetToProperPos(
   const L = list.length;
   const type = judgeSetType(list);
   if (type === RUMMY_SET_TYPE.samevalue) {
+    // 放到预设位置
     for (let i = 0; i < sameValueIndexList.length; i++) {
       const index = sameValueIndexList[i];
+      if (index < 0) break;
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
       const hasPlace = new Array(L).fill(1).every((_, index) => {
         const card = playgroundData[colIndex][rowIndex + index];
@@ -574,8 +578,20 @@ function handleSetToProperPos(
           setPlaygroundData,
           setCardList
         );
-        break;
+        return;
       }
+    }
+    // 如果没有预设位置，则找一个空位即可
+    const index = findGroundEmptyPlace(list, playgroundData);
+    if (index >= 0) {
+      placeSetToGroundByIndex(
+        list,
+        index,
+        playgroundData,
+        cardList,
+        setPlaygroundData,
+        setCardList
+      );
     }
   } else {
     let firstCardValue, firstCardColor;
@@ -585,6 +601,7 @@ function handleSetToProperPos(
       firstCardColor = card.color;
     });
     const straightIndexList = getStraightIndexListByValue(firstCardValue);
+    // 放到预设位置
     for (let i = 0; i < straightIndexList.length; i++) {
       const index = straightIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
@@ -606,10 +623,45 @@ function handleSetToProperPos(
           setPlaygroundData,
           setCardList
         );
-        break;
+        return;
+      }
+    }
+    // 如果没有预设位置，则找一个空位即可
+    const index = findGroundEmptyPlace(list, playgroundData);
+    if (index >= 0) {
+      placeSetToGroundByIndex(
+        list,
+        index,
+        playgroundData,
+        cardList,
+        setPlaygroundData,
+        setCardList
+      );
+    }
+  }
+}
+
+function findGroundEmptyPlace(list, playgroundData) {
+  const N = list.length;
+  let l = 0;
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      if (j === 0) {
+        l = 1;
+      }
+      if (!card || getCardIndexByID(list, card.id) >= 0) {
+        l++;
+      } else {
+        l = 0;
+      }
+      if (l >= N + 2) {
+        return i * GROUND_ROW_LEN + j - N;
       }
     }
   }
+
+  return -1;
 }
 
 function placeSetToGroundByIndex(

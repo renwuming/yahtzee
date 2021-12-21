@@ -7,9 +7,27 @@ import {
   Image,
 } from "@tarojs/components";
 import { AtButton, AtIcon, AtProgress } from "taro-ui";
-import "./index.scss";
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 import { flat, getUserProfile, SLEEP } from "@/utils";
+import {
+  AchievementGameIndex,
+  PlayerContext,
+  RUMMY_AREA_STATUS,
+  RUMMY_ROUND_TIME_LIMIT,
+  RUMMY_SHOW_ROUND_TIME_LIMIT,
+} from "@/const";
+import { useGameApi } from "@/utils_api";
+// @ts-ignore
+import JokerIcon from "@/assets/imgs/rummy-joker.png";
+// @ts-ignore
+import AddIcon from "@/assets/imgs/rummy-arrow.png";
+// @ts-ignore
+import PerfectIcon from "@/assets/imgs/rummy-right.png";
+import HallPlayer from "@/Components/HallPlayer";
+import LoadPage from "@/Components/LoadPage";
+import { GameGift } from "@/Components/Gifts";
+import PlayerList from "@/Components/CommonPlayerList";
 import {
   BOARD_COL_LEN,
   BOARD_ROW_LEN,
@@ -31,21 +49,7 @@ import {
   sortCardList,
   updateCardPos,
 } from "./api";
-import {
-  AchievementGameIndex,
-  PlayerContext,
-  RUMMY_AREA_STATUS,
-  RUMMY_ROUND_TIME_LIMIT,
-  RUMMY_SHOW_ROUND_TIME_LIMIT,
-} from "@/const";
-import { useGameApi } from "@/utils_api";
-import PlayerList from "@/Components/MartianPlayerList";
-// @ts-ignore
-import JokerIcon from "@/assets/imgs/rummy-joker.png";
-import HallPlayer from "@/Components/HallPlayer";
-import LoadPage from "@/Components/LoadPage";
-import clsx from "clsx";
-import { GameGift } from "@/Components/Gifts";
+import "./index.scss";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -91,6 +95,7 @@ export default function Index() {
     roundSum,
     winner,
     inRound,
+    cardLibrary,
   } = gameData || {};
   const singlePlayer = players.length === 1;
   const gaming = start && !end;
@@ -110,10 +115,10 @@ export default function Index() {
     const { roundTimeStamp } = data || {};
     if (!roundTimeStamp) return Infinity;
     const timeStamp = Date.now();
-    const roundCountDown = Math.floor(
+    const _roundCountDown = Math.floor(
       RUMMY_ROUND_TIME_LIMIT - (timeStamp - +new Date(roundTimeStamp)) / 1000
     );
-    return roundCountDown;
+    return _roundCountDown;
   }
 
   function initFn(data: Rummy.RummyGameBaseData) {
@@ -450,11 +455,11 @@ export default function Index() {
           <View className="rummy-game-top">
             <View id="playground" className="playground">
               {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
-                const show4 = colIndex <= 7 && colIndex % 3 === 0;
-                const showN = colIndex > 7 && (colIndex - 8) % 3 === 0;
+                const show4 = colIndex <= 5 && colIndex % 3 === 0;
+                const showN = colIndex > 5 && (colIndex - 8) % 3 === 0;
                 const showIndex = show4 || showN;
                 return (
-                  <View className="row">
+                  <View key={colIndex} className="row">
                     {new Array(GROUND_ROW_LEN).fill(1).map((_, rowIndex) => {
                       let indexValue;
                       if (show4) {
@@ -465,7 +470,7 @@ export default function Index() {
                         indexValue = rowIndex + 1;
                       }
                       return (
-                        <View className="playground-box">
+                        <View key={rowIndex} className="playground-box">
                           {showIndex && indexValue}
                         </View>
                       );
@@ -492,6 +497,7 @@ export default function Index() {
                     showActive: start,
                     showOffline: !end,
                     showGift: !end && inGame,
+                    noNickName: true,
                   }}
                 >
                   <PlayerList players={players}></PlayerList>
@@ -512,11 +518,12 @@ export default function Index() {
                     }}
                     disabled={!inRound}
                   >
-                    <AtIcon
-                      value="add-circle"
-                      size="22"
-                      color="#93d439"
-                    ></AtIcon>
+                    <Text className="library-num">{cardLibrary.length}</Text>
+                    <Image
+                      className="add-icon"
+                      mode="aspectFit"
+                      src={AddIcon}
+                    ></Image>
                   </AtButton>
                   <AtButton
                     className="round-ctrl-btn card"
@@ -525,11 +532,7 @@ export default function Index() {
                     }}
                     disabled={!inRound}
                   >
-                    <AtIcon
-                      value="check-circle"
-                      size="22"
-                      color="#93d439"
-                    ></AtIcon>
+                    <Image mode="aspectFit" src={PerfectIcon}></Image>
                   </AtButton>
                 </View>
               )}
@@ -545,38 +548,7 @@ export default function Index() {
                 />
               )}
           </View>
-          <View
-            className={clsx(
-              "playboard-container",
-              (!start || end) && "not-start"
-            )}
-          >
-            <View className="playboard-col">
-              {gaming && (
-                <View>
-                  <AtButton
-                    className="ctrl-btn"
-                    onClick={() => {
-                      execPlaceSetFromBoardToGround();
-                    }}
-                  >
-                    <AtIcon value="chevron-up" size="18" color="#fff"></AtIcon>
-                  </AtButton>
-                  <AtButton
-                    className="ctrl-btn"
-                    onClick={() => {
-                      resetBoard();
-                    }}
-                  >
-                    <AtIcon
-                      value="chevron-down"
-                      size="18"
-                      color="#fff"
-                    ></AtIcon>
-                  </AtButton>
-                </View>
-              )}
-            </View>
+          <View className={clsx("playboard-container", !gaming && "not-start")}>
             <View
               className={clsx(
                 "playboard-wrapper",
@@ -584,43 +556,56 @@ export default function Index() {
               )}
             >
               <View id="playboard" className="playboard">
-                {new Array(BOARD_COL_LEN).fill(1).map((_) => {
+                {new Array(BOARD_COL_LEN).fill(1).map((_, colIndex) => {
                   return (
-                    <View className="row">
-                      {new Array(BOARD_ROW_LEN).fill(1).map((_) => {
-                        return <View className="playboard-box"></View>;
+                    <View key={colIndex} className="row">
+                      {new Array(BOARD_ROW_LEN).fill(1).map((_, rowIndex) => {
+                        return (
+                          <View key={rowIndex} className="playboard-box"></View>
+                        );
                       })}
                     </View>
                   );
                 })}
               </View>
             </View>
-            <View className="playboard-col right">
-              {gaming && (
-                <View>
-                  <AtButton
-                    className="ctrl-btn"
-                    onClick={() => {
-                      execSortCardList();
-                    }}
-                  >
-                    <AtIcon
-                      value="numbered-list"
-                      size="18"
-                      color="#fff"
-                    ></AtIcon>
-                  </AtButton>
-                  <AtButton
-                    className="ctrl-btn"
-                    onClick={() => {
-                      restartRound();
-                    }}
-                  >
-                    <AtIcon value="reload" size="18" color="#fff"></AtIcon>
-                  </AtButton>
-                </View>
-              )}
-            </View>
+            {gaming && (
+              <View className="playboard-ctrl-box">
+                <AtButton
+                  className="ctrl-btn"
+                  onClick={() => {
+                    execPlaceSetFromBoardToGround();
+                  }}
+                >
+                  <AtIcon value="chevron-up" size="18" color="#fff"></AtIcon>
+                </AtButton>
+                <AtButton
+                  className="ctrl-btn"
+                  onClick={() => {
+                    resetBoard();
+                  }}
+                >
+                  <AtIcon value="chevron-down" size="18" color="#fff"></AtIcon>
+                </AtButton>
+                <AtButton
+                  className="ctrl-btn"
+                  onClick={() => {
+                    execSortCardList();
+                  }}
+                >
+                  <AtIcon value="numbered-list" size="18" color="#fff"></AtIcon>
+                </AtButton>
+                <AtButton
+                  className="ctrl-btn"
+                  onClick={() => {
+                    restartRound();
+                  }}
+                >
+                  <AtIcon value="reload" size="18" color="#fff"></AtIcon>
+                </AtButton>
+              </View>
+            )}
+
             {gameData && !start && (
               <View className="before-start-btn-box">
                 {own ? (
@@ -670,10 +655,14 @@ export default function Index() {
                     <Text className="text">回合数</Text>
                     <Text className="number">{roundSum}</Text>
                   </View>
-                ) : (
+                ) : players[winner] ? (
                   <View className="result-box">
                     <Text className="text">获胜者</Text>
-                    <HallPlayer data={players?.[winner]}></HallPlayer>
+                    <HallPlayer data={players[winner]}></HallPlayer>
+                  </View>
+                ) : (
+                  <View className="result-box">
+                    <Text className="text">游戏超时</Text>
                   </View>
                 )}
               </View>

@@ -1,4 +1,4 @@
-import PlayerList from "@/Components/MartianPlayerList";
+import PlayerList from "@/Components/CommonPlayerList";
 import HallPlayer from "@/Components/HallPlayer";
 import { AchievementGameIndex, PlayerContext, SET_TIME_LIMIT } from "@/const";
 import { useGameApi } from "@/utils_api";

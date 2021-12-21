@@ -1,4 +1,4 @@
-.martian-player-list {
+.common-player-list {
   display: flex;
   padding: 0 100px;
   min-height: 130px;
@@ -7,5 +7,9 @@
   box-sizing: border-box;
   &.set-player-list {
     min-height: 170px;
+  }
+  &.rummy-player-list {
+    flex-direction: column;
+    padding: 0;
   }
 }

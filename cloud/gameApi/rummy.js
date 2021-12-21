@@ -4,16 +4,16 @@ const { updatePlayer, getPlayer, findOne, shuffle, flat } = require("./common");
 
 const MAX_PLAYERS = 4;
 const PLAYER_START_CARD_NUM = 14;
-const GROUND_COL_LEN = 16;
+const GROUND_COL_LEN = 14;
 const GROUND_ROW_LEN = 13;
 const RUMMY_SET_TYPE = {
   straight: 1,
   samevalue: 2,
 };
 
-const sameValueIndexList = new Array(16).fill(1).map((_, index) => {
-  if (index % 2 === 0) return (7 - index / 2) * GROUND_ROW_LEN + 2;
-  else return (8 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
+const sameValueIndexList = new Array(GROUND_COL_LEN).fill(1).map((_, index) => {
+  if (index % 2 === 0) return (5 - index / 2) * GROUND_ROW_LEN + 2;
+  else return (6 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
 });
 
 function getStraightIndexListByValue(value) {
@@ -150,8 +150,6 @@ exports.handleGame = async function handleGame(
 };
 
 async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
-  const db = cloud.database();
-  const _ = db.command;
   const OPENID = openid || cloud.getWXContext().OPENID;
   const { owner, players, start, roundPlayer } = oldData;
   const openids = players.map((item) => item.openid);
@@ -207,7 +205,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
   }
   // 结束回合，不需要抽牌
   else if (action === "endRoundPerfect" && inRound) {
-    const { playgroundData, roundSum } = oldData;
+    const { playgroundData, roundSum, cardLibrary } = oldData;
     const currentPlayer = players[playerIndex];
     const { playgroundData: newPlaygroundData } = data;
     const newData = handleEndRoundPerfect(
@@ -217,7 +215,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
       playerIndex
     );
 
-    const newRoundData = newRound(roundPlayer, players, roundSum);
+    const newRoundData = newRound(roundPlayer, players, roundSum, cardLibrary);
     return { ...newData, ...newRoundData };
   }
   // 结束回合，并抽牌
@@ -227,7 +225,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
     const [newCard] = cardLibrary.splice(0, 1);
     if (newCard) cardList.unshift(newCard);
 
-    const newRoundData = newRound(roundPlayer, players, roundSum);
+    const newRoundData = newRound(roundPlayer, players, roundSum, cardLibrary);
     return {
       [`players.${playerIndex}.cardList`]: cardList,
       cardLibrary,
@@ -241,7 +239,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
     const [newCard] = cardLibrary.splice(0, 1);
     if (newCard) cardList.unshift(newCard);
 
-    const newRoundData = newRound(roundPlayer, players, roundSum);
+    const newRoundData = newRound(roundPlayer, players, roundSum, cardLibrary);
     return {
       [`players.${roundPlayer}.cardList`]: cardList,
       cardLibrary,
@@ -262,10 +260,10 @@ function handleEndRoundPerfect(
   if (!isPerfect) {
     throw new Error("400-出牌失败");
   }
-  oldPlaygroundDataIDList = flat(oldPlaygroundData)
+  const oldPlaygroundDataIDList = flat(oldPlaygroundData)
     .filter((item) => item)
     .map((card) => card.id);
-  newPlaygroundDataList = flat(newPlaygroundData).filter((item) => item);
+  const newPlaygroundDataList = flat(newPlaygroundData).filter((item) => item);
   const { cardList, icebreaking } = currentPlayer;
   const playerCardIDList = cardList.map((card) => card.id);
   const newPlaygroundDataIDList = newPlaygroundDataList.map((card) => card.id);
@@ -322,14 +320,23 @@ function handleEndRoundPerfect(
   };
 }
 
-function newRound(roundPlayer, players, roundSum) {
+function newRound(roundPlayer, players, roundSum, cardLibrary) {
   const newRoundPlayer = (roundPlayer + 1) % players.length;
 
-  return {
+  const updateData = {
     roundPlayer: newRoundPlayer,
     roundTimeStamp: new Date(),
     roundSum: roundSum + 1,
   };
+
+  const emptyLibrary = cardLibrary.length === 0;
+  if (emptyLibrary) {
+    updateData.end = true;
+    updateData.endTime = new Date();
+    updateData.winner = null;
+  }
+
+  return updateData;
 }
 
 function handleEndData(list, playerIndex) {
@@ -366,8 +373,10 @@ function handleSetToProperPos(list, playgroundData, rowColorMap) {
   const L = list.length;
   const type = judgeSetType(list);
   if (type === RUMMY_SET_TYPE.samevalue) {
+    // 放到预设位置
     for (let i = 0; i < sameValueIndexList.length; i++) {
       const index = sameValueIndexList[i];
+      if (index < 0) break;
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
       const hasPlace = new Array(L).fill(1).every((_, index) => {
         const card = playgroundData[colIndex][rowIndex + index];
@@ -376,8 +385,13 @@ function handleSetToProperPos(list, playgroundData, rowColorMap) {
       });
       if (hasPlace) {
         placeSetToGroundByIndex(list, index, playgroundData);
-        break;
+        return;
       }
+    }
+    // 如果没有预设位置，则找一个空位即可
+    const index = findGroundEmptyPlace(list, playgroundData);
+    if (index >= 0) {
+      placeSetToGroundByIndex(list, index, playgroundData);
     }
   } else {
     let firstCardValue, firstCardColor;
@@ -387,6 +401,7 @@ function handleSetToProperPos(list, playgroundData, rowColorMap) {
       firstCardColor = card.color;
     });
     const straightIndexList = getStraightIndexListByValue(firstCardValue);
+    // 放到预设位置
     for (let i = 0; i < straightIndexList.length; i++) {
       const index = straightIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
@@ -401,10 +416,38 @@ function handleSetToProperPos(list, playgroundData, rowColorMap) {
 
       if (sameColor && hasPlace) {
         placeSetToGroundByIndex(list, index, playgroundData);
-        break;
+        return;
+      }
+    }
+    // 如果没有预设位置，则找一个空位即可
+    const index = findGroundEmptyPlace(list, playgroundData);
+    if (index >= 0) {
+      placeSetToGroundByIndex(list, index, playgroundData);
+    }
+  }
+}
+
+function findGroundEmptyPlace(list, playgroundData) {
+  const N = list.length;
+  let l = 0;
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      if (j === 0) {
+        l = 1;
+      }
+      if (!card || getCardIndexByID(list, card.id) >= 0) {
+        l++;
+      } else {
+        l = 0;
+      }
+      if (l >= N + 2) {
+        return i * GROUND_ROW_LEN + j - N;
       }
     }
   }
+
+  return -1;
 }
 
 function placeSetToGroundByIndex(list, index, playgroundData) {

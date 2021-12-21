@@ -59,14 +59,25 @@ async function execHandleExceptionSet(db) {
 }
 
 async function handleExceptionSet(db, game) {
-  const _ = db.command;
-  const { _id, players } = game;
+  const { _id, players, start } = game;
   const realPlayers = players.filter((item) => item && item.openid);
+  const gamingPlayers = realPlayers.filter(
+    (item) => item.sumScore || item.sumScore === 0
+  );
   const redundantPlayers = realPlayers.length < players.length;
+  const bugPlayers = start && gamingPlayers.length < players.length;
   const updateData = {};
 
   // 纠正玩家离开房间后，更新了在线时间戳
-  if (redundantPlayers) {
+  // 纠正在开始游戏的瞬间，玩家进入了房间
+  if (bugPlayers || redundantPlayers) {
+    realPlayers.forEach((player) => {
+      if (!player.sumScore) {
+        player.sumScore = 0;
+        player.successSum = 0;
+        player.failSum = 0;
+      }
+    });
     updateData.players = realPlayers;
   }
 

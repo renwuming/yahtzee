@@ -61,15 +61,25 @@ async function execHandleExceptionRummy(db) {
 }
 
 async function handleExceptionRummy(db, game) {
-  const _ = db.command;
-  const { _id, players } = game;
+  const { _id, players, start, roundPlayer } = game;
   const realPlayers = players.filter((item) => item && item.openid);
+  const gamingPlayers = realPlayers.filter((item) => item.cardList);
   const redundantPlayers = realPlayers.length < players.length;
+  const bugPlayers = start && gamingPlayers.length < players.length;
   const updateData = {};
 
   // 纠正玩家离开房间后，更新了在线时间戳
   if (redundantPlayers) {
     updateData.players = realPlayers;
+  }
+  // 纠正在开始游戏的瞬间，玩家进入了房间
+  if (bugPlayers) {
+    updateData.players = gamingPlayers;
+  }
+
+  // 纠正在开始游戏的瞬间，玩家离开了房间
+  if (start && roundPlayer >= gamingPlayers.length) {
+    updateData.roundPlayer = 0;
   }
 
   if (Object.keys(updateData).length > 0) {

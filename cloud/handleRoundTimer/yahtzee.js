@@ -1,6 +1,21 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const DEFAULT_SCORES = {
+  ones: null,
+  twos: null,
+  threes: null,
+  fours: null,
+  fives: null,
+  sixes: null,
+  sum: null,
+  fourOfKind: null,
+  fullhouse: null,
+  miniStraight: null,
+  straight: null,
+  fiveOfKind: null,
+};
+
 async function execHandleRoundTimerYahtzee(db) {
   const _ = db.command;
   // 处理所有【开始的】【多人的】游戏
@@ -73,28 +88,25 @@ async function execHandleExceptionYahtzee(db) {
 }
 
 async function handleExceptionYahtzee(db, game) {
-  const _ = db.command;
   const { _id, roundPlayer, players, start } = game;
   const realPlayers = players.filter((item) => item && item.openid);
+  const gamingPlayers = realPlayers.filter(
+    (item) => item.sumScore || item.sumScore === 0
+  );
   const redundantPlayers = realPlayers.length < players.length;
+  const bugPlayers = start && gamingPlayers.length < players.length;
   const updateData = {};
 
   // 纠正玩家离开房间后，更新了在线时间戳
-  if (redundantPlayers) {
-    updateData.players = realPlayers;
-  }
-
-  // 纠正玩家没有初始化scores
-  if (start) {
-    players.forEach((item, index) => {
-      if (index >= realPlayers.length) return;
-      if (!item.scores) {
-        updateData[`players.${index}.scores`] = DEFAULT_SCORES;
-      }
-      if (!item.sumScore) {
-        updateData[`players.${index}.sumScore`] = 0;
+  // 纠正在开始游戏的瞬间，玩家进入了房间
+  if (bugPlayers || redundantPlayers) {
+    realPlayers.forEach((player) => {
+      if (!player.sumScore) player.sumScore = 0;
+      if (!player.scores) {
+        player.scores = DEFAULT_SCORES;
       }
     });
+    updateData.players = realPlayers;
   }
 
   // 纠正在开始游戏的瞬间，玩家离开了房间

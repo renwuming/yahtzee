@@ -140,4 +140,5 @@ export enum RUMMY_AREA_STATUS {
 export enum RUMMY_SET_TYPE {
   straight,
   samevalue,
+  all, // 可能是任何一种
 }

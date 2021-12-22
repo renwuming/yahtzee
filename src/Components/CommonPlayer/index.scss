@@ -1,7 +1,9 @@
 .rummy-player {
   margin-top: 30px;
+  z-index: 50;
+  background-color: #4b6d8d;
   &.active {
-    background-color: rgba($color: #eee, $alpha: 0.7) !important;
+    background-color: #eee !important;
   }
 }
 .common-game-player {
@@ -55,7 +57,7 @@
       justify-content: center;
       text {
         font-size: 36px;
-        color: #0d0812;
+        color: #333300;
       }
     }
   }

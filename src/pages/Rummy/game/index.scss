@@ -29,7 +29,7 @@ movable-area {
     align-items: center;
     width: 100%;
   }
-  .rummy-game-right {
+  .rummy-game-left {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -68,12 +68,15 @@ movable-area {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      &.hidden {
+        visibility: hidden;
+      }
       .round-ctrl-btn {
-        width: 50px;
+        width: 60px;
         height: 90px;
         line-height: 90px;
         padding: 0;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         border-radius: 6px;
         border: none;
         .at-button__text {
@@ -83,6 +86,8 @@ movable-area {
           align-items: center;
         }
         .library-num {
+          width: 50px;
+          color: #339933;
           margin-top: -30px;
         }
         image {
@@ -143,7 +148,7 @@ movable-area {
     background-color: #9b5d1d;
     width: 100%;
     &.hidden {
-      visibility: hidden;
+      background-color: transparent;
     }
     .before-start-btn-box {
       position: absolute;
@@ -176,12 +181,6 @@ movable-area {
           font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
             Arial, sans-serif;
         }
-      }
-    }
-    &.not-start {
-      background-color: transparent;
-      .playboard-wrapper {
-        border-color: transparent;
       }
     }
     .playboard-ctrl-box {
@@ -240,6 +239,15 @@ movable-area {
       sans-serif;
     font-size: 30px;
     font-weight: bold;
+    &.hidden {
+      visibility: hidden;
+    }
+    &.bottom {
+      z-index: 10;
+    }
+    &.round-card {
+      opacity: 0.8;
+    }
     &.red {
       color: #c2302f;
     }
@@ -266,14 +274,19 @@ movable-area {
     width: 100%;
     height: 14px;
     padding: 2px 0;
+    &.my-count-down {
+      .at-progress--error .at-progress__outer-inner-background {
+        background-color: #65f742;
+      }
+    }
     .at-progress {
-      width: 99%;
+      width: 100%;
     }
     .at-progress__outer-inner {
       background-color: #867f80;
     }
     .at-progress--error .at-progress__outer-inner-background {
-      background-color: #65f742;
+      background-color: #333300;
     }
     .at-progress__content {
       display: none;

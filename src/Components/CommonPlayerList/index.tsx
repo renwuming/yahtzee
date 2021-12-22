@@ -1,9 +1,10 @@
+import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";
-import "./index.scss";
-import Player from "../CommonPlayer";
+import clsx from "clsx";
 import { useContext } from "react";
 import { AchievementGameIndex, PlayerContext } from "@/const";
-import clsx from "clsx";
+import Player from "../CommonPlayer";
+import "./index.scss";
 
 interface IProps {
   players: AnyPlayer[];
@@ -25,7 +26,7 @@ export default function Index({ players }: IProps) {
       )}
     >
       {players.map((player, index) => (
-        <Player data={player} index={index}></Player>
+        <Player key={player.openid} data={player} index={index}></Player>
       ))}
     </View>
   );

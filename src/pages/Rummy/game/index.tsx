@@ -12,6 +12,7 @@ import clsx from "clsx";
 import { flat, getUserProfile, SLEEP } from "@/utils";
 import {
   AchievementGameIndex,
+  MAX_PLAYERS,
   PlayerContext,
   RUMMY_AREA_STATUS,
   RUMMY_ROUND_TIME_LIMIT,
@@ -31,6 +32,7 @@ import PlayerList from "@/Components/CommonPlayerList";
 import {
   BOARD_COL_LEN,
   BOARD_ROW_LEN,
+  CARD_LIBRARY,
   getAreaPos,
   getBoxCross,
   getCardIndexByID,
@@ -99,6 +101,7 @@ export default function Index() {
   } = gameData || {};
   const singlePlayer = players.length === 1;
   const gaming = start && !end;
+  const showPlayboard = gaming && (inGame || singlePlayer);
 
   useGameApi({
     id,
@@ -127,19 +130,27 @@ export default function Index() {
       gameData;
     setGameData(gameData);
     setPlayers(players);
-    setPlaygroundData(playgroundData);
-    setPlaygroundCardList(playgroundCardList);
+    setPlaygroundData(playgroundData.concat());
+    setPlaygroundCardList(playgroundCardList.concat());
 
-    updateCardList(myCardList, cardList, playgroundData);
+    const list = updateCardList(myCardList, cardList, playgroundData);
+    resetBoard(playgroundData, list);
   }
 
   function gameDataWatchCb(data: Rummy.RummyGameBaseData, updatedFields = []) {
     if (!data) return;
-    const gameDataChange =
-      updatedFields.filter(
-        (key) =>
-          !(key === "_updateTime" || /^players\.\d+\.timeStamp/.test(key))
-      ).length > 0;
+
+    updatedFields = updatedFields.filter(
+      (key) => !(key === "_updateTime" || /^players\.\d+\.timeStamp/.test(key))
+    );
+    // 自己所在回合，忽略临时变化的 roundPlaygroundData
+    if (inRound) {
+      updatedFields = updatedFields.filter(
+        (key) => key !== "roundPlaygroundData"
+      );
+    }
+    const gameDataChange = updatedFields.length > 0;
+
     if (gameDataChange) {
       const cardListPattern = new RegExp(`^players\.${playerIndex}\.cardList`);
       const boardChange = updatedFields.some((key) =>
@@ -165,8 +176,9 @@ export default function Index() {
       const query = Taro.createSelectorQuery();
       query.select("#playground").boundingClientRect();
       query.select("#playboard").boundingClientRect();
+      query.select("#cardLibrary").boundingClientRect();
       query.exec((res) => {
-        const [playground, playboard] = res;
+        const [playground, playboard, cardLibrary] = res;
         const { left, top, width, height } = playground;
         // 存到 Storage
         Taro.setStorageSync("rummy_device_data", {
@@ -184,13 +196,46 @@ export default function Index() {
           },
           cardW: Math.floor(width / GROUND_ROW_LEN),
           cardH: Math.floor(height / GROUND_COL_LEN),
+          cardLibraryPosData: {
+            x: cardLibrary.left,
+            y: cardLibrary.top,
+            width: cardLibrary.width,
+            height: cardLibrary.height,
+          },
         });
+
         getGameData(id).then((data) => {
           initFn(data);
         });
       });
     });
   }, []);
+
+  useEffect(() => {
+    SLEEP(200).then(() => {
+      const query = Taro.createSelectorQuery();
+      // 初始化所有玩家的头像位置，存入Storage
+      const PLAY_NUM = MAX_PLAYERS;
+      for (let i = 0; i < PLAY_NUM; i++) {
+        const avatarDom = `#player-${i}-avatar`;
+        query.select(avatarDom).boundingClientRect();
+      }
+      query.exec((avatarPosList) => {
+        avatarPosList.forEach((data, i) => {
+          if (data) {
+            Taro.setStorageSync(
+              `rummy-player-${players.length}-${i}-avatar-pos`,
+              data
+            );
+          }
+        });
+      });
+
+      getGameData(id).then((data) => {
+        initFn(data);
+      });
+    });
+  }, [players.length]);
 
   function onTouchStart(id) {
     setActiveCardID(id);
@@ -237,8 +282,9 @@ export default function Index() {
     // 拖动公共牌
     if (isGroundCard) {
       index = getCardIndexByID(playgroundCardList, activeCardID);
+      // 自己回合才可以拖动公共牌
       const targetIsValid =
-        targetInPlayGround && !playgroundData[colIndex][rowIndex];
+        inRound && targetInPlayGround && !playgroundData[colIndex][rowIndex];
 
       // 拖动目标位置是有效的
       if (targetIsValid) {
@@ -264,8 +310,11 @@ export default function Index() {
     }
     // 拖动玩家手牌
     else {
+      // 自己回合才可以拖动手牌到公共区
       const targetIsValid =
-        (targetInPlayGround && !playgroundData[colIndex][rowIndex]) ||
+        (inRound &&
+          targetInPlayGround &&
+          !playgroundData[colIndex][rowIndex]) ||
         (targetInPlayBoard && !playboardData[colIndex][rowIndex]);
       // 拖动目标位置是有效的
       if (targetIsValid) {
@@ -290,18 +339,20 @@ export default function Index() {
       cardList[index] = updateCardPos(cardList[index], pos);
       setCardList(cardList.concat());
     }
+
+    updateRoundPlaygroundData();
   }
 
   function updateCardList(
     cardList: Rummy.RummyCardData[],
     oldCardList: Rummy.RummyCardData[] = [],
-    playgroundData: Rummy.RummyCardData[][] = null
+    _playgroundData: Rummy.RummyCardData[][] = playgroundData
   ) {
     // 排除公共区的牌
     const groundCardIDList = [];
     for (let i = 0; i < GROUND_COL_LEN; i++) {
       for (let j = 0; j < GROUND_ROW_LEN; j++) {
-        const card = playgroundData?.[i][j];
+        const card = _playgroundData?.[i][j];
         if (card) {
           groundCardIDList.push(card.id);
         }
@@ -327,20 +378,23 @@ export default function Index() {
     setCardList(cardList);
     cardList.forEach((card) => {
       const cross = getCrossByCardPos(card);
-      handlePlaygroundAndPlayboard(cross, card);
+      handlePlaygroundAndPlayboard(cross, card, _playgroundData);
     });
+
+    return cardList;
   }
 
   function handlePlaygroundAndPlayboard(
     cross: Rummy.CrossData,
-    card: Rummy.RummyCardData
+    card: Rummy.RummyCardData,
+    _playgroundData: Rummy.RummyCardData[][] = playgroundData
   ) {
     const { id, areaStatus } = card;
     const { rowIndex, colIndex } = cross;
-    playgroundData?.forEach((row, i) => {
+    _playgroundData?.forEach((row, i) => {
       row.forEach((item, j) => {
         if (item && item.id === id) {
-          playgroundData[i][j] = null;
+          _playgroundData[i][j] = null;
         }
       });
     });
@@ -352,8 +406,8 @@ export default function Index() {
       });
     });
     if (areaStatus === RUMMY_AREA_STATUS.playground) {
-      playgroundData[colIndex][rowIndex] = card;
-      setPlaygroundData(playgroundData);
+      _playgroundData[colIndex][rowIndex] = card;
+      setPlaygroundData(_playgroundData);
     } else if (areaStatus === RUMMY_AREA_STATUS.playboard) {
       playboardData[colIndex][rowIndex] = card;
       setPlayboardData(playboardData);
@@ -403,13 +457,26 @@ export default function Index() {
       const cross = getCrossByCardPos(card);
       handlePlaygroundAndPlayboard(cross, card);
     });
+
+    updateRoundPlaygroundData();
   }
 
-  function resetBoard() {
+  // 更新本回合的临时 playgroundData
+  function updateRoundPlaygroundData() {
+    if (!inRound) return;
+    handleGameAction(id, "updateRoundPlaygroundData", {
+      playgroundData,
+    });
+  }
+
+  function resetBoard(
+    _playgroundData: Rummy.RummyCardData[][] = playgroundData,
+    _cardList: Rummy.RummyCardData[] = cardList
+  ) {
     const resetList = [];
     for (let i = GROUND_COL_LEN - 1; i >= 0; i--) {
       for (let j = 0; j < GROUND_ROW_LEN; j++) {
-        const card = playgroundData[i][j];
+        const card = _playgroundData[i][j];
         if (card && !card.inGround) {
           card.areaStatus = RUMMY_AREA_STATUS.playboard;
           resetList.push(card);
@@ -421,7 +488,9 @@ export default function Index() {
       const pos = posList[index];
       updateCardPos(card, pos);
     });
-    updateCardList(cardList.concat());
+    updateCardList(_cardList.concat());
+
+    updateRoundPlaygroundData();
   }
 
   function startBtnClick() {
@@ -453,33 +522,7 @@ export default function Index() {
       <View className="rummy-game">
         <View className="rummy-game-wrapper">
           <View className="rummy-game-top">
-            <View id="playground" className="playground">
-              {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
-                const show4 = colIndex <= 5 && colIndex % 3 === 0;
-                const showN = colIndex > 5 && (colIndex - 8) % 3 === 0;
-                const showIndex = show4 || showN;
-                return (
-                  <View key={colIndex} className="row">
-                    {new Array(GROUND_ROW_LEN).fill(1).map((_, rowIndex) => {
-                      let indexValue;
-                      if (show4) {
-                        if (rowIndex >= 2 && rowIndex <= 10 && rowIndex !== 6) {
-                          indexValue = 4;
-                        }
-                      } else {
-                        indexValue = rowIndex + 1;
-                      }
-                      return (
-                        <View key={rowIndex} className="playground-box">
-                          {showIndex && indexValue}
-                        </View>
-                      );
-                    })}
-                  </View>
-                );
-              })}
-            </View>
-            <View className="rummy-game-right">
+            <View className="rummy-game-left">
               <View className="player-list">
                 <PlayerContext.Provider
                   value={{
@@ -509,36 +552,62 @@ export default function Index() {
                   </View>
                 )}
               </View>
-              {gaming && (
-                <View className="round-btn-box">
-                  <AtButton
-                    className="round-ctrl-btn card"
-                    onClick={() => {
-                      addCard();
-                    }}
-                    disabled={!inRound}
-                  >
-                    <Text className="library-num">{cardLibrary.length}</Text>
-                    <Image
-                      className="add-icon"
-                      mode="aspectFit"
-                      src={AddIcon}
-                    ></Image>
-                  </AtButton>
-                  <AtButton
-                    className="round-ctrl-btn card"
-                    onClick={() => {
-                      endRound();
-                    }}
-                    disabled={!inRound}
-                  >
-                    <Image mode="aspectFit" src={PerfectIcon}></Image>
-                  </AtButton>
-                </View>
-              )}
+              <View className={clsx("round-btn-box", !gaming && "hidden")}>
+                <AtButton
+                  className="round-ctrl-btn card"
+                  onClick={() => {
+                    addCard();
+                  }}
+                  disabled={!inRound}
+                >
+                  <Text id="cardLibrary" className="library-num">
+                    {cardLibrary?.length}
+                  </Text>
+                  <Image
+                    className="add-icon"
+                    mode="aspectFit"
+                    src={AddIcon}
+                  ></Image>
+                </AtButton>
+                <AtButton
+                  className="round-ctrl-btn card"
+                  onClick={() => {
+                    endRound();
+                  }}
+                  disabled={!inRound}
+                >
+                  <Image mode="aspectFit" src={PerfectIcon}></Image>
+                </AtButton>
+              </View>
+            </View>
+            <View id="playground" className="playground">
+              {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
+                const show4 = colIndex <= 5 && colIndex % 3 === 0;
+                const showN = colIndex > 5 && (colIndex - 8) % 3 === 0;
+                const showIndex = show4 || showN;
+                return (
+                  <View key={colIndex} className="row">
+                    {new Array(GROUND_ROW_LEN).fill(1).map((_, rowIndex) => {
+                      let indexValue;
+                      if (show4) {
+                        if (rowIndex >= 2 && rowIndex <= 10 && rowIndex !== 6) {
+                          indexValue = 4;
+                        }
+                      } else {
+                        indexValue = rowIndex + 1;
+                      }
+                      return (
+                        <View key={rowIndex} className="playground-box">
+                          {showIndex && indexValue}
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
             </View>
           </View>
-          <View className="count-down-box">
+          <View className={clsx("count-down-box", inRound && "my-count-down")}>
             {gaming &&
               !singlePlayer &&
               roundCountDown <= RUMMY_SHOW_ROUND_TIME_LIMIT && (
@@ -548,13 +617,8 @@ export default function Index() {
                 />
               )}
           </View>
-          <View className={clsx("playboard-container", !gaming && "not-start")}>
-            <View
-              className={clsx(
-                "playboard-wrapper",
-                !inGame && !singlePlayer && "hidden"
-              )}
-            >
+          <View className={clsx("playboard-container", !gaming && "hidden")}>
+            <View className={clsx("playboard-wrapper")}>
               <View id="playboard" className="playboard">
                 {new Array(BOARD_COL_LEN).fill(1).map((_, colIndex) => {
                   return (
@@ -569,23 +633,25 @@ export default function Index() {
                 })}
               </View>
             </View>
-            {gaming && (
+            {showPlayboard && (
               <View className="playboard-ctrl-box">
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
                     execPlaceSetFromBoardToGround();
                   }}
+                  disabled={!inRound}
                 >
-                  <AtIcon value="chevron-up" size="18" color="#fff"></AtIcon>
+                  <AtIcon value="arrow-up" size="18" color="#fff"></AtIcon>
                 </AtButton>
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
                     resetBoard();
                   }}
+                  disabled={!inRound}
                 >
-                  <AtIcon value="chevron-down" size="18" color="#fff"></AtIcon>
+                  <AtIcon value="arrow-down" size="18" color="#fff"></AtIcon>
                 </AtButton>
                 <AtButton
                   className="ctrl-btn"
@@ -669,70 +735,86 @@ export default function Index() {
             )}
           </View>
         </View>
-        {gaming &&
-          cardList?.map(({ color, value, x, y, id }) => {
-            const isJoker = value === 0;
-            return (
-              <MovableView
-                key={id}
-                className={`card ${color} ${
-                  id === activeCardID ? "active" : ""
-                }`}
-                direction="all"
-                onChange={(event) => {
-                  onChange(event, id);
-                }}
-                onTouchStart={() => {
-                  onTouchStart(id);
-                }}
-                onTouchEnd={onTouchEnd}
-                x={x}
-                y={y}
-              >
-                {isJoker ? (
-                  <Image
-                    className="card-img"
-                    mode="aspectFit"
-                    src={JokerIcon}
-                  ></Image>
-                ) : (
-                  value
-                )}
-              </MovableView>
-            );
-          })}
-        {playgroundCardList?.map((card) => {
-          const { color, value, x, y, id } = card;
+
+        {CARD_LIBRARY.map((id) => {
+          const playerCard = gaming
+            ? cardList?.find((card) => card.id === id)
+            : null;
+          const groundCard = playgroundCardList?.find((card) => card.id === id);
+
+          let otherPlayerCard;
+          if (!playerCard && !groundCard) {
+            for (let i = 0; i < players.length; i++) {
+              const { cardList } = players[i];
+              otherPlayerCard = cardList?.find((card) => card.id === id);
+              if (otherPlayerCard) {
+                const { left, top } =
+                  Taro.getStorageSync(
+                    `rummy-player-${players.length}-${i}-avatar-pos`
+                  ) || {};
+                otherPlayerCard.x = left;
+                otherPlayerCard.y = top;
+                break;
+              }
+            }
+          }
+
+          let isLibrary = false;
+          let cardData;
+          if (playerCard) {
+            cardData = playerCard;
+          } else if (groundCard) {
+            cardData = groundCard;
+          } else if (otherPlayerCard) {
+            cardData = otherPlayerCard;
+            delete cardData.value;
+          } else {
+            const { cardLibraryPosData } =
+              Taro.getStorageSync("rummy_device_data");
+            cardData = {
+              id,
+              x: cardLibraryPosData?.x,
+              y: cardLibraryPosData?.y,
+            };
+            delete cardData.value;
+            isLibrary = true;
+          }
+          if (!cardData) return null;
+
+          const { color, value, x, y, inGroundTemp } = cardData;
           const isJoker = value === 0;
           return (
-            card && (
-              <MovableView
-                key={id}
-                className={`card ${color} ${
-                  id === activeCardID ? "active" : ""
-                }`}
-                direction="all"
-                onChange={(event) => {
-                  onChange(event, id);
-                }}
-                onTouchStart={() => {
-                  onTouchStart(id);
-                }}
-                onTouchEnd={onTouchEnd}
-                x={x}
-                y={y}
-              >
-                {isJoker ? (
-                  <Image
-                    className="card-img"
-                    mode="aspectFit"
-                    src={JokerIcon}
-                  ></Image>
-                ) : (
-                  value
-                )}
-              </MovableView>
-            )
+            <MovableView
+              key={id}
+              className={clsx(
+                "card",
+                color,
+                groundCard && "ground-card",
+                (!groundCard || inGroundTemp) && "round-card",
+                otherPlayerCard ? "bottom" : id === activeCardID && "active",
+                isLibrary && "hidden"
+              )}
+              direction="all"
+              onChange={(event) => {
+                onChange(event, id);
+              }}
+              onTouchStart={() => {
+                onTouchStart(id);
+              }}
+              onTouchEnd={onTouchEnd}
+              x={x}
+              y={y}
+            >
+              {isJoker ? (
+                <Image
+                  className="card-img"
+                  mode="aspectFit"
+                  src={JokerIcon}
+                ></Image>
+              ) : (
+                value
+              )}
+            </MovableView>
           );
         })}
       </View>

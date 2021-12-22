@@ -9,6 +9,7 @@ const GROUND_ROW_LEN = 13;
 const RUMMY_SET_TYPE = {
   straight: 1,
   samevalue: 2,
+  all: 3,
 };
 
 const sameValueIndexList = new Array(GROUND_COL_LEN).fill(1).map((_, index) => {
@@ -176,6 +177,7 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
       roundPlayer: startIndex,
       startPlayer: startIndex,
       roundSum: 0,
+      roundPlaygroundData: null,
     };
   }
   // 加入游戏
@@ -201,6 +203,13 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
     const newPlayers = players.filter((item) => item.openid !== OPENID);
     return {
       players: newPlayers,
+    };
+  }
+  // 更新本回合的临时 playgroundData
+  else if (action === "updateRoundPlaygroundData" && inRound) {
+    const { playgroundData: roundPlaygroundData } = data;
+    return {
+      roundPlaygroundData,
     };
   }
   // 结束回合，不需要抽牌
@@ -327,6 +336,7 @@ function newRound(roundPlayer, players, roundSum, cardLibrary) {
     roundPlayer: newRoundPlayer,
     roundTimeStamp: new Date(),
     roundSum: roundSum + 1,
+    roundPlaygroundData: null,
   };
 
   const emptyLibrary = cardLibrary.length === 0;
@@ -472,6 +482,7 @@ function moveCardToGroundIndex(card, index, playgroundData) {
 
 function judgeSetType(list) {
   const noJokerList = list.filter((item) => item.value !== 0);
+  if (noJokerList.length === 1) return RUMMY_SET_TYPE.all;
   const colorN = new Set(noJokerList.map((item) => item.color)).size;
   const isStraight = colorN === 1;
   return isStraight ? RUMMY_SET_TYPE.straight : RUMMY_SET_TYPE.samevalue;
@@ -519,6 +530,10 @@ function selectNewListFromPlayground(
       }
     }
   }
+  if (tempList.length > 0) {
+    resList.push(tempList);
+    tempList = [];
+  }
 
   return resList;
 }
@@ -542,25 +557,40 @@ function judgePlaygroundPerfect(playgroundData) {
       }
     }
   }
-
+  if (tempList.length > 0) {
+    const judgeRes = judgeListIsSet(tempList);
+    if (!judgeRes) {
+      return false;
+    }
+    tempList = [];
+  }
   return true;
 }
 
 function judgeListIsSet(list) {
   if (list.length < 3) return false;
   const noJokerList = list.filter((item) => item.value !== 0);
+  // 两张鬼牌+一张普通牌，必定符合条件
+  if (noJokerList.length === 1) return true;
+
   const colorN = new Set(noJokerList.map((item) => item.color)).size;
   const isStraight = colorN === 1;
   const isSameValue = colorN === noJokerList.length;
+
   if (isStraight) {
     const exp = new RegExp(
       list
         .map((item, index) => {
-          if (item.value === 0)
-            return list[index - 1]
-              ? list[index - 1].value + 1
-              : list[index + 1].value - 1;
-          else return item.value;
+          if (item.value === 0) {
+            if (list[index - 1] && list[index - 1].value)
+              return list[index - 1].value + 1;
+            if (list[index - 2] && list[index - 2].value)
+              return list[index - 2].value + 2;
+            if (list[index + 1] && list[index + 1].value)
+              return list[index + 1].value - 1;
+            if (list[index + 2] && list[index + 2].value)
+              return list[index + 2].value - 2;
+          } else return item.value;
         })
         .join("-")
     );
@@ -580,16 +610,37 @@ function getListValueSum(list) {
     if (value !== 0) {
       sum += value;
     } else {
-      const isStraight = judgeSetType(list) === RUMMY_SET_TYPE.straight;
-      if (isStraight) {
-        sum +=
-          (list[i - 1] && list[i - 1].value + 1) ||
-          (list[i + 1] && list[i + 1].value - 1);
+      const type = judgeSetType(list);
+      const isStraight = type === RUMMY_SET_TYPE.straight;
+      const isAll = type === RUMMY_SET_TYPE.all;
+      let v;
+      // 若是两张鬼牌+一张普通牌
+      if (isAll) {
+        let noJokerIndex = 0;
+        list.forEach((card, index) => {
+          if (card.value !== 0) {
+            noJokerIndex = index;
+          }
+        });
+        const { value } = list[noJokerIndex];
+        // 普通牌在第一个
+        if (noJokerIndex === 0) {
+          if (value <= 11) return (value + 1) * 3;
+        }
+        // 其余情况
+        return value * 3;
+      } else if (isStraight) {
+        if (list[i - 1] && list[i - 1].value) v = list[i - 1].value + 1;
+        else if (list[i - 2] && list[i - 2].value) v = list[i - 2].value + 2;
+        else if (list[i + 1] && list[i + 1].value) v = list[i + 1].value - 1;
+        else if (list[i + 2] && list[i + 2].value) v = list[i + 2].value - 2;
       } else {
-        sum +=
-          (list[i - 1] && list[i - 1].value) ||
-          (list[i + 1] && list[i + 1].value);
+        if (list[i - 1] && list[i - 1].value) v = list[i - 1].value;
+        else if (list[i - 2] && list[i - 2].value) v = list[i - 2].value;
+        else if (list[i + 1] && list[i + 1].value) v = list[i + 1].value;
+        else if (list[i + 2] && list[i + 2].value) v = list[i + 2].value;
       }
+      sum += v;
     }
   }
   return sum;

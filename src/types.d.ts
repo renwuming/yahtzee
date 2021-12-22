@@ -237,6 +237,7 @@ declare namespace Rummy {
     y?: number;
     areaStatus?: number;
     inGround?: boolean;
+    inGroundTemp?: boolean;
   }
   interface CrossData {
     rowIndex: number;
@@ -247,6 +248,7 @@ declare namespace Rummy {
     winner?: number;
     cardLibrary: RummyCardData[];
     playgroundData: RummyCardData[][];
+    roundPlaygroundData: RummyCardData[][]; // 临时的 playgroundData
   }
   interface RummyGameData extends GameData, RummyGameBaseData {
     playgroundCardList: RummyCardData[];

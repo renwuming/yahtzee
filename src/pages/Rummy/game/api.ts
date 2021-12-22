@@ -1,6 +1,8 @@
 import Taro from "@tarojs/taro";
 import { MAX_PLAYERS, RUMMY_AREA_STATUS, RUMMY_SET_TYPE } from "@/const";
-import { CallCloudFunction, navigateTo, shuffle } from "@/utils";
+import { CallCloudFunction, flat, navigateTo } from "@/utils";
+
+export const CARD_LIBRARY: number[] = new Array(106).fill(1).map((_, id) => id);
 
 export async function handleGameAction(
   id: string,
@@ -57,44 +59,65 @@ export function handleGameData(
   data: Rummy.RummyGameBaseData
 ): Rummy.RummyGameData {
   const { openid } = Taro.getStorageSync("userInfo");
-  const { start, owner, players, playgroundData, roundPlayer } = data;
+  const {
+    start,
+    end,
+    owner,
+    players,
+    playgroundData,
+    roundPlayer,
+    roundPlaygroundData,
+  } = data;
 
   const own = owner.openid === openid;
   const canJoin = players.length < MAX_PLAYERS;
   const openids = players.map((item) => item.openid);
   const playerIndex = openids.indexOf(openid);
   const inGame = playerIndex >= 0;
+  const inRound = roundPlayer === playerIndex;
 
   const singlePlayer = players.length === 1;
 
   let myCardList = [];
+  let _playgroundData = playgroundData;
+  let playgroundCardList = [];
   if (start) {
     players[roundPlayer].inRound = true;
 
     // 单人游戏时，公开手牌信息
     if (singlePlayer) {
-      const { cardList } = players[0];
+      const { cardList } = players[roundPlayer];
       myCardList = handleCardList(cardList);
     } else if (inGame) {
       const { cardList } = players[playerIndex];
       myCardList = handleCardList(cardList);
     }
+
+    if (roundPlaygroundData && !inRound && !end) {
+      _playgroundData = roundPlaygroundData;
+    }
+    const playgroundDataIDList = flat(playgroundData)
+      .filter((e) => e)
+      .map((card) => card.id);
+    playgroundCardList = groundData2List(_playgroundData, playgroundDataIDList);
   }
 
   return {
     ...data,
     own,
     inGame,
-    inRound: roundPlayer === playerIndex,
+    inRound,
     playerIndex,
     canJoin,
-    playgroundCardList: groundData2List(playgroundData),
+    playgroundData: _playgroundData,
+    playgroundCardList,
     myCardList,
   };
 }
 
 function groundData2List(
-  playgroundData: Rummy.RummyCardData[][]
+  playgroundData: Rummy.RummyCardData[][],
+  playgroundDataIDList: number[]
 ): Rummy.RummyCardData[] {
   const resList = [];
   for (let i = 0; i < GROUND_COL_LEN; i++) {
@@ -110,6 +133,11 @@ function groundData2List(
         );
 
         card.inGround = true;
+        if (playgroundDataIDList.includes(card.id)) {
+          card.inGroundTemp = false;
+        } else {
+          card.inGroundTemp = true;
+        }
         resList.push(updateCardPos(card, pos));
       }
     }
@@ -236,7 +264,7 @@ export function getAreaPos(
   const { rowIndex, colIndex } = cross;
   const boardExtraCol = inGround ? 0 : colIndex * 1.5;
 
-  const { x, y } = areaPos;
+  const { x, y } = areaPos || {};
   const _x = rowIndex * cardW + x + 1;
   const _y = colIndex * cardH + y + boardExtraCol;
   return {
@@ -715,6 +743,7 @@ function moveCardToGroundIndex(
 
 function judgeSetType(list: Rummy.RummyCardData[]): number {
   const noJokerList = list.filter((item) => item.value !== 0);
+  if (noJokerList.length === 1) return RUMMY_SET_TYPE.all;
   const colorN = new Set(noJokerList.map((item) => item.color)).size;
   const isStraight = colorN === 1;
   return isStraight ? RUMMY_SET_TYPE.straight : RUMMY_SET_TYPE.samevalue;
@@ -795,6 +824,13 @@ export function judgePlaygroundPerfect(
         tempList.push(card);
       }
     }
+  }
+  if (tempList.length > 0) {
+    const judgeRes = judgeListIsSet(tempList);
+    if (!judgeRes) {
+      return false;
+    }
+    tempList = [];
   }
 
   return true;

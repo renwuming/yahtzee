@@ -117,13 +117,19 @@
         {
           "name": "拉密",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=d20aea5861c1db94015cf74f48e0fdad",
+          "query": "id=133e253361c2a93c0198532252fcf125",
           "scene": null
         },
         {
           "name": "拉密2",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=133e253361c1a98c0175c7f41619e0e5",
+          "query": "id=133e253361c3237401b529d11df2d139",
+          "scene": null
+        },
+        {
+          "name": "拉密3",
+          "pathName": "pages/Rummy/game/index",
+          "query": "id=133e253361c28bf5019204c2143e810f",
           "scene": null
         }
       ]

@@ -82,6 +82,7 @@ export default function Index() {
     Rummy.RummyCardData[]
   >([]);
   // client端
+  const [activePlayer, setActivePlayer] = useState<number>(0);
   const [tinyCorrection, setTinyCorrection] = useState<number>(0.1);
   const [activeCardID, setActiveCardID] = useState<number>(-1);
   const crossData = useRef<Rummy.CrossData>(null);
@@ -284,7 +285,10 @@ export default function Index() {
       index = getCardIndexByID(playgroundCardList, activeCardID);
       // 自己回合才可以拖动公共牌
       const targetIsValid =
-        inRound && targetInPlayGround && !playgroundData[colIndex][rowIndex];
+        inRound &&
+        !end &&
+        targetInPlayGround &&
+        !playgroundData[colIndex][rowIndex];
 
       // 拖动目标位置是有效的
       if (targetIsValid) {
@@ -340,6 +344,7 @@ export default function Index() {
       setCardList(cardList.concat());
     }
 
+    setActiveCardID(-1);
     updateRoundPlaygroundData();
   }
 
@@ -541,6 +546,10 @@ export default function Index() {
                     showOffline: !end,
                     showGift: !end && inGame,
                     noNickName: true,
+                    onItemClick(index) {
+                      setActivePlayer(index);
+                    },
+                    activePlayer,
                   }}
                 >
                   <PlayerList players={players}></PlayerList>

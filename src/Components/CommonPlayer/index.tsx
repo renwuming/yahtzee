@@ -30,6 +30,8 @@ export default function Index({
     noNickName,
     kickPlayer,
     initGameIndex,
+    onItemClick,
+    activePlayer,
   } = playerContext;
 
   const realShowSetting = index !== 0 && showSetting;
@@ -66,7 +68,8 @@ export default function Index({
         "common-game-player",
         isMartianPlayer && "martian-player",
         isRummyPlayer && "rummy-player",
-        showActive && inRound && "active"
+        showActive && inRound && "active",
+        activePlayer === index && "zIndexActive"
       )}
     >
       <View className="at-row at-row__align--center">
@@ -74,10 +77,11 @@ export default function Index({
           className={`player-info ${offline ? "offline" : ""}`}
           onClick={() => {
             doShowAchievement();
+            onItemClick(index);
           }}
         >
           <Image
-            className={`avatar`}
+            className="avatar"
             id={`player-${index}-avatar`}
             src={avatarUrl}
           ></Image>

@@ -14,6 +14,8 @@ export const PlayerContext: Context<{
   kickPlayer?: (openid: string) => void;
   roundCountDown?: string | number;
   showGift?: boolean;
+  onItemClick?: (index: number) => void;
+  activePlayer?: number;
 }> = createContext({
   gameID: null,
   players: [],
@@ -27,6 +29,8 @@ export const PlayerContext: Context<{
   kickPlayer: () => {},
   roundCountDown: Infinity,
   showGift: false,
+  onItemClick: () => {},
+  activePlayer: -1,
 });
 
 export enum AchievementGameIndex {

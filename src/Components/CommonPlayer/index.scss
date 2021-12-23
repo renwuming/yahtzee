@@ -16,6 +16,9 @@
   &.active {
     background-color: #999;
   }
+  &.zIndexActive {
+    z-index: 75;
+  }
   .player-info {
     display: flex;
     flex-direction: column;

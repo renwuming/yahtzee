@@ -126,6 +126,11 @@ exports.handleGame = async function handleGame(
       openid
     );
     if (newData) {
+      // 游戏结束，则更新所有玩家的成就
+      if (newData.end) {
+        updatePlayer(oldData.players, "rummy");
+      }
+
       const date = new Date();
       // 增量更新数据
       await db
@@ -343,7 +348,7 @@ function newRound(roundPlayer, players, roundSum, cardLibrary) {
   if (emptyLibrary) {
     updateData.end = true;
     updateData.endTime = new Date();
-    updateData.winner = null;
+    updateData.winner = -1;
   }
 
   return updateData;
@@ -645,3 +650,55 @@ function getListValueSum(list) {
   }
   return sum;
 }
+
+exports.getRanking = async function getRanking(data) {
+  const db = cloud.database();
+  const _ = db.command;
+  const { type, skip, pageLength } = data;
+
+  const _skip = +(skip || 0);
+  const _pageLength = +(pageLength || 10);
+
+  if (type === "round") {
+    const list = await db
+      .collection("players")
+      .where({
+        "achievement.rummy.minRoundSum": _.exists(1),
+        "achievement.rummy.minRoundSum": _.neq(null),
+      })
+      .orderBy("achievement.rummy.minRoundSum", "asc")
+      .field({
+        avatarUrl: 1,
+        nickName: 1,
+        achievement: 1,
+        openid: 1,
+      })
+      .skip(_skip)
+      .limit(_pageLength)
+      .get()
+      .then((res) => res.data);
+
+    return list;
+  } else if (type === "sum") {
+    const list = await db
+      .collection("players")
+      .where({
+        "achievement.rummy.multiWinSum": _.exists(1),
+      })
+      .orderBy("achievement.rummy.multiWinSum", "desc")
+      .field({
+        avatarUrl: 1,
+        nickName: 1,
+        achievement: 1,
+        openid: 1,
+      })
+      .skip(_skip)
+      .limit(_pageLength)
+      .get()
+      .then((res) => res.data);
+
+    return list;
+  }
+
+  return [];
+};

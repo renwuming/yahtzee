@@ -1,7 +1,15 @@
+import { ScrollView, View, Text } from "@tarojs/components";
+import { useEffect, useState } from "react";
+import { AtDivider, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
+import PlayerItem from "@/Components/HallPlayer";
+import { PAGE_LEN, RANKING_LEN } from "../../../const";
+import { CallCloudFunction } from "../../../utils";
+import "./index.scss";
+
 interface RankItemProps {
   index: number;
   data: Player;
-  type: "time" | "score";
+  type: "sum" | "round";
 }
 
 function RankItem({ index, data, type }: RankItemProps) {
@@ -12,34 +20,24 @@ function RankItem({ index, data, type }: RankItemProps) {
       <View className="user-box">
         <PlayerItem data={data}></PlayerItem>
       </View>
-      {type === "time" ? (
+      {type === "sum" ? (
         <View className="column-right">
-          <Text className="score-title">最短时间</Text>
-          <Text className="score">{`${achievement?.set?.bestTime.toFixed(
-            2
-          )} s`}</Text>
+          <Text className="score-title">获胜局数</Text>
+          <Text className="score">{achievement?.rummy?.multiWinSum}</Text>
         </View>
       ) : (
         <View className="column-right">
-          <Text className="score-title">最高分</Text>
-          <Text className="score">{achievement?.set?.highScore}</Text>
+          <Text className="score-title">最少回合</Text>
+          <Text className="score">{achievement?.rummy?.minRoundSum}</Text>
         </View>
       )}
     </View>
   );
 }
 
-import { ScrollView, View, Text } from "@tarojs/components";
-import { useEffect, useState } from "react";
-import { AtDivider, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
-import "./index.scss";
-import PlayerItem from "@/Components/HallPlayer";
-import { PAGE_LEN, RANKING_LEN } from "../../../const";
-import { CallCloudFunction } from "../../../utils";
-
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const tabList = [{ title: "神速榜" }, { title: "高分榜" }];
+  const tabList = [{ title: "赌神榜" }, { title: "幸运榜" }];
   const [list1, setList1] = useState<Player[]>([]);
   const [pageNum1, setPageNum1] = useState<number>(0);
   const [list2, setList2] = useState<Player[]>([]);
@@ -53,9 +51,9 @@ export default function Index() {
       name: "gameApi",
       data: {
         action: "getRanking",
-        gameDbName: "set_games",
+        gameDbName: "rummy_games",
         data: {
-          type: "time",
+          type: "sum",
           skip: pageNum1 * PAGE_LEN,
           pageLength: PAGE_LEN,
         },
@@ -74,9 +72,9 @@ export default function Index() {
       name: "gameApi",
       data: {
         action: "getRanking",
-        gameDbName: "set_games",
+        gameDbName: "rummy_games",
         data: {
-          type: "score",
+          type: "round",
           skip: pageNum2 * PAGE_LEN,
           pageLength: PAGE_LEN,
         },
@@ -96,20 +94,25 @@ export default function Index() {
   }, []);
 
   return (
-    <View className="set-ranking">
+    <View className="rummy-ranking">
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
           <ScrollView
             className="scroll-view"
-            scrollY={true}
-            enableBackToTop={true}
+            scrollY
+            enableBackToTop
             onScrollToLower={() => {
               updateList1();
             }}
           >
             {list1.map((data, index) => {
               return (
-                <RankItem data={data} index={index} type={"time"}></RankItem>
+                <RankItem
+                  key={data.openid}
+                  data={data}
+                  index={index}
+                  type="sum"
+                ></RankItem>
               );
             })}
             {page1End ? (
@@ -132,15 +135,20 @@ export default function Index() {
         <AtTabsPane current={tabIndex} index={1}>
           <ScrollView
             className="scroll-view scroll-view2"
-            scrollY={true}
-            enableBackToTop={true}
+            scrollY
+            enableBackToTop
             onScrollToLower={() => {
               updateList2();
             }}
           >
             {list2.map((data, index) => {
               return (
-                <RankItem data={data} index={index} type={"score"}></RankItem>
+                <RankItem
+                  key={data.openid}
+                  data={data}
+                  index={index}
+                  type="round"
+                ></RankItem>
               );
             })}
             {page2End ? (

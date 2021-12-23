@@ -54,7 +54,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
   });
 
   const { achievement, wealth } = playerData || {};
-  const { yahtzee, martian, cantstop, set } = achievement || {};
+  const { yahtzee, martian, cantstop, set, rummy } = achievement || {};
   const { gold } = wealth || {};
 
   async function sendGiftTo(gift: GiftItem) {
@@ -109,28 +109,35 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
             <AchievementItem
               gameName="yahtzee"
               data={yahtzee}
-              noTitle={true}
+              noTitle
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.martian && (
             <AchievementItem
               gameName="martian"
               data={martian}
-              noTitle={true}
+              noTitle
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.cantstop && (
             <AchievementItem
               gameName="cantstop"
               data={cantstop}
-              noTitle={true}
+              noTitle
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.set && (
             <AchievementItem
               gameName="set"
               data={set}
-              noTitle={true}
+              noTitle
+            ></AchievementItem>
+          )}
+          {initGameIndex === AchievementGameIndex.rummy && (
+            <AchievementItem
+              gameName="rummy"
+              data={rummy}
+              noTitle
             ></AchievementItem>
           )}
 

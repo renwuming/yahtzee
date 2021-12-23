@@ -7,6 +7,7 @@
   }
 }
 .common-game-player {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -63,6 +64,13 @@
         color: #333300;
       }
     }
+  }
+  .freezing-icon {
+    position: absolute;
+    left: -12px;
+    top: -14px;
+    width: 50px;
+    height: 50px;
   }
   .set-game-info {
     margin-top: 10px;

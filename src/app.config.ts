@@ -26,6 +26,9 @@ export default {
     "pages/Set/ranking/index",
     // 拉密
     "pages/Rummy/game/index",
+    "pages/Rummy/hall/index",
+    "pages/Rummy/history/index",
+    "pages/Rummy/ranking/index",
   ],
   window: {
     backgroundTextStyle: "light",

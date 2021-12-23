@@ -1,14 +1,16 @@
 import { View, Image, Text } from "@tarojs/components";
-import "./index.scss";
-import Achievement from "../Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
+import clsx from "clsx";
+// @ts-ignore
+import FreezingIcon from "@/assets/imgs/freezing.png";
 import {
   AchievementGameIndex,
   OFFLINE_DELAY,
   PlayerContext,
 } from "../../const";
-import clsx from "clsx";
+import Achievement from "../Achievement";
+import "./index.scss";
 
 interface IProps {
   data: AnyPlayer;
@@ -45,6 +47,7 @@ export default function Index({
     successSum,
     failSum,
     cardList,
+    icebreaking,
   } = data;
   const [isAchievementOpened, setAchievementOpened] = useState<boolean>(false);
   const [isActionSheetOpened, setActionSheetOpened] = useState<boolean>(false);
@@ -107,6 +110,13 @@ export default function Index({
               setActionSheetOpened(true);
             }}
           ></AtIcon>
+        )}
+        {isRummyPlayer && showScore && !icebreaking && (
+          <Image
+            className="freezing-icon"
+            mode="aspectFit"
+            src={FreezingIcon}
+          ></Image>
         )}
       </View>
       {isSetPlayer && showScore && (

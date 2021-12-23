@@ -25,6 +25,10 @@ const dataMap = {
     title: "神奇形色牌",
     rows: ["bestTime", "highScore", "multiWinRate", "multiNum"],
   },
+  rummy: {
+    title: "拉密牌",
+    rows: ["minRoundSum", "multiWinRate", "multiNum", "singleNum"],
+  },
 };
 
 export default function Index({ gameName, data, noTitle = false }: IProps) {
@@ -45,7 +49,9 @@ export default function Index({ gameName, data, noTitle = false }: IProps) {
         {rows.includes("bestTime") && (
           <View className="detail-item">
             <Text className="text">最短时间</Text>
-            <Text className="value">{bestTime ? `${bestTime.toFixed(2)} s` : "-"}</Text>
+            <Text className="value">
+              {bestTime ? `${bestTime.toFixed(2)} s` : "-"}
+            </Text>
           </View>
         )}
         {rows.includes("minRoundSum") && (

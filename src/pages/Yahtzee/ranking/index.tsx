@@ -37,7 +37,7 @@ import { CallCloudFunction } from "../../../utils";
 
 export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const tabList = [{ title: "赌神榜" }, { title: "积分榜" }];
+  const tabList = [{ title: "赌神榜" }, { title: "高分榜" }];
   const [list1, setList1] = useState<Player[]>([]);
   const [pageNum1, setPageNum1] = useState<number>(0);
   const [list2, setList2] = useState<Player[]>([]);

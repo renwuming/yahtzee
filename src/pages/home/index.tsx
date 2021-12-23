@@ -28,11 +28,8 @@ export default function Index() {
     {
       name: "拉密牌",
       imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/rummy-cover.png",
-      // pageType: "Rummy",
-      // pagePath: `game/index`,
-      navigateFn() {
-        createGame();
-      },
+      pageType: "Rummy",
+      pagePath: `hall/index`,
     },
     {
       name: "神奇形色牌",

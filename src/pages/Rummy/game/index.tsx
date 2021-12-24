@@ -6,7 +6,7 @@ import {
   MovableArea,
   Image,
 } from "@tarojs/components";
-import { AtButton, AtIcon, AtProgress } from "taro-ui";
+import { AtBadge, AtButton, AtIcon, AtProgress } from "taro-ui";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { flat, getUserProfile, SLEEP } from "@/utils";
@@ -49,6 +49,7 @@ import {
   judgePlaygroundPerfect,
   placeSetFromBoardToGround,
   sortCardList,
+  // tidyPlayground,
   updateCardPos,
 } from "./api";
 import "./index.scss";
@@ -133,9 +134,8 @@ export default function Index() {
     setPlayers(players);
     setPlaygroundData(playgroundData.concat());
     setPlaygroundCardList(playgroundCardList.concat());
-
     const list = updateCardList(myCardList, cardList, playgroundData);
-    resetBoard(playgroundData, list);
+    resetBoard(false, playgroundData, list);
   }
 
   function gameDataWatchCb(data: Rummy.RummyGameBaseData, updatedFields = []) {
@@ -475,6 +475,7 @@ export default function Index() {
   }
 
   function resetBoard(
+    updateRoundPlaygroundDataFlag: boolean = false,
     _playgroundData: Rummy.RummyCardData[][] = playgroundData,
     _cardList: Rummy.RummyCardData[] = cardList
   ) {
@@ -494,8 +495,9 @@ export default function Index() {
       updateCardPos(card, pos);
     });
     updateCardList(_cardList.concat());
-
-    updateRoundPlaygroundData();
+    if (updateRoundPlaygroundDataFlag) {
+      updateRoundPlaygroundData();
+    }
   }
 
   function startBtnClick() {
@@ -514,7 +516,7 @@ export default function Index() {
   }
 
   function restartRound() {
-    resetBoard();
+    resetBoard(true);
     getGameData(id).then((data) => {
       initFn(data);
     });
@@ -656,7 +658,7 @@ export default function Index() {
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
-                    resetBoard();
+                    resetBoard(true);
                   }}
                   disabled={!inRound}
                 >
@@ -670,13 +672,22 @@ export default function Index() {
                 >
                   <AtIcon value="numbered-list" size="18" color="#fff"></AtIcon>
                 </AtButton>
+
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
                     restartRound();
+                    // tidyPlayground(
+                    //   playgroundData,
+                    //   playgroundCardList,
+                    //   setPlaygroundData,
+                    //   setPlaygroundCardList
+                    // );
                   }}
                 >
-                  <AtIcon value="reload" size="18" color="#fff"></AtIcon>
+                  <AtBadge value="重置回合">
+                    <AtIcon value="reload" size="18" color="#fff"></AtIcon>
+                  </AtBadge>
                 </AtButton>
               </View>
             )}
@@ -814,21 +825,19 @@ export default function Index() {
               x={x}
               y={y}
             >
-              {isJoker ? (
+              {noValue ? null : isJoker ? (
                 <Image
                   className="card-img"
                   mode="aspectFit"
                   src={JokerIcon}
                 ></Image>
               ) : (
-                !noValue && (
-                  <View className="content">
-                    {value}
-                    {(!groundCard || inGroundTemp) && (
-                      <View className="point"></View>
-                    )}
-                  </View>
-                )
+                <View className="content">
+                  {value}
+                  {(!groundCard || inGroundTemp) && (
+                    <View className="point"></View>
+                  )}
+                </View>
               )}
             </MovableView>
           );

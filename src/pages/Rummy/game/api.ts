@@ -76,19 +76,12 @@ export function handleGameData(
   const inGame = playerIndex >= 0;
   const inRound = roundPlayer === playerIndex;
 
-  const singlePlayer = players.length === 1;
-
   let myCardList = [];
   let _playgroundData = playgroundData;
   let playgroundCardList = [];
   if (start) {
     players[roundPlayer].inRound = true;
-
-    // 单人游戏时，公开手牌信息
-    if (singlePlayer) {
-      const { cardList } = players[roundPlayer];
-      myCardList = handleCardList(cardList);
-    } else if (inGame) {
+    if (inGame) {
       const { cardList } = players[playerIndex];
       myCardList = handleCardList(cardList);
     }
@@ -154,12 +147,10 @@ export const BOARD_SUM: number = BOARD_COL_LEN * BOARD_ROW_LEN;
 const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
 const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
-const sameValueIndexList: number[] = new Array(GROUND_COL_LEN)
-  .fill(1)
-  .map((_, index) => {
-    if (index % 2 === 0) return (5 - index / 2) * GROUND_ROW_LEN + 2;
-    else return (6 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
-  });
+const sameValueIndexList: number[] = new Array(12).fill(1).map((_, index) => {
+  if (index % 2 === 0) return (index / 2) * GROUND_ROW_LEN + 2;
+  else return Math.ceil(index / 2) * GROUND_ROW_LEN - 6;
+});
 
 function getStraightIndexListByValue(value: number): number[] {
   let colIndex = GROUND_COL_LEN - 1;
@@ -680,6 +671,10 @@ function findGroundEmptyPlace(list, playgroundData) {
       }
       if (!card || getCardIndexByID(list, card.id) >= 0) {
         l++;
+        if (j === GROUND_ROW_LEN - 1) {
+          j++;
+          l++;
+        }
       } else {
         l = 0;
       }
@@ -841,4 +836,80 @@ export function updateCardPos(card, pos) {
   card.x = x || 0.1;
   card.y = y || 0.1;
   return card;
+}
+
+export function tidyPlayground(
+  playgroundData,
+  cardList,
+  setPlaygroundData,
+  setCardList
+) {
+  const rowColorMap = [];
+  const straightList = [];
+  const samevalueList = [];
+  let tempList = [];
+  // 筛选所有 straight
+  for (let i = GROUND_COL_LEN - 1; i >= 0; i--) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      // 中断 或者 新的一行
+      if (!card || j === 0) {
+        tidyAddSet(straightList, tempList, true);
+        tempList = [];
+      }
+      if (card) {
+        tempList.push(card);
+      }
+    }
+  }
+  if (tempList) {
+    tidyAddSet(straightList, tempList, true);
+    tempList = [];
+  }
+
+  // 筛选所有 samevalue
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      // 中断 或者 新的一行
+      if (!card || j === 0) {
+        tidyAddSet(samevalueList, tempList, false);
+        tempList = [];
+      }
+      if (card) {
+        tempList.push(card);
+      }
+    }
+  }
+  if (tempList) {
+    tidyAddSet(samevalueList, tempList, false);
+    tempList = [];
+  }
+  // 重新整理
+  const newPlayground = initPlayground();
+  straightList.concat(samevalueList).forEach((list) => {
+    handleSetToProperPos(
+      list,
+      newPlayground,
+      cardList,
+      setPlaygroundData,
+      setCardList,
+      rowColorMap
+    );
+  });
+}
+
+function tidyAddSet(list, set, isStraight) {
+  const type = judgeSetType(set);
+  if (isStraight && type === RUMMY_SET_TYPE.straight) {
+    list.push(set);
+  } else if (!isStraight && type !== RUMMY_SET_TYPE.straight) {
+    list.push(set);
+  }
+}
+
+function initPlayground() {
+  return new Array(GROUND_COL_LEN).fill(1).map((_) => {
+    return new Array(GROUND_ROW_LEN);
+  });
 }

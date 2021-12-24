@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 
-export const VERSION = "v4.9.4";
+export const VERSION = "v5.0.0";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";

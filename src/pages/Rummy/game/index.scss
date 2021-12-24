@@ -57,6 +57,7 @@ movable-area {
         border-radius: 12px;
         background-color: rgba(90, 90, 90, 0.5);
         .number {
+          font-size: 34px;
           margin-top: 10px;
           font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
             Arial, sans-serif;
@@ -197,6 +198,11 @@ movable-area {
         margin: 0;
         border-radius: 0;
         border: none;
+        overflow: visible;
+        .at-badge__num {
+          top: 10px;
+          right: -54px;
+        }
       }
     }
     .playboard-wrapper {

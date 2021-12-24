@@ -12,9 +12,9 @@ const RUMMY_SET_TYPE = {
   all: 3,
 };
 
-const sameValueIndexList = new Array(GROUND_COL_LEN).fill(1).map((_, index) => {
-  if (index % 2 === 0) return (5 - index / 2) * GROUND_ROW_LEN + 2;
-  else return (6 - Math.floor(index / 2)) * GROUND_ROW_LEN - 6;
+const sameValueIndexList = new Array(12).fill(1).map((_, index) => {
+  if (index % 2 === 0) return (index / 2) * GROUND_ROW_LEN + 2;
+  else return Math.ceil(index / 2) * GROUND_ROW_LEN - 6;
 });
 
 function getStraightIndexListByValue(value) {
@@ -317,7 +317,7 @@ function handleEndRoundPerfect(
     }
   }
   // 整理playgroundData
-  tidyPlayground(newPlaygroundData);
+  newPlaygroundData = tidyPlayground(newPlaygroundData);
 
   const newCardList = cardList.filter(
     (card) => !newPlaygroundDataIDList.includes(card.id)
@@ -368,19 +368,60 @@ function handleEndData(list, playerIndex) {
 
 function tidyPlayground(playgroundData) {
   const rowColorMap = [];
+  const straightList = [];
+  const samevalueList = [];
   let tempList = [];
+  // 筛选所有 straight
   for (let i = GROUND_COL_LEN - 1; i >= 0; i--) {
     for (let j = 0; j < GROUND_ROW_LEN; j++) {
       const card = playgroundData[i][j];
       // 中断 或者 新的一行
-      if ((!card || j === 0) && tempList.length >= 3) {
-        handleSetToProperPos(tempList, playgroundData, rowColorMap);
+      if (!card || j === 0) {
+        tidyAddSet(straightList, tempList, true);
         tempList = [];
       }
       if (card) {
         tempList.push(card);
       }
     }
+  }
+  if (tempList) {
+    tidyAddSet(straightList, tempList, true);
+    tempList = [];
+  }
+
+  // 筛选所有 samevalue
+  for (let i = 0; i < GROUND_COL_LEN; i++) {
+    for (let j = 0; j < GROUND_ROW_LEN; j++) {
+      const card = playgroundData[i][j];
+      // 中断 或者 新的一行
+      if (!card || j === 0) {
+        tidyAddSet(samevalueList, tempList, false);
+        tempList = [];
+      }
+      if (card) {
+        tempList.push(card);
+      }
+    }
+  }
+  if (tempList) {
+    tidyAddSet(samevalueList, tempList, false);
+    tempList = [];
+  }
+  // 重新整理
+  const newPlayground = initPlayground();
+  straightList.concat(samevalueList).forEach((list) => {
+    handleSetToProperPos(list, newPlayground, rowColorMap);
+  });
+  return newPlayground;
+}
+
+function tidyAddSet(list, set, isStraight) {
+  const type = judgeSetType(set);
+  if (isStraight && type === RUMMY_SET_TYPE.straight) {
+    list.push(set);
+  } else if (!isStraight && type !== RUMMY_SET_TYPE.straight) {
+    list.push(set);
   }
 }
 
@@ -453,6 +494,10 @@ function findGroundEmptyPlace(list, playgroundData) {
       }
       if (!card || getCardIndexByID(list, card.id) >= 0) {
         l++;
+        if (j === GROUND_ROW_LEN - 1) {
+          j++;
+          l++;
+        }
       } else {
         l = 0;
       }

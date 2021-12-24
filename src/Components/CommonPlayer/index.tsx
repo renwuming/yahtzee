@@ -70,17 +70,20 @@ export default function Index({
       className={clsx(
         "common-game-player",
         isMartianPlayer && "martian-player",
+        isSetPlayer && "set-player",
         isRummyPlayer && "rummy-player",
         showActive && inRound && "active",
         activePlayer === index && "zIndexActive"
       )}
+      onClick={() => {
+        onItemClick(index);
+      }}
     >
       <View className="at-row at-row__align--center">
         <View
           className={`player-info ${offline ? "offline" : ""}`}
           onClick={() => {
             doShowAchievement();
-            onItemClick(index);
           }}
         >
           <Image

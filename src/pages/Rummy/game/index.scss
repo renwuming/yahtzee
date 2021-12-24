@@ -245,20 +245,29 @@ movable-area {
     &.bottom {
       z-index: 10;
     }
-    &.round-card {
-      opacity: 0.8;
-    }
     &.red {
       color: #c2302f;
+      .point {
+        background-color: #c2302f;
+      }
     }
     &.yellow {
       color: #f4870b;
+      .point {
+        background-color: #f4870b;
+      }
     }
     &.black {
       color: #0d0812;
+      .point {
+        background-color: #0d0812;
+      }
     }
     &.blue {
       color: #4272a6;
+      .point {
+        background-color: #4272a6;
+      }
     }
     &.active {
       z-index: 100;
@@ -266,6 +275,20 @@ movable-area {
     .card-img {
       width: 100%;
       height: 100%;
+    }
+    .content {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      .point {
+        position: absolute;
+        bottom: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 8px;
+      }
     }
   }
   .count-down-box {

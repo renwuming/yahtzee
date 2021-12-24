@@ -769,6 +769,7 @@ export default function Index() {
           }
 
           let isLibrary = false;
+          let noValue = false;
           let cardData;
           if (playerCard) {
             cardData = playerCard;
@@ -776,7 +777,7 @@ export default function Index() {
             cardData = groundCard;
           } else if (otherPlayerCard) {
             cardData = otherPlayerCard;
-            delete cardData.value;
+            noValue = true;
           } else {
             const { cardLibraryPosData } =
               Taro.getStorageSync("rummy_device_data");
@@ -785,7 +786,7 @@ export default function Index() {
               x: cardLibraryPosData?.x,
               y: cardLibraryPosData?.y,
             };
-            delete cardData.value;
+            noValue = true;
             isLibrary = true;
           }
           if (!cardData) return null;
@@ -799,7 +800,6 @@ export default function Index() {
                 "card",
                 color,
                 groundCard && "ground-card",
-                (!groundCard || inGroundTemp) && "round-card",
                 otherPlayerCard ? "bottom" : id === activeCardID && "active",
                 isLibrary && "hidden"
               )}
@@ -821,7 +821,14 @@ export default function Index() {
                   src={JokerIcon}
                 ></Image>
               ) : (
-                value
+                !noValue && (
+                  <View className="content">
+                    {value}
+                    {(!groundCard || inGroundTemp) && (
+                      <View className="point"></View>
+                    )}
+                  </View>
+                )
               )}
             </MovableView>
           );

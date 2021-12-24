@@ -1,11 +1,3 @@
-.rummy-player {
-  margin-top: 30px;
-  z-index: 50;
-  background-color: #4b6d8d;
-  &.active {
-    background-color: #eee !important;
-  }
-}
 .common-game-player {
   position: relative;
   display: flex;
@@ -55,23 +47,42 @@
       font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
         sans-serif;
     }
-    &.rummy-card-num {
-      width: 70px;
-      display: flex;
-      justify-content: center;
-      text {
-        font-size: 36px;
-        color: #333300;
-      }
+  }
+  .setting {
+    margin-left: 10px;
+  }
+}
+.rummy-player {
+  margin-top: 30px;
+  z-index: 50;
+  background-color: #4b6d8d;
+  &.active {
+    background-color: #eee !important;
+  }
+  .rummy-setting {
+    position: absolute;
+    right: -14px;
+    bottom: 0;
+    font-size: 28px !important;
+  }
+  .rummy-card-num {
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    text {
+      font-size: 36px;
+      color: #333300;
     }
   }
   .freezing-icon {
     position: absolute;
     left: -12px;
-    top: -14px;
+    bottom: 10px;
     width: 50px;
     height: 50px;
   }
+}
+.set-player {
   .set-game-info {
     margin-top: 10px;
     .text {
@@ -85,12 +96,6 @@
       font-size: 34px;
       font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
         sans-serif;
-    }
-  }
-  .setting {
-    margin-left: 10px;
-    &.rummy-setting {
-      font-size: 28px !important;
     }
   }
 }

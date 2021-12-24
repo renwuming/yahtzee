@@ -50,7 +50,7 @@ export default function Index({ gameName, data, noTitle = false }: IProps) {
           <View className="detail-item">
             <Text className="text">最短时间</Text>
             <Text className="value">
-              {bestTime ? `${bestTime.toFixed(2)} s` : "-"}
+              {bestTime ? `${bestTime.toFixed(1)}s` : "-"}
             </Text>
           </View>
         )}

@@ -833,8 +833,9 @@ export function judgePlaygroundPerfect(
 
 export function updateCardPos(card, pos) {
   const { x, y } = pos;
-  card.x = x || 0.1;
-  card.y = y || 0.1;
+  card.x = Number.isInteger(x) ? x + 0.1 : Math.floor(x);
+  card.y = Number.isInteger(y) ? y + 0.1 : Math.floor(y);
+
   return card;
 }
 

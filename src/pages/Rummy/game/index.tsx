@@ -84,7 +84,6 @@ export default function Index() {
   >([]);
   // client端
   const [activePlayer, setActivePlayer] = useState<number>(0);
-  const [tinyCorrection, setTinyCorrection] = useState<number>(0.1);
   const [activeCardID, setActiveCardID] = useState<number>(-1);
   const crossData = useRef<Rummy.CrossData>(null);
   const cardAreaStatus = useRef<number>(RUMMY_AREA_STATUS.other);
@@ -303,10 +302,9 @@ export default function Index() {
       // 否则，返回原位置
       else {
         pos = {
-          x: playgroundCardList[index].x + tinyCorrection,
-          y: playgroundCardList[index].y + tinyCorrection,
+          x: playgroundCardList[index].x,
+          y: playgroundCardList[index].y,
         };
-        setTinyCorrection(-tinyCorrection);
       }
 
       playgroundCardList[index] = updateCardPos(playgroundCardList[index], pos);
@@ -334,10 +332,9 @@ export default function Index() {
       // 否则，返回原位置
       else {
         pos = {
-          x: cardList[index].x + tinyCorrection,
-          y: cardList[index].y + tinyCorrection,
+          x: cardList[index].x,
+          y: cardList[index].y,
         };
-        setTinyCorrection(-tinyCorrection);
       }
 
       cardList[index] = updateCardPos(cardList[index], pos);

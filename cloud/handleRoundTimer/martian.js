@@ -1,6 +1,8 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const { execHandleEmptyGame } = require("./common");
+
 async function execHandleExceptionMartian(db) {
   const _ = db.command;
   // 处理【最近1小时的】【未结束的】游戏
@@ -19,6 +21,8 @@ async function execHandleExceptionMartian(db) {
   list.forEach((item) => {
     handleExceptionMartian(db, item);
   });
+
+  execHandleEmptyGame(db, "martian_games");
 }
 
 async function handleExceptionMartian(db, game) {

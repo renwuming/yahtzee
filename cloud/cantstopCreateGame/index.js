@@ -32,6 +32,9 @@ exports.main = async (event) => {
     data: {
       env,
       openid: OPENID,
+      data: {
+        simple: true,
+      },
     },
   });
 

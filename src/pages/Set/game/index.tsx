@@ -50,7 +50,8 @@ export default function Index() {
   });
 
   function getCountDown(data: Set.SetGameBaseData) {
-    const { startTime } = data;
+    const { startTime } = data || {};
+    if (!startTime) return Infinity;
     const timeStamp = Date.now();
     const roundCountDown = Math.floor(
       SET_TIME_LIMIT - (timeStamp - +startTime) / 1000

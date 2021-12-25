@@ -1,6 +1,8 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const { execHandleEmptyGame } = require("./common");
+
 const DEFAULT_SCORES = {
   ones: null,
   twos: null,
@@ -85,6 +87,8 @@ async function execHandleExceptionYahtzee(db) {
   list.forEach((item) => {
     handleExceptionYahtzee(db, item);
   });
+
+  execHandleEmptyGame(db, "yahtzee_games");
 }
 
 async function handleExceptionYahtzee(db, game) {

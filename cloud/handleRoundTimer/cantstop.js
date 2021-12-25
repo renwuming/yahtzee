@@ -1,6 +1,8 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const { execHandleEmptyGame } = require("./common");
+
 const DEFAULT_PROGRESS = new Array(13).fill(0);
 
 async function execHandleExceptionCantStop(db) {
@@ -76,6 +78,8 @@ async function execHandleRoundTimerCantStop(db) {
   list.forEach((item) => {
     handleRoundTimerCantStop(item);
   });
+
+  execHandleEmptyGame(db, "cantstop_games");
 }
 
 function handleRoundTimerCantStop(game) {

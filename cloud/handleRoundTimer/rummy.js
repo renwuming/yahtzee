@@ -1,6 +1,8 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const { execHandleEmptyGame } = require("./common");
+
 async function execHandleTimerRummy(db) {
   const _ = db.command;
   // 处理所有【开始的】【多人的】游戏
@@ -58,6 +60,8 @@ async function execHandleExceptionRummy(db) {
   list.forEach((item) => {
     handleExceptionRummy(db, item);
   });
+
+  execHandleEmptyGame(db, "rummy_games");
 }
 
 async function handleExceptionRummy(db, game) {

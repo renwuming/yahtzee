@@ -4,12 +4,13 @@ const cloud = require("wx-server-sdk");
 // 云函数入口函数
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
-  let { env, openid } = event;
+  let { env, openid, data } = event;
   cloud.init({
     env: env || "prod-0gjpxr644f6d941d",
   });
 
   const db = cloud.database();
+  const { simple } = data || {};
 
   // 不存在openid参数则是查询自己的用户信息
   openid = openid || OPENID;
@@ -38,7 +39,7 @@ exports.main = async (event) => {
           },
         });
     }
-    return data;
+    return simple ? getSimplePlayer(data) : data;
   }
   // 查询集合
   else if (openid instanceof Array) {
@@ -54,7 +55,17 @@ exports.main = async (event) => {
 
     return openid.map((_openid) => {
       const index = idList.indexOf(_openid);
-      return list[index];
+      return simple ? getSimplePlayer(list[index]) : list[index];
     });
   }
 };
+
+function getSimplePlayer(data) {
+  const { nickName, avatarUrl, openid, _id } = data;
+  return {
+    nickName,
+    avatarUrl,
+    openid,
+    _id,
+  };
+}

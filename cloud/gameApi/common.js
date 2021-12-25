@@ -33,16 +33,13 @@ exports.getPlayer = async function (_openid) {
     name: "getPlayers",
     data: {
       openid: _openid,
+      data: {
+        simple: true,
+      },
     },
   });
 
-  const { nickName, avatarUrl, openid, _id } = player;
-  return {
-    nickName,
-    avatarUrl,
-    openid,
-    _id,
-  };
+  return player;
 };
 
 exports.findOne = async function findOne(gameDbName, id) {

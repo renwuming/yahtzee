@@ -76,7 +76,7 @@ export default function Index({
         activePlayer === index && "zIndexActive"
       )}
       onClick={() => {
-        onItemClick(index);
+        onItemClick?.(index);
       }}
     >
       <View className="at-row at-row__align--center">

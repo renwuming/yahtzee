@@ -1,6 +1,8 @@
 const cloud = require("wx-server-sdk");
 const ENV = "prod-0gjpxr644f6d941d";
 
+const { execHandleEmptyGame } = require("./common");
+
 async function execHandleTimerSet(db) {
   const _ = db.command;
   // 处理所有【开始的】【计时的】游戏
@@ -56,6 +58,8 @@ async function execHandleExceptionSet(db) {
   list.forEach((item) => {
     handleExceptionSet(db, item);
   });
+
+  execHandleEmptyGame(db, "set_games");
 }
 
 async function handleExceptionSet(db, game) {

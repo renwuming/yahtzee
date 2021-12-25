@@ -73,6 +73,9 @@ async function handleUpdateData(action, oldData, data, env) {
       data: {
         env,
         openid: OPENID,
+        data: {
+          simple: true,
+        },
       },
     });
     players.push(player);

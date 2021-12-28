@@ -266,7 +266,7 @@ export function getAreaPos(
 
 function getGroundCrossByIndex(index: number): Rummy.CrossData {
   const rowIndex = index % GROUND_ROW_LEN;
-  const colIndex = Math.floor(index / GROUND_ROW_LEN);
+  const colIndex = ~~(index / GROUND_ROW_LEN);
   return {
     rowIndex,
     colIndex,
@@ -286,14 +286,14 @@ export function getCrossByCardPos(card: Rummy.RummyCardData): Rummy.CrossData {
     Y = playboardPosData.y;
   }
   return {
-    colIndex: Math.floor((y - Y) / cardH),
-    rowIndex: Math.floor((x - X) / cardW),
+    colIndex: ~~((y - Y) / cardH),
+    rowIndex: ~~((x - X) / cardW),
   };
 }
 
 function getBoardCrossByIndex(index: number): Rummy.CrossData {
   const rowIndex = index % BOARD_ROW_LEN;
-  const colIndex = Math.floor(index / BOARD_ROW_LEN);
+  const colIndex = ~~(index / BOARD_ROW_LEN);
   return {
     rowIndex,
     colIndex,
@@ -357,8 +357,8 @@ export function getBoxCross(
 
   const _x = x1 - x;
   const _y = y1 - y;
-  const rowIndex = Math.floor((_x + cardW / 2) / cardW);
-  const colIndex = Math.floor((_y + cardH / 2) / cardH);
+  const rowIndex = ~~((_x + cardW / 2) / cardW);
+  const colIndex = ~~((_y + cardH / 2) / cardH);
 
   return {
     rowIndex,
@@ -833,9 +833,8 @@ export function judgePlaygroundPerfect(
 
 export function updateCardPos(card, pos) {
   const { x, y } = pos;
-  card.x = Number.isInteger(x) ? x + 0.1 : Math.floor(x);
-  card.y = Number.isInteger(y) ? y + 0.1 : Math.floor(y);
-
+  card.x = Number.isInteger(x) ? x + 0.1 : ~~x;
+  card.y = Number.isInteger(y) ? y + 0.1 : ~~y;
   return card;
 }
 
@@ -913,4 +912,37 @@ function initPlayground() {
   return new Array(GROUND_COL_LEN).fill(1).map((_) => {
     return new Array(GROUND_ROW_LEN);
   });
+}
+
+export function getNearestEmptyCross(
+  areaStatus: RUMMY_AREA_STATUS,
+  crossData: Rummy.CrossData,
+  cardID: number,
+  cardDataMap: Rummy.RummyCardData[][]
+): Rummy.CrossData {
+  const targetIsPlayground = areaStatus === RUMMY_AREA_STATUS.playground;
+  const maxH = targetIsPlayground ? GROUND_COL_LEN : BOARD_COL_LEN;
+  const maxW = targetIsPlayground ? GROUND_ROW_LEN : BOARD_ROW_LEN;
+
+  const { rowIndex, colIndex } = crossData;
+
+  const rowOffsetList = [0, -1, 1];
+  const colOffsetList = [0, -1, 1];
+
+  for (let i = 0; i < colOffsetList.length; i++) {
+    for (let j = 0; j < rowOffsetList.length; j++) {
+      const _row = rowIndex + rowOffsetList[j];
+      const _col = colIndex + colOffsetList[i];
+      const placeCard = cardDataMap[_col][_row];
+      if (placeCard?.id === cardID) return null;
+      if (_row >= 0 && _row < maxW && _col >= 0 && _col < maxH && !placeCard) {
+        return {
+          rowIndex: _row,
+          colIndex: _col,
+        };
+      }
+    }
+  }
+
+  return null;
 }

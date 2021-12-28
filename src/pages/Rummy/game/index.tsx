@@ -38,6 +38,7 @@ import {
   getCardIndexByID,
   getCrossByCardPos,
   getGameData,
+  getNearestEmptyCross,
   getNewCardPosOnBoard,
   getResetCardPosOnBoard,
   GROUND_COL_LEN,
@@ -119,8 +120,9 @@ export default function Index() {
     const { roundTimeStamp } = data || {};
     if (!roundTimeStamp) return Infinity;
     const timeStamp = Date.now();
-    const _roundCountDown = Math.floor(
-      RUMMY_ROUND_TIME_LIMIT - (timeStamp - +new Date(roundTimeStamp)) / 1000
+    const _roundCountDown = ~~(
+      RUMMY_ROUND_TIME_LIMIT -
+      (timeStamp - +new Date(roundTimeStamp)) / 1000
     );
     return _roundCountDown;
   }
@@ -183,19 +185,19 @@ export default function Index() {
         // 存到 Storage
         Taro.setStorageSync("rummy_device_data", {
           playgroundPosData: {
-            x: left,
-            y: top,
-            width,
-            height,
+            x: ~~left,
+            y: ~~top,
+            width: ~~width,
+            height: ~~height,
           },
           playboardPosData: {
-            x: playboard.left,
-            y: playboard.top,
-            width: playboard.width,
-            height: playboard.height,
+            x: ~~playboard.left,
+            y: ~~playboard.top,
+            width: ~~playboard.width,
+            height: ~~playboard.height,
           },
-          cardW: Math.floor(width / GROUND_ROW_LEN),
-          cardH: Math.floor(height / GROUND_COL_LEN),
+          cardW: ~~(width / GROUND_ROW_LEN),
+          cardH: ~~(height / GROUND_COL_LEN),
           cardLibraryPosData: {
             x: cardLibrary.left,
             y: cardLibrary.top,
@@ -229,10 +231,10 @@ export default function Index() {
             );
           }
         });
-      });
 
-      getGameData(id).then((data) => {
-        initFn(data);
+        getGameData(id).then((data) => {
+          initFn(data);
+        });
       });
     });
   }, [players.length]);
@@ -272,7 +274,6 @@ export default function Index() {
     let index = getCardIndexByID(cardList, activeCardID);
     // 是否为公共牌
     const isGroundCard = index < 0;
-    const { rowIndex, colIndex } = crossData.current;
 
     const targetInPlayGround =
       cardAreaStatus.current === RUMMY_AREA_STATUS.playground;
@@ -283,21 +284,24 @@ export default function Index() {
     if (isGroundCard) {
       index = getCardIndexByID(playgroundCardList, activeCardID);
       // 自己回合才可以拖动公共牌
-      const targetIsValid =
-        inRound &&
-        !end &&
-        targetInPlayGround &&
-        !playgroundData[colIndex][rowIndex];
+      const targetIsValid = inRound && !end && targetInPlayGround;
+
+      let _crossData = null;
+      if (targetIsValid) {
+        _crossData = getNearestEmptyCross(
+          RUMMY_AREA_STATUS.playground,
+          crossData.current,
+          activeCardID,
+          playgroundData
+        );
+      }
 
       // 拖动目标位置是有效的
-      if (targetIsValid) {
-        pos = getAreaPos(crossData.current, RUMMY_AREA_STATUS.playground);
+      if (targetIsValid && _crossData) {
+        pos = getAreaPos(_crossData, RUMMY_AREA_STATUS.playground);
 
         playgroundCardList[index].areaStatus = cardAreaStatus.current;
-        handlePlaygroundAndPlayboard(
-          crossData.current,
-          playgroundCardList[index]
-        );
+        handlePlaygroundAndPlayboard(_crossData, playgroundCardList[index]);
       }
       // 否则，返回原位置
       else {
@@ -306,7 +310,6 @@ export default function Index() {
           y: playgroundCardList[index].y,
         };
       }
-
       playgroundCardList[index] = updateCardPos(playgroundCardList[index], pos);
       setPlaygroundCardList(playgroundCardList.concat());
     }
@@ -314,20 +317,30 @@ export default function Index() {
     else {
       // 自己回合才可以拖动手牌到公共区
       const targetIsValid =
-        (inRound &&
-          targetInPlayGround &&
-          !playgroundData[colIndex][rowIndex]) ||
-        (targetInPlayBoard && !playboardData[colIndex][rowIndex]);
-      // 拖动目标位置是有效的
+        (inRound && targetInPlayGround) || targetInPlayBoard;
+
+      let _crossData = null;
       if (targetIsValid) {
+        _crossData = getNearestEmptyCross(
+          targetInPlayGround
+            ? RUMMY_AREA_STATUS.playground
+            : RUMMY_AREA_STATUS.playboard,
+          crossData.current,
+          activeCardID,
+          targetInPlayGround ? playgroundData : playboardData
+        );
+      }
+
+      // 拖动目标位置是有效的
+      if (targetIsValid && _crossData) {
         if (targetInPlayGround) {
-          pos = getAreaPos(crossData.current, RUMMY_AREA_STATUS.playground);
+          pos = getAreaPos(_crossData, RUMMY_AREA_STATUS.playground);
         } else if (targetInPlayBoard) {
-          pos = getAreaPos(crossData.current, RUMMY_AREA_STATUS.playboard);
+          pos = getAreaPos(_crossData, RUMMY_AREA_STATUS.playboard);
         }
 
         cardList[index].areaStatus = cardAreaStatus.current;
-        handlePlaygroundAndPlayboard(crossData.current, cardList[index]);
+        handlePlaygroundAndPlayboard(_crossData, cardList[index]);
       }
       // 否则，返回原位置
       else {
@@ -391,16 +404,17 @@ export default function Index() {
     card: Rummy.RummyCardData,
     _playgroundData: Rummy.RummyCardData[][] = playgroundData
   ) {
+    if (!_playgroundData || !playboardData) return;
     const { id, areaStatus } = card;
     const { rowIndex, colIndex } = cross;
-    _playgroundData?.forEach((row, i) => {
+    _playgroundData.forEach((row, i) => {
       row.forEach((item, j) => {
         if (item && item.id === id) {
           _playgroundData[i][j] = null;
         }
       });
     });
-    playboardData?.forEach((row, i) => {
+    playboardData.forEach((row, i) => {
       row.forEach((item, j) => {
         if (item && item.id === id) {
           playboardData[i][j] = null;
@@ -674,12 +688,6 @@ export default function Index() {
                   className="ctrl-btn"
                   onClick={() => {
                     restartRound();
-                    // tidyPlayground(
-                    //   playgroundData,
-                    //   playgroundCardList,
-                    //   setPlaygroundData,
-                    //   setPlaygroundCardList
-                    // );
                   }}
                 >
                   <AtBadge value="重置回合">

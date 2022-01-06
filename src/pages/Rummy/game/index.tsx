@@ -88,6 +88,7 @@ export default function Index() {
   const [activeCardID, setActiveCardID] = useState<number>(-1);
   const crossData = useRef<Rummy.CrossData>(null);
   const cardAreaStatus = useRef<number>(RUMMY_AREA_STATUS.other);
+  const [errList, setErrList] = useState<number[]>([]);
 
   const {
     playerIndex,
@@ -237,12 +238,12 @@ export default function Index() {
         });
       });
     });
-  }, [players.length]);
+  }, [players.length, start]);
 
-  function onTouchStart(id) {
+  function onTouchStart(id: number) {
     setActiveCardID(id);
   }
-  function onChange(event, id) {
+  function onChange(event, id: number) {
     if (id !== activeCardID) return;
     const {
       detail: { x, y },
@@ -268,10 +269,11 @@ export default function Index() {
       cardAreaStatus.current = RUMMY_AREA_STATUS.other;
     }
   }
-  function onTouchEnd() {
+  async function onTouchEnd(id: number) {
+    if (id !== activeCardID) return;
     if (!crossData.current) return;
     let pos;
-    let index = getCardIndexByID(cardList, activeCardID);
+    let index = getCardIndexByID(cardList, id);
     // 是否为公共牌
     const isGroundCard = index < 0;
 
@@ -282,7 +284,7 @@ export default function Index() {
 
     // 拖动公共牌
     if (isGroundCard) {
-      index = getCardIndexByID(playgroundCardList, activeCardID);
+      index = getCardIndexByID(playgroundCardList, id);
       // 自己回合才可以拖动公共牌
       const targetIsValid = inRound && !end && targetInPlayGround;
 
@@ -291,7 +293,7 @@ export default function Index() {
         _crossData = getNearestEmptyCross(
           RUMMY_AREA_STATUS.playground,
           crossData.current,
-          activeCardID,
+          id,
           playgroundData
         );
       }
@@ -311,6 +313,7 @@ export default function Index() {
         };
       }
       playgroundCardList[index] = updateCardPos(playgroundCardList[index], pos);
+      await SLEEP(50);
       setPlaygroundCardList(playgroundCardList.concat());
     }
     // 拖动玩家手牌
@@ -326,7 +329,7 @@ export default function Index() {
             ? RUMMY_AREA_STATUS.playground
             : RUMMY_AREA_STATUS.playboard,
           crossData.current,
-          activeCardID,
+          id,
           targetInPlayGround ? playgroundData : playboardData
         );
       }
@@ -351,6 +354,7 @@ export default function Index() {
       }
 
       cardList[index] = updateCardPos(cardList[index], pos);
+      await SLEEP(50);
       setCardList(cardList.concat());
     }
 
@@ -431,7 +435,6 @@ export default function Index() {
   }
 
   async function endRound() {
-    const perfect = judgePlaygroundPerfect(playgroundData);
     const groundCardIncreased =
       flat(playgroundData).filter((e) => e).length > playgroundCardList.length;
     if (!groundCardIncreased) {
@@ -440,14 +443,22 @@ export default function Index() {
         icon: "none",
         duration: 1000,
       });
-    } else if (perfect) {
-      await handleGameAction(id, "endRoundPerfect", { playgroundData });
-    } else {
+      return;
+    }
+
+    const errList = judgePlaygroundPerfect(playgroundData);
+    if (errList) {
       Taro.showToast({
         title: "出牌失败",
         icon: "none",
         duration: 1000,
       });
+      setErrList(errList.map((card) => card.id));
+      setTimeout(() => {
+        setErrList([]);
+      }, 2000);
+    } else {
+      await handleGameAction(id, "endRoundPerfect", { playgroundData });
     }
   }
 
@@ -527,9 +538,9 @@ export default function Index() {
   }
 
   function restartRound() {
-    resetBoard(true);
     getGameData(id).then((data) => {
       initFn(data);
+      resetBoard(true);
     });
   }
 
@@ -809,6 +820,8 @@ export default function Index() {
 
           const { color, value, x, y, inGroundTemp } = cardData;
           const isJoker = value === 0;
+
+          const isErr = errList.includes(id);
           return (
             <MovableView
               key={id}
@@ -817,6 +830,7 @@ export default function Index() {
                 color,
                 groundCard && "ground-card",
                 otherPlayerCard ? "bottom" : id === activeCardID && "active",
+                isErr && "err",
                 isLibrary && "hidden"
               )}
               direction="all"
@@ -826,7 +840,9 @@ export default function Index() {
               onTouchStart={() => {
                 onTouchStart(id);
               }}
-              onTouchEnd={onTouchEnd}
+              onTouchEnd={() => {
+                onTouchEnd(id);
+              }}
               x={x}
               y={y}
             >

@@ -58,16 +58,20 @@ export function useGameApi(data: GameApiData) {
     execGiftActions(giftActionList, lastGiftActionExecTime, players);
   };
   // 监听数据库变化
+  const watcherMap = {
+    watcher: null,
+    eventsWatcher: null,
+    lastUpdate: new Date(),
+  };
   useEffect(() => {
     if (!pageShow) return;
-    let watcher, eventsWatcher;
     SLEEP(500).then(() => {
-      watcher = watchDataBase(id, gameDbName, cb);
-      eventsWatcher = watchEvents_DataBase(id, eventCb);
+      watchDataBase(id, gameDbName, cb, watcherMap);
+      watchEvents_DataBase(id, eventCb, watcherMap);
     });
     return () => {
-      watcher?.close();
-      eventsWatcher?.close();
+      watcherMap.watcher?.close();
+      watcherMap.eventsWatcher?.close();
     };
   }, [pageShow]);
 
@@ -87,9 +91,23 @@ export function useGameApi(data: GameApiData) {
       setRoundCountDown(showRoundCountDown);
     }, 500);
 
+    // // 断线重连
+    // const watcherTimer = setInterval(() => {
+    //   const now = Date.now();
+    //   if (now - watcherMap.lastUpdate.getTime() > 5000) {
+    //     watcherMap.watcher?.close();
+    //     watcherMap.eventsWatcher?.close();
+    //     setTimeout(() => {
+    //       watchDataBase(id, gameDbName, cb, watcherMap);
+    //       watchEvents_DataBase(id, eventCb, watcherMap);
+    //     }, 100);
+    //   }
+    // }, 1000);
+
     return () => {
       clearInterval(timer);
       clearInterval(roundTimer);
+      // clearInterval(watcherTimer);
     };
   }, [end, pageShow, gameData]);
 }
@@ -110,7 +128,7 @@ async function updatePlayerOnline_Database(game: GameData, gameDbName: string) {
     });
 }
 
-function watchDataBase(id: string, gameDbName: string, onChange) {
+function watchDataBase(id: string, gameDbName: string, onChange, watcherMap) {
   const watcher = DB.collection(gameDbName)
     .doc(id)
     /* @ts-ignore */
@@ -119,17 +137,21 @@ function watchDataBase(id: string, gameDbName: string, onChange) {
         const { docs, docChanges } = data;
         const updatedFields = docChanges?.[0]?.updatedFields || {};
         onChange.current(docs[0], Object.keys(updatedFields));
+        watcherMap.lastUpdate = new Date();
       },
       onError(err) {
         console.error(err);
+        // 报错后重新监听
+        watcherMap.watcher?.close();
+        watchDataBase(id, gameDbName, onChange, watcherMap);
       },
     });
 
-  return watcher;
+  watcherMap.watcher = watcher;
 }
 
 // 游戏事件、动画相关
-export function watchEvents_DataBase(id: string, onChange) {
+export function watchEvents_DataBase(id: string, onChange, watcherMap) {
   const watcher = DB.collection("game_events")
     .where({
       gameID: id,
@@ -140,13 +162,17 @@ export function watchEvents_DataBase(id: string, onChange) {
         const { docs, docChanges } = data;
         const updatedFields = docChanges?.[0]?.updatedFields || {};
         onChange.current(docs[0], Object.keys(updatedFields));
+        watcherMap.lastUpdate = new Date();
       },
       onError(err) {
         console.error(err);
+        // 报错后重新监听
+        watcherMap.eventsWatcher?.close();
+        watchEvents_DataBase(id, onChange, watcherMap);
       },
     });
 
-  return watcher;
+  watcherMap.eventsWatcher = watcher;
 }
 
 export function execGiftActions(
@@ -264,4 +290,9 @@ function sendGiftAnimate(
       }
     );
   });
+}
+
+export function clearGiftAnimate() {
+  const selector = "#game-gift-container .game-gift";
+  Current.page.clearAnimation(selector, () => {});
 }

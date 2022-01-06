@@ -1,6 +1,5 @@
-import Taro from "@tarojs/taro";
 import { useEffect, useRef, useState } from "react";
-import {
+import Taro, {
   getCurrentInstance,
   useDidHide,
   useDidShow,
@@ -8,8 +7,6 @@ import {
 } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { AtButton, AtFab, AtModal } from "taro-ui";
-
-import "./index.scss";
 import {
   AchievementGameIndex,
   ACTION_DELAY,
@@ -20,13 +17,13 @@ import {
   PlayerContext,
   ROUND_TIME_LIMIT,
   SHOW_ROUND_TIME_LIMIT,
-} from "../../../const";
-import PlayerList from "../../../Components/YahtzeePlayerList";
-import DiceList from "../../../Components/YahtzeeDiceList";
-import RatingTable from "../../../Components/YahtzeeRatingTable";
+} from "@/const";
 import Player from "@/Components/HallPlayer";
-import LoadPage from "../../../Components/LoadPage";
-
+import PlayerList from "@/Components/YahtzeePlayerList";
+import DiceList from "@/Components/YahtzeeDiceList";
+import RatingTable from "@/Components/YahtzeeRatingTable";
+import LoadPage from "@/Components/LoadPage";
+import { GameGift } from "@/Components/Gifts";
 import {
   getUserProfile,
   gotoYahtzeeGuide,
@@ -45,7 +42,7 @@ import {
   updateGameScores,
   updatePlayerOnline_Database,
 } from "./gameApi";
-import { GameGift } from "../../../Components/Gifts";
+import "./index.scss";
 
 export default function Index() {
   // 页面参数

@@ -1,4 +1,6 @@
+import { clearGiftAnimate } from "@/utils_api";
 import { View, Text } from "@tarojs/components";
+import { useDidShow } from "@tarojs/taro";
 import { ANIMATION_BACKUP_LIST } from "../../const";
 import "./index.scss";
 
@@ -28,6 +30,11 @@ export const Praise = function Index() {
 
 export const GameGift = function Index() {
   const list = ANIMATION_BACKUP_LIST;
+
+  useDidShow(() => {
+    clearGiftAnimate();
+  });
+
   return (
     <View id="game-gift-container">
       {list.map((_, index) => (

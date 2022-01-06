@@ -801,7 +801,7 @@ function getRowColorMap(
 
 export function judgePlaygroundPerfect(
   playgroundData: Rummy.RummyCardData[][]
-): boolean {
+): Rummy.RummyCardData[] {
   let tempList = [];
   for (let i = 0; i < GROUND_COL_LEN; i++) {
     for (let j = 0; j < GROUND_ROW_LEN; j++) {
@@ -810,7 +810,7 @@ export function judgePlaygroundPerfect(
         if (tempList.length > 0) {
           const judgeRes = judgeListIsSet(tempList);
           if (!judgeRes) {
-            return false;
+            return tempList;
           }
           tempList = [];
         }
@@ -823,12 +823,12 @@ export function judgePlaygroundPerfect(
   if (tempList.length > 0) {
     const judgeRes = judgeListIsSet(tempList);
     if (!judgeRes) {
-      return false;
+      return tempList;
     }
     tempList = [];
   }
 
-  return true;
+  return null;
 }
 
 export function updateCardPos(card, pos) {
@@ -933,7 +933,7 @@ export function getNearestEmptyCross(
     for (let j = 0; j < rowOffsetList.length; j++) {
       const _row = rowIndex + rowOffsetList[j];
       const _col = colIndex + colOffsetList[i];
-      const placeCard = cardDataMap[_col][_row];
+      const placeCard = cardDataMap[_col]?.[_row];
       if (placeCard?.id === cardID) return null;
       if (_row >= 0 && _row < maxW && _col >= 0 && _col < maxH && !placeCard) {
         return {

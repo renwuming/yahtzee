@@ -173,6 +173,11 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
     });
     const startIndex = Math.floor(Math.random() * players.length);
     const now = new Date();
+
+    // 如果已经开始游戏，则忽略
+    const { start } = await findOne(gameDbName, id);
+    if (start) return null;
+
     return {
       startTime: now,
       start: true,

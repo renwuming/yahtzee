@@ -1,9 +1,9 @@
 import { View, Image, Text } from "@tarojs/components";
-import "./index.scss";
-import Achievement from "../Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
-import { OFFLINE_DELAY, PlayerContext } from "../../const";
+import { OFFLINE_DELAY, PlayerContext } from "@/const";
+import Achievement from "../Achievement";
+import "./index.scss";
 
 interface IProps {
   data: Yahtzee.YahtzeePlayer;
@@ -43,7 +43,7 @@ export default function Index({
         }}
       >
         <Image
-          className={`avatar`}
+          className="avatar"
           id={`player-${index}-avatar`}
           src={avatarUrl}
         ></Image>

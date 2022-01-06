@@ -25,39 +25,9 @@
           "scene": null
         },
         {
-          "name": "快艇大厅",
-          "pathName": "pages/Yahtzee/hall/index",
-          "query": "",
-          "scene": null
-        },
-        {
           "name": "火星骰",
           "pathName": "pages/Martian/game/index",
           "query": "id=14139e12612f908a08ab30af675f131b",
-          "scene": null
-        },
-        {
-          "name": "火星骰多人",
-          "pathName": "pages/Martian/game/index",
-          "query": "id=9e7190f1617d566102dad5a703ed0a39",
-          "scene": null
-        },
-        {
-          "name": "火星骰多人2",
-          "pathName": "pages/Martian/game/index",
-          "query": "id=9e7190f16175057701c39be21a05b127",
-          "scene": null
-        },
-        {
-          "name": "快艇排行榜",
-          "pathName": "pages/Yahtzee/ranking/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "name": "欲罢不能大厅",
-          "pathName": "pages/CantStop/hall/index",
-          "query": "",
           "scene": null
         },
         {
@@ -67,27 +37,9 @@
           "scene": null
         },
         {
-          "name": "欲罢不能2",
-          "pathName": "pages/CantStop/game/index",
-          "query": "id=cd045e75613eb4990d35094020e39285",
-          "scene": null
-        },
-        {
-          "name": "每日福利",
-          "pathName": "pages/wealth/index",
-          "query": "",
-          "scene": null
-        },
-        {
           "name": "赛季排行榜",
           "pathName": "pages/seasonRank/index",
           "query": "",
-          "scene": null
-        },
-        {
-          "name": "火星骰3",
-          "pathName": "pages/Martian/game/index",
-          "query": "id=fa24ce1a618e368105f9499f472037b9",
           "scene": null
         },
         {
@@ -97,39 +49,21 @@
           "scene": null
         },
         {
-          "name": "Set2",
-          "pathName": "pages/Set/game/index",
-          "query": "id=3ba7a66861a24159005e01833984ce58",
-          "scene": null
-        },
-        {
           "name": "个人主页",
           "pathName": "pages/homepage/index",
           "query": "openid=oqWgm5fO6WmeIflXZZJusUBmWPB0",
           "scene": null
         },
         {
-          "name": "个人主页2",
-          "pathName": "pages/homepage/index",
-          "query": "openid=oqWgm5b36pHkbm6JY2nutZChE170",
-          "scene": null
-        },
-        {
-          "name": "拉密大厅",
-          "pathName": "pages/Rummy/hall/index",
-          "query": "id=d20aea5861c29cf601724cfe6612131e",
-          "scene": null
-        },
-        {
           "name": "拉密2",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=5b049cc861cab9c200e66fd11e262aae",
+          "query": "id=54ad1eea61cad3ed01258573334ce914",
           "scene": null
         },
         {
-          "name": "拉密3",
-          "pathName": "pages/Rummy/game/index",
-          "query": "id=bf4a0bf261cacf580105cc22716f3a1d",
+          "name": "电波同步",
+          "pathName": "pages/WaveLength/game/index",
+          "query": "",
           "scene": null
         }
       ]

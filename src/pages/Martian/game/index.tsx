@@ -108,11 +108,16 @@ export default function Index() {
   // 监听数据库变化
   useEffect(() => {
     if (!pageShow) return;
+    const watcherMap = {
+      watcher: null,
+      eventsWatcher: null,
+      lastUpdate: new Date(),
+    };
     const watcher = watchDataBase(id, cb);
-    const eventsWatcher = watchEvents_DataBase(id, eventCb);
+    watchEvents_DataBase(id, eventCb, watcherMap);
     return () => {
       watcher.close();
-      eventsWatcher.close();
+      watcherMap.eventsWatcher.close();
     };
   }, [pageShow]);
 

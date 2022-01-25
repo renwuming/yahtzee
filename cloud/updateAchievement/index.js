@@ -297,9 +297,16 @@ async function handleRummyAchievement(db, openid) {
 
   let multiWinSum = 0;
   let minRoundSum = Infinity;
+  let minGroundCardSum = Infinity;
 
   singleGames.forEach((item) => {
     minRoundSum = Math.min(item.roundSum, minRoundSum);
+
+    const CARD_SUM = 106;
+    minGroundCardSum = Math.min(
+      CARD_SUM - item.cardLibrary.length,
+      minGroundCardSum
+    );
   });
 
   multiGames.forEach((item) => {
@@ -319,5 +326,6 @@ async function handleRummyAchievement(db, openid) {
     multiWinRateValue,
     multiWinRate,
     minRoundSum,
+    minGroundCardSum,
   };
 }

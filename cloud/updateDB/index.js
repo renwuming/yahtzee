@@ -12,24 +12,57 @@ exports.main = async (event) => {
 
   return; // TODO >>>>>>>>>>>>>>>>
 
-  // 删除旧数据
   const ONE_DAYS = 1 * 24 * 60 * 60 * 1000;
   const TIME = new Date(Date.now() - ONE_DAYS);
-  const list = await db.collection("players").where({
-    "achievement.set": _.exists(1),
-    // _updateTime: _.lt(TIME),
-    // end: _.neq(true),
-    //       winner: -1,
-  });
-  // .limit(1000)
-  // .get();
-  //     .then((res) => res.data);
+  const list = await db
+    .collection("rummy_games")
+    .where({
+      // "achievement.set": _.exists(1),
+      // _updateTime: _.lt(TIME),
+      //       winner: -1,
+      end: true,
+      // endTime: _.gt(new Date("2022-01-24")),
+      rankList: _.exists(0),
+    })
+    .limit(1000)
+    .get()
+    .then((res) => res.data);
   // .update({
   //   data: {
   //     "achievement.set": _.remove(),
   //   },
   // });
   // .remove();
+  const JokerValue = 30;
+
+  list.forEach((item) => {
+    const { _id, players } = item;
+
+    const handValueSumList = players.map((player, index) => {
+      const { cardList } = player;
+      const valueSum = cardList.reduce((sum, card) => {
+        const value = card.value === 0 ? JokerValue : card.value;
+        return sum + value;
+      }, 0);
+      return {
+        value: valueSum,
+        index,
+      };
+    });
+
+    const rankList = handValueSumList
+      .sort((a, b) => a.value - b.value)
+      .map((item) => item.index);
+
+    db.collection("rummy_games")
+      .doc(_id)
+      .update({
+        data: {
+          winner: rankList[0],
+          rankList,
+        },
+      });
+  });
 
   return list;
 };

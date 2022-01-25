@@ -128,7 +128,7 @@ exports.handleGame = async function handleGame(
     if (newData) {
       // 游戏结束，则更新所有玩家的成就
       if (newData.end) {
-        updatePlayer(oldData.players, "rummy");
+        updatePlayer(oldData.players, "rummy", newData.rankList);
       }
 
       const date = new Date();
@@ -224,45 +224,38 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
   }
   // 结束回合，不需要抽牌
   else if (action === "endRoundPerfect" && inRound) {
-    const { playgroundData, roundSum, cardLibrary } = oldData;
+    const { playgroundData, roundSum } = oldData;
     const currentPlayer = players[playerIndex];
     const { playgroundData: newPlaygroundData } = data;
     const newData = handleEndRoundPerfect(
       playgroundData,
       newPlaygroundData,
       currentPlayer,
-      playerIndex
+      playerIndex,
+      players
     );
 
-    const newRoundData = newRound(roundPlayer, players, roundSum, cardLibrary);
+    const newRoundData = newRound(roundPlayer, players, roundSum);
     return { ...newData, ...newRoundData };
   }
   // 结束回合，并抽牌
-  else if (action === "endRoundAddCard" && inRound) {
-    const { cardLibrary, roundSum } = oldData;
-    const { cardList } = players[playerIndex];
-    const [newCard] = cardLibrary.splice(0, 1);
-    if (newCard) cardList.unshift(newCard);
-
-    const newRoundData = newRound(roundPlayer, players, roundSum, cardLibrary);
-    return {
-      [`players.${playerIndex}.cardList`]: cardList,
-      cardLibrary,
-      ...newRoundData,
-    };
-  }
   // 超时，通过定时器，结束回合，并抽牌
-  else if (action === "endRoundByTimer") {
+  else if (
+    (action === "endRoundAddCard" && inRound) ||
+    action === "endRoundByTimer"
+  ) {
     const { cardLibrary, roundSum } = oldData;
     const { cardList } = players[roundPlayer];
     const [newCard] = cardLibrary.splice(0, 1);
     if (newCard) cardList.unshift(newCard);
 
-    const newRoundData = newRound(roundPlayer, players, roundSum, cardLibrary);
+    const newRoundData = newRound(roundPlayer, players, roundSum);
+    const endData = handleEndData(players, cardLibrary, null);
     return {
       [`players.${roundPlayer}.cardList`]: cardList,
       cardLibrary,
       ...newRoundData,
+      ...endData,
     };
   }
 
@@ -273,7 +266,8 @@ function handleEndRoundPerfect(
   oldPlaygroundData,
   newPlaygroundData,
   currentPlayer,
-  playerIndex
+  playerIndex,
+  players
 ) {
   const isPerfect = judgePlaygroundPerfect(newPlaygroundData);
   if (!isPerfect) {
@@ -318,7 +312,9 @@ function handleEndRoundPerfect(
     );
     const allSet = newSetList.every((list) => judgeListIsSet(list));
     if (!allSet || newListValueSum < 30) {
-      throw new Error("400-破冰失败");
+      throw new Error(
+        "400-破冰失败。第一次出牌要求点数之和不小于30，且不能使用公共牌。"
+      );
     }
   }
   // 整理playgroundData
@@ -329,7 +325,8 @@ function handleEndRoundPerfect(
   );
 
   // 判断回合结束
-  const endData = handleEndData(newCardList, playerIndex);
+  players[playerIndex].cardList = newCardList;
+  const endData = handleEndData(players, null, newCardList);
 
   return {
     playgroundData: newPlaygroundData,
@@ -339,7 +336,7 @@ function handleEndRoundPerfect(
   };
 }
 
-function newRound(roundPlayer, players, roundSum, cardLibrary) {
+function newRound(roundPlayer, players, roundSum) {
   const newRoundPlayer = (roundPlayer + 1) % players.length;
 
   const updateData = {
@@ -349,22 +346,37 @@ function newRound(roundPlayer, players, roundSum, cardLibrary) {
     roundPlaygroundData: null,
   };
 
-  const emptyLibrary = cardLibrary.length === 0;
-  if (emptyLibrary) {
-    updateData.end = true;
-    updateData.endTime = new Date();
-    updateData.winner = -1;
-  }
-
   return updateData;
 }
 
-function handleEndData(list, playerIndex) {
-  if (list.length === 0) {
+function handleEndData(players, cardLibrary, cardList) {
+  // 小丑价值30
+  const JokerValue = 30;
+  if (
+    (cardLibrary && cardLibrary.length === 0) ||
+    (cardList && cardList.length === 0)
+  ) {
+    const handValueSumList = players.map((player, index) => {
+      const { cardList } = player;
+      const valueSum = cardList.reduce((sum, card) => {
+        const value = card.value === 0 ? JokerValue : card.value;
+        return sum + value;
+      }, 0);
+      return {
+        value: valueSum,
+        index,
+      };
+    });
+
+    const rankList = handValueSumList
+      .sort((a, b) => a.value - b.value)
+      .map((item) => item.index);
+
     return {
       end: true,
       endTime: new Date(),
-      winner: playerIndex,
+      winner: rankList[0],
+      rankList,
     };
   }
 
@@ -736,6 +748,26 @@ exports.getRanking = async function getRanking(data) {
         "achievement.rummy.multiWinSum": _.exists(1),
       })
       .orderBy("achievement.rummy.multiWinSum", "desc")
+      .field({
+        avatarUrl: 1,
+        nickName: 1,
+        achievement: 1,
+        openid: 1,
+      })
+      .skip(_skip)
+      .limit(_pageLength)
+      .get()
+      .then((res) => res.data);
+
+    return list;
+  } else if (type === "cardSum") {
+    const list = await db
+      .collection("players")
+      .where({
+        "achievement.rummy.minGroundCardSum": _.exists(1),
+        "achievement.rummy.minGroundCardSum": _.neq(null),
+      })
+      .orderBy("achievement.rummy.minGroundCardSum", "asc")
       .field({
         avatarUrl: 1,
         nickName: 1,

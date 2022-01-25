@@ -1,6 +1,11 @@
 const cloud = require("wx-server-sdk");
 
-exports.updatePlayer = function (players, gameName) {
+exports.updatePlayer = function (players, gameName, rankList) {
+  // 按照游戏名次，更新赛季积分数据
+  if (rankList) {
+    handleSeasonRankData(players, rankList);
+  }
+
   players.forEach(async (item) => {
     const { openid } = item;
 
@@ -27,6 +32,67 @@ exports.updatePlayer = function (players, gameName) {
     });
   });
 };
+
+const SeasonRankScoreMap = {
+  2: {
+    0: 20,
+    1: -15,
+  },
+  3: {
+    0: 25,
+    1: 10,
+    2: -20,
+  },
+  4: {
+    0: 30,
+    1: 15,
+    2: 0,
+    3: -25,
+  },
+};
+async function handleSeasonRankData(players, rankList) {
+  const playerSum = players.length;
+  if (playerSum < 2) return;
+  const db = cloud.database();
+  const _ = db.command;
+
+  const [seasonRankData] = await db
+    .collection("season_ranks")
+    .where({
+      game: "rummy",
+      start: true,
+      end: _.neq(true),
+    })
+    .orderBy("startTime", "desc")
+    .get()
+    .then((res) => res.data);
+
+  if (!seasonRankData) return;
+
+  const { seasonRankList, _id } = seasonRankData;
+  rankList.forEach((playerIndex, rank) => {
+    const { openid } = players[playerIndex];
+    const data = seasonRankList.find((item) => item.openid === openid);
+    const scoreChange = SeasonRankScoreMap[playerSum][rank];
+    if (data) {
+      data.score += scoreChange;
+    } else {
+      seasonRankList.push({
+        openid,
+        score: scoreChange,
+      });
+    }
+  });
+
+  seasonRankList.sort((a, b) => b.score - a.score);
+
+  // 更新赛季积分数据
+  db.collection("season_ranks").doc(_id).update({
+    data: {
+      seasonRankList,
+    },
+  });
+}
 
 exports.getPlayer = async function (_openid) {
   const { result: player } = await cloud.callFunction({

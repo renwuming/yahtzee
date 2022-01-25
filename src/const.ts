@@ -1,6 +1,24 @@
 import { Context, createContext } from "react";
 import { Bomb, Praise, Rose } from "@/Components/Gifts";
 
+export const SeasonRankScoreMap = {
+  2: {
+    0: 20,
+    1: -15,
+  },
+  3: {
+    0: 25,
+    1: 10,
+    2: -20,
+  },
+  4: {
+    0: 30,
+    1: 15,
+    2: 0,
+    3: -25,
+  },
+};
+
 export const PlayerContext: Context<{
   gameID?: string;
   players?: Player[];
@@ -39,6 +57,7 @@ export enum AchievementGameIndex {
   cantstop,
   set,
   rummy,
+  wavelength,
 }
 
 export const GIFT_LIST: GiftItem[] = [
@@ -134,6 +153,7 @@ export const INIT_CARD_SUM = 12;
 export const SET_TIME_LIMIT = 5 * 60;
 
 // 拉密
+export const CARD_SUM = 106;
 export const RUMMY_ROUND_TIME_LIMIT = 65;
 export const RUMMY_SHOW_ROUND_TIME_LIMIT = 60;
 export enum RUMMY_AREA_STATUS {

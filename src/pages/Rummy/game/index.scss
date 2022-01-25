@@ -1,14 +1,13 @@
 page {
   --boxW: 48px;
   --boxH: 66px;
-  --cardW: 46px;
-  --cardH: 64px;
 
   min-height: 100%;
   height: 100%;
   background-color: #4b6d8d;
 }
 movable-area {
+  position: relative;
   width: 100%;
   height: 100%;
 }
@@ -28,6 +27,10 @@ movable-area {
     justify-content: flex-end;
     align-items: center;
     width: 100%;
+    visibility: hidden;
+    &.show {
+      visibility: visible;
+    }
   }
   .rummy-game-left {
     display: flex;
@@ -73,6 +76,7 @@ movable-area {
         visibility: hidden;
       }
       .round-ctrl-btn {
+        display: flex;
         width: 60px;
         height: 90px;
         line-height: 90px;
@@ -80,6 +84,16 @@ movable-area {
         margin-bottom: 20px;
         border-radius: 6px;
         border: none;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f6d1;
+        border-radius: 4px;
+        box-shadow: 1px 1px 2px 2px #b2a27d;
+        font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
+          Arial, sans-serif;
+        font-size: 30px;
+        font-weight: bold;
+
         .at-button__text {
           display: flex;
           flex-direction: column;
@@ -232,73 +246,15 @@ movable-area {
       }
     }
   }
-  .card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--cardW);
-    height: var(--cardH);
-    background-color: #f8f6d1;
-    border-radius: 4px;
-    box-shadow: 1px 1px 2px 2px #b2a27d;
-    font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
-      sans-serif;
-    font-size: 30px;
-    font-weight: bold;
+  .card-wrapper {
     &.hidden {
       visibility: hidden;
     }
     &.bottom {
       z-index: 10;
     }
-    &.red {
-      color: #c2302f;
-      .point {
-        background-color: #c2302f;
-      }
-    }
-    &.yellow {
-      color: #f4870b;
-      .point {
-        background-color: #f4870b;
-      }
-    }
-    &.black {
-      color: #0d0812;
-      .point {
-        background-color: #0d0812;
-      }
-    }
-    &.blue {
-      color: #4272a6;
-      .point {
-        background-color: #4272a6;
-      }
-    }
     &.active {
       z-index: 100;
-    }
-    .card-img {
-      width: 100%;
-      height: 100%;
-    }
-    .content {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      .point {
-        position: absolute;
-        bottom: 4px;
-        width: 8px;
-        height: 8px;
-        border-radius: 8px;
-      }
-    }
-    &.err {
-      background-color: rgb(240, 128, 128, 0.7);
-      box-shadow: none;
     }
   }
   .count-down-box {
@@ -328,4 +284,10 @@ movable-area {
       height: 10px;
     }
   }
+}
+// 游戏结果
+.result-box {
+  position: absolute;
+  top: 30px;
+  width: 100%;
 }

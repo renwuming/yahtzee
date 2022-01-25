@@ -27,8 +27,8 @@ function RankItem({ index, data, type }: RankItemProps) {
         </View>
       ) : (
         <View className="column-right">
-          <Text className="score-title">最少回合</Text>
-          <Text className="score">{achievement?.rummy?.minRoundSum}</Text>
+          <Text className="score-title">最少用牌</Text>
+          <Text className="score">{achievement?.rummy?.minGroundCardSum}</Text>
         </View>
       )}
     </View>
@@ -74,7 +74,7 @@ export default function Index() {
         action: "getRanking",
         gameDbName: "rummy_games",
         data: {
-          type: "round",
+          type: "cardSum",
           skip: pageNum2 * PAGE_LEN,
           pageLength: PAGE_LEN,
         },

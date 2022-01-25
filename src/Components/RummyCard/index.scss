@@ -1,0 +1,67 @@
+.rummy-card {
+  --cardW: 46px;
+  --cardH: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cardW);
+  height: var(--cardH);
+  background-color: #f8f6d1;
+  border-radius: 4px;
+  box-shadow: 1px 1px 2px 2px #b2a27d;
+  font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
+    sans-serif;
+  font-size: 30px;
+  font-weight: bold;
+  &.offset {
+    margin-bottom: 4px;
+    margin-left: 4px;
+  }
+  &.red {
+    color: #c2302f;
+    .point {
+      background-color: #c2302f;
+    }
+  }
+  &.yellow {
+    color: #f4870b;
+    .point {
+      background-color: #f4870b;
+    }
+  }
+  &.black {
+    color: #0d0812;
+    .point {
+      background-color: #0d0812;
+    }
+  }
+  &.blue {
+    color: #4272a6;
+    .point {
+      background-color: #4272a6;
+    }
+  }
+  .card-img {
+    width: 100%;
+    height: 100%;
+  }
+  .content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    .point {
+      position: absolute;
+      bottom: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 8px;
+    }
+  }
+  &.err {
+    background-color: rgb(240, 128, 128, 0.7);
+    box-shadow: none;
+  }
+}

@@ -55,15 +55,21 @@
           "scene": null
         },
         {
-          "name": "拉密2",
+          "name": "拉密",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=54ad1eea61cad3ed01258573334ce914",
+          "query": "id=54ad1eea61c5d2f90056396746cec50f",
           "scene": null
         },
         {
           "name": "电波同步",
           "pathName": "pages/WaveLength/game/index",
           "query": "",
+          "scene": null
+        },
+        {
+          "name": "拉密多人",
+          "pathName": "pages/Rummy/game/index",
+          "query": "id=bf4a0bf261c72ee0007f12e423211795",
           "scene": null
         }
       ]

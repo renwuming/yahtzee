@@ -1,13 +1,21 @@
 import Taro from "@tarojs/taro";
-import { MAX_PLAYERS, RUMMY_AREA_STATUS, RUMMY_SET_TYPE } from "@/const";
+import {
+  CARD_SUM,
+  MAX_PLAYERS,
+  RUMMY_AREA_STATUS,
+  RUMMY_SET_TYPE,
+} from "@/const";
 import { CallCloudFunction, flat, navigateTo } from "@/utils";
 
-export const CARD_LIBRARY: number[] = new Array(106).fill(1).map((_, id) => id);
+export const CARD_LIBRARY: number[] = new Array(CARD_SUM)
+  .fill(1)
+  .map((_, id) => id);
 
 export async function handleGameAction(
   id: string,
   action: string,
-  data: any = {}
+  data: any = {},
+  showToast: any = () => {}
 ) {
   const res = await CallCloudFunction({
     name: "gameApi",
@@ -22,11 +30,7 @@ export async function handleGameAction(
   if (res) {
     const { errCode, errMsg } = res;
     if (errCode === 400) {
-      Taro.showToast({
-        title: errMsg,
-        icon: "none",
-        duration: 1000,
-      });
+      showToast(errMsg, 3000);
     }
   }
 }

@@ -71,7 +71,7 @@ import { Rose } from "@/Components/Gifts";
 export default function Index() {
   const [tabList, setTabList] = useState<TabItem[]>([
     {
-      title: "赛季排行",
+      title: "赛季榜",
     },
     {
       title: "魅力榜",

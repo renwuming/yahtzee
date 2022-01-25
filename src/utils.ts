@@ -1,7 +1,8 @@
 import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
+import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.1.0";
+export const VERSION = "v5.1.1";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -258,4 +259,59 @@ export function gotoRummyGuide() {
     appId: "wx7564fd5313d24844",
     path: "pages/video/video?__preload_=16402720928313&__key_=16402720928314&avid=29811984",
   });
+}
+
+export async function getSeasonRankData(
+  game: string,
+  pageNum: number
+): Promise<SeasonRankPlayerData[]> {
+  const _ = DB.command;
+
+  const [seasonRankData] = await DB.collection("season_ranks")
+    .where({
+      game,
+      start: true,
+      end: _.neq(true),
+    })
+    .orderBy("startTime", "desc")
+    .get()
+    .then((res) => res.data);
+
+  if (!seasonRankData) return [];
+
+  const { seasonRankList } = seasonRankData;
+  const rankList = seasonRankList.slice(
+    pageNum * PAGE_LEN,
+    (pageNum + 1) * PAGE_LEN
+  );
+  const openidList = rankList.map((item) => item.openid);
+  const playerList = await DB.collection("players")
+    .where({
+      openid: _.in(openidList),
+    })
+    .get()
+    .then((res) => res.data);
+
+  return rankList.map((data) => {
+    const { openid, score } = data;
+    const player = playerList.find((item) => item.openid === openid);
+    const rankImgUrl = getRankImgUrl(score);
+    return {
+      ...data,
+      ...player,
+      rankImgUrl,
+    };
+  });
+}
+
+function getRankImgUrl(score) {
+  let rankValue = 0;
+  if (score < 50) rankValue = 0;
+  else if (score < 100) rankValue = 1;
+  else if (score < 300) rankValue = 2;
+  else if (score < 600) rankValue = 3;
+  else if (score < 1000) rankValue = 4;
+  else rankValue = 5;
+  const rankImgUrl = `https://cdn.renwuming.cn/static/yahtzee/imgs/level${rankValue}.jpg`;
+  return rankImgUrl;
 }

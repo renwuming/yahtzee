@@ -7,7 +7,7 @@ import {
   Image,
 } from "@tarojs/components";
 import { AtBadge, AtButton, AtIcon, AtProgress, AtToast } from "taro-ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { flat, getUserProfile, SLEEP } from "@/utils";
 import {
@@ -85,12 +85,14 @@ export default function Index() {
   >([]);
   // client端
   const [activePlayer, setActivePlayer] = useState<number>(0);
-  const [activeCardID, setActiveCardID] = useState<number>(-1);
+  const activeCardID = useRef<number>(-1);
   const crossData = useRef<Rummy.CrossData[]>([]);
   const cardAreaStatus = useRef<number>(RUMMY_AREA_STATUS.other);
   const [errList, setErrList] = useState<number[]>([]);
   const [toastText, setToastText] = useState<string>("");
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [straightSortFirst, setStraightSortFirst] = useState<boolean>(true);
+  const waiting = useRef<boolean>(false);
 
   const {
     playerIndex,
@@ -107,6 +109,30 @@ export default function Index() {
   const showPlayboard = gaming && (inGame || singlePlayer);
   const groundCardSum = CARD_SUM - cardLibrary?.length;
   const gameDataLoaded = players.length >= 1;
+
+  const MemoCardList = useMemo(
+    () => (
+      <CardList
+        gaming={gaming}
+        gameData={gameData}
+        cardList={cardList}
+        playgroundCardList={playgroundCardList}
+        errList={errList}
+        activeCardID={activeCardID}
+        onChange={onChange}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      ></CardList>
+    ),
+    [
+      gaming,
+      gameData,
+      cardList,
+      playgroundCardList,
+      errList,
+      activeCardID.current,
+    ]
+  );
 
   useGameApi({
     id,
@@ -144,7 +170,6 @@ export default function Index() {
 
   function gameDataWatchCb(data: Rummy.RummyGameBaseData, updatedFields = []) {
     if (!data) return;
-
     updatedFields = updatedFields.filter(
       (key) => !(key === "_updateTime" || /^players\.\d+\.timeStamp/.test(key))
     );
@@ -155,7 +180,6 @@ export default function Index() {
       );
     }
     const gameDataChange = updatedFields.length > 0;
-
     if (gameDataChange) {
       const cardListPattern = new RegExp(`^players\.${playerIndex}\.cardList`);
       const boardChange = updatedFields.some((key) =>
@@ -243,10 +267,10 @@ export default function Index() {
   }, [players.length, start]);
 
   function onTouchStart(id: number) {
-    setActiveCardID(id);
+    activeCardID.current = id;
   }
   function onChange(event, id: number) {
-    if (id !== activeCardID) return;
+    if (id !== activeCardID.current) return;
     const {
       detail: { x, y },
     } = event;
@@ -260,20 +284,20 @@ export default function Index() {
     if (judgeIn(cardPosData, RUMMY_AREA_STATUS.playground)) {
       cardAreaStatus.current = RUMMY_AREA_STATUS.playground;
       const _crossData = getBoxCross(cardPosData, RUMMY_AREA_STATUS.playground);
-      crossData.current[activeCardID] = _crossData;
+      crossData.current[activeCardID.current] = _crossData;
     }
     // 在玩家面板中
     else if (judgeIn(cardPosData, RUMMY_AREA_STATUS.playboard)) {
       cardAreaStatus.current = RUMMY_AREA_STATUS.playboard;
       const _crossData = getBoxCross(cardPosData, RUMMY_AREA_STATUS.playboard);
-      crossData.current[activeCardID] = _crossData;
+      crossData.current[activeCardID.current] = _crossData;
     } else {
       cardAreaStatus.current = RUMMY_AREA_STATUS.other;
     }
   }
   async function onTouchEnd(id: number) {
-    if (id !== activeCardID) return;
-    if (!crossData.current[activeCardID]) return;
+    if (id !== activeCardID.current) return;
+    if (!crossData.current[activeCardID.current]) return;
     let pos;
     let index = getCardIndexByID(cardList, id);
     // 是否为公共牌
@@ -294,7 +318,7 @@ export default function Index() {
       if (targetIsValid) {
         _crossData = getNearestEmptyCross(
           RUMMY_AREA_STATUS.playground,
-          crossData.current[activeCardID],
+          crossData.current[activeCardID.current],
           id,
           playgroundData
         );
@@ -330,7 +354,7 @@ export default function Index() {
           targetInPlayGround
             ? RUMMY_AREA_STATUS.playground
             : RUMMY_AREA_STATUS.playboard,
-          crossData.current[activeCardID],
+          crossData.current[activeCardID.current],
           id,
           targetInPlayGround ? playgroundData : playboardData
         );
@@ -359,8 +383,7 @@ export default function Index() {
       await SLEEP(50);
       setCardList(cardList.concat());
     }
-
-    setActiveCardID(-1);
+    activeCardID.current = -1;
     updateRoundPlaygroundData();
   }
 
@@ -461,14 +484,22 @@ export default function Index() {
     }
   }
 
-  function addCard() {
+  async function addCard() {
+    if (waiting.current) return;
+    waiting.current = true;
     resetBoard();
-    handleGameAction(id, "endRoundAddCard");
+    await handleGameAction(id, "endRoundAddCard");
+    waiting.current = false;
   }
 
-  function execSortCardList() {
-    const showCardList = sortCardList(cardList);
+  async function execSortCardList() {
+    if (waiting.current) return;
+    waiting.current = true;
+    const showCardList = sortCardList(cardList, straightSortFirst);
     updateCardList(showCardList);
+    setStraightSortFirst(!straightSortFirst);
+    await SLEEP(1000);
+    waiting.current = false;
   }
 
   function execPlaceSetFromBoardToGround() {
@@ -761,95 +792,13 @@ export default function Index() {
             )}
           </View>
         </View>
-
-        {end
-          ? null
-          : CARD_LIBRARY.map((id) => {
-              const playerCard = gaming
-                ? cardList?.find((card) => card.id === id)
-                : null;
-              const groundCard = playgroundCardList?.find(
-                (card) => card.id === id
-              );
-
-              let otherPlayerCard;
-              if (!playerCard && !groundCard) {
-                for (let i = 0; i < players.length; i++) {
-                  const { cardList } = players[i];
-                  otherPlayerCard = cardList?.find((card) => card.id === id);
-                  if (otherPlayerCard) {
-                    const { left, top } =
-                      Taro.getStorageSync(
-                        `rummy-player-${players.length}-${i}-avatar-pos`
-                      ) || {};
-                    otherPlayerCard.x = left;
-                    otherPlayerCard.y = top;
-                    break;
-                  }
-                }
-              }
-
-              let isLibrary = false;
-              let noValue = false;
-              let cardData;
-              if (playerCard) {
-                cardData = playerCard;
-              } else if (groundCard) {
-                cardData = groundCard;
-              } else if (otherPlayerCard) {
-                cardData = otherPlayerCard;
-                noValue = true;
-              } else {
-                const { cardLibraryPosData } =
-                  Taro.getStorageSync("rummy_device_data");
-                cardData = {
-                  id,
-                  x: cardLibraryPosData?.x,
-                  y: cardLibraryPosData?.y,
-                };
-                noValue = true;
-                isLibrary = true;
-              }
-              if (!cardData) return null;
-
-              const { x, y, inGroundTemp } = cardData;
-
-              const isErr = errList.includes(id);
-              return (
-                <MovableView
-                  key={id}
-                  className={clsx(
-                    "card-wrapper",
-                    otherPlayerCard
-                      ? "bottom"
-                      : id === activeCardID && "active",
-                    isLibrary && "hidden"
-                  )}
-                  direction="all"
-                  onChange={(event) => {
-                    onChange(event, id);
-                  }}
-                  onTouchStart={() => {
-                    onTouchStart(id);
-                  }}
-                  onTouchEnd={() => {
-                    onTouchEnd(id);
-                  }}
-                  x={x}
-                  y={y}
-                >
-                  {noValue ? null : (
-                    <RummyCard
-                      data={cardData}
-                      inGround={!groundCard || inGroundTemp}
-                      isErr={isErr}
-                    ></RummyCard>
-                  )}
-                </MovableView>
-              );
-            })}
+        <AtToast
+          isOpened={toastIsOpen}
+          text={toastText}
+          status="error"
+        ></AtToast>
+        {MemoCardList}
       </View>
-      <AtToast isOpened={toastIsOpen} text={toastText} status="error"></AtToast>
 
       {end && (
         <View className="result-box">
@@ -857,5 +806,120 @@ export default function Index() {
         </View>
       )}
     </MovableArea>
+  );
+}
+
+interface CardListProps {
+  gaming: boolean;
+  gameData: Rummy.RummyGameData;
+  cardList: Rummy.RummyCardData[];
+  playgroundCardList: Rummy.RummyCardData[];
+  errList: number[];
+  activeCardID: React.MutableRefObject<number>;
+  onChange: any;
+  onTouchStart: any;
+  onTouchEnd: any;
+}
+function CardList({
+  gaming,
+  gameData,
+  cardList,
+  playgroundCardList,
+  errList,
+  activeCardID,
+  onChange,
+  onTouchStart,
+  onTouchEnd,
+}: CardListProps) {
+  const { end, players } = gameData || {};
+  return (
+    <View>
+      {end
+        ? null
+        : CARD_LIBRARY.map((id) => {
+            // if (id === 0) console.log('开始重新渲染卡片列表......');
+            const playerCard = gaming
+              ? cardList?.find((card) => card.id === id)
+              : null;
+            const groundCard = playgroundCardList?.find(
+              (card) => card.id === id
+            );
+
+            let otherPlayerCard;
+            if (!playerCard && !groundCard) {
+              for (let i = 0; i < players?.length; i++) {
+                const { cardList } = players[i];
+                otherPlayerCard = cardList?.find((card) => card.id === id);
+                if (otherPlayerCard) {
+                  const { left, top } =
+                    Taro.getStorageSync(
+                      `rummy-player-${players.length}-${i}-avatar-pos`
+                    ) || {};
+                  otherPlayerCard.x = left;
+                  otherPlayerCard.y = top;
+                  break;
+                }
+              }
+            }
+
+            let isLibrary = false;
+            let noValue = false;
+            let cardData;
+            if (playerCard) {
+              cardData = playerCard;
+            } else if (groundCard) {
+              cardData = groundCard;
+            } else if (otherPlayerCard) {
+              cardData = otherPlayerCard;
+              noValue = true;
+            } else {
+              const { cardLibraryPosData } =
+                Taro.getStorageSync("rummy_device_data");
+              cardData = {
+                id,
+                x: cardLibraryPosData?.x,
+                y: cardLibraryPosData?.y,
+              };
+              noValue = true;
+              isLibrary = true;
+            }
+            if (!cardData) return null;
+
+            const { x, y, inGroundTemp } = cardData;
+
+            const isErr = errList.includes(id);
+            return (
+              <MovableView
+                key={id}
+                className={clsx(
+                  "card-wrapper",
+                  otherPlayerCard
+                    ? "bottom"
+                    : id === activeCardID.current && "active",
+                  isLibrary && "hidden"
+                )}
+                direction="all"
+                onChange={(event) => {
+                  onChange(event, id);
+                }}
+                onTouchStart={() => {
+                  onTouchStart(id);
+                }}
+                onTouchEnd={() => {
+                  onTouchEnd(id);
+                }}
+                x={x}
+                y={y}
+              >
+                <RummyCard
+                  data={cardData}
+                  inGround={!groundCard || inGroundTemp}
+                  isErr={isErr}
+                  noValue={noValue}
+                ></RummyCard>
+              </MovableView>
+            );
+          })}
+    </View>
   );
 }

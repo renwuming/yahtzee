@@ -28,7 +28,7 @@ export default function Index() {
   const [tabIndex, setTabIndex] = useState<number>(0);
   const tabList = [
     {
-      title: "成就",
+      title: "游戏记录",
     },
     {
       title: "礼物",

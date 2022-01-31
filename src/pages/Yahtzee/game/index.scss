@@ -70,18 +70,4 @@
     flex: 1;
     overflow-y: scroll;
   }
-
-  .guide-btn .at-fab {
-    position: fixed;
-    right: -30px;
-    bottom: 320px;
-    z-index: 100;
-    width: 150px;
-    height: 80px;
-    border-radius: 0;
-    border-top-left-radius: 40px;
-    border-bottom-left-radius: 40px;
-    background-color: #fff;
-    color: #6190e8;
-  }
 }

@@ -1,0 +1,487 @@
+.wavelength-game {
+  min-height: 100%;
+  padding: 10px 0;
+  background-color: #eef5ff;
+  .top-container {
+    display: flex;
+    width: 100%;
+    height: 250px;
+    justify-content: space-between;
+    .team-img {
+      width: 126px;
+      height: 100%;
+    }
+    .player-list {
+      width: 420px;
+      .common-player-list {
+        padding: 0;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+    }
+    // .team-item {
+    //   display: flex;
+    //   flex-direction: column;
+    //   align-items: center;
+    //   flex: 1;
+    //   height: 100%;
+    //   font-family: yansong;
+    //   color: #666;
+    // }
+  }
+  .btn-box {
+    box-sizing: border-box;
+    padding: 0 126px;
+    margin-top: 20px;
+    .at-button {
+      margin-bottom: 20px;
+      width: 350px;
+    }
+  }
+
+  // old css TODO
+  .room-container {
+    box-sizing: border-box;
+    padding: 40px 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    at-button,
+    login-btn {
+      width: 100%;
+    }
+  }
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 750px;
+    margin-top: 20px;
+    margin-bottom: 60px;
+    .at-tag {
+      width: 180px;
+      background-color: transparent;
+      color: #6190e8;
+      border: 1px solid #6190e8;
+      height: 50px;
+      line-height: 50px;
+      margin-top: 20px;
+      margin-right: 30px;
+      &.red {
+        color: #e6504b;
+        border: 1px solid #e6504b;
+      }
+    }
+  }
+  .player-box {
+    width: 100%;
+    margin-bottom: 100px;
+  }
+  .player-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 50px;
+    .row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+  .index {
+    display: block;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    box-shadow: 5px 5px 5px #aaa;
+  }
+  .menu-btn {
+    margin-bottom: 30px;
+  }
+  .error-btn {
+    background-color: #e6504b;
+    border: 1rpx #e6504b solid;
+  }
+  .invite-btn .at-fab {
+    position: fixed;
+    right: -4px;
+    bottom: 150px;
+    z-index: 100;
+    width: 200px;
+    height: 80px;
+    border-radius: 0;
+    border-top-left-radius: 40px;
+    border-bottom-left-radius: 40px;
+    background-color: #fff;
+    .at-button {
+      width: 160px;
+      height: 90px;
+      font-size: 28px;
+      color: #6190e8;
+      border: 0;
+    }
+  }
+  .history-btn .at-fab,
+  .home-btn .at-fab {
+    position: fixed;
+    right: -4px;
+    bottom: 50px;
+    z-index: 100;
+    width: 200px;
+    height: 80px;
+    border-radius: 0;
+    border-top-left-radius: 40px;
+    border-bottom-left-radius: 40px;
+    background-color: #fff;
+    color: #6190e8;
+  }
+  .invite-btn.gaming .at-fab {
+    right: initial;
+    left: -30px;
+    top: 750px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+  }
+  .home-btn.gaming .at-fab {
+    right: initial;
+    left: -30px;
+    top: 650px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+  }
+  .history-btn .at-fab {
+    right: -30px;
+    top: 650px;
+  }
+
+  // 游戏状态
+  .game-container {
+    box-sizing: border-box;
+    padding: 20px;
+    padding-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .gaming-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    &.hidden {
+      display: none;
+    }
+  }
+  .team-list {
+    display: flex;
+    width: 750px;
+    justify-content: space-between;
+    .team-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      height: 250px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      font-family: yansong;
+      color: #666;
+      &.team-left {
+        background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/team1.png");
+        background-position: left center;
+        padding-left: 126px;
+      }
+      &.team-right {
+        background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/team2.png");
+        background-position: right center;
+        padding-right: 126px;
+      }
+    }
+  }
+  .co-team-list {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    .img {
+      width: 126px;
+      height: 250px;
+      background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/team1.png");
+      background-position: left center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      &.right {
+        background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/team2.png");
+        background-position: right center;
+      }
+    }
+    .co-team-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      .team-box {
+        justify-content: center;
+      }
+    }
+  }
+  .team-box {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .notice-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: yansong;
+    font-size: 36px;
+    &.co-result-box {
+      display: flex;
+      flex-direction: column;
+      font-size: 44px;
+    }
+    .success {
+      color: #e35654;
+    }
+    .m-r {
+      margin-right: 20px;
+    }
+    text {
+      color: #666;
+    }
+    .score {
+      color: #eb6a4a;
+      font-size: 40px;
+    }
+    .co-comment {
+      max-width: 500px;
+      font-size: 30px;
+      line-height: 44px;
+      margin-top: 20px;
+      color: #996699;
+      text-align: center;
+    }
+  }
+
+  .turnplate-container {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    .scores {
+      position: absolute;
+      left: 5%;
+      top: 5%;
+      width: 90%;
+      height: 90%;
+      background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/scores-2.png");
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+      &.rotating {
+        animation: rotate 0.3s linear infinite;
+      }
+      &.co-scores {
+        background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/co-scores.png");
+      }
+    }
+    .turnplate {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/turnplate-3.png");
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+    .pointer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/pointer.jpg");
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+    .other-answers {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-item {
+        margin-top: -28px;
+      }
+      .line {
+        width: 4px;
+        height: 44%;
+        margin-top: -30px;
+        background-color: #996699;
+      }
+    }
+  }
+  .card {
+    display: flex;
+    width: 500px;
+    height: 160px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    font-size: 30px;
+    color: #fff;
+    .words-tip {
+      position: absolute;
+      width: 100px;
+      right: 100px;
+      .at-badge__num {
+        line-height: 2;
+      }
+    }
+    &.back {
+      .left {
+        background-color: #e55f3f;
+      }
+      .right {
+        background-color: #db9f25;
+      }
+    }
+    .left {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      background-color: #99cc99;
+    }
+    .right {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      background-color: #1e8177;
+    }
+  }
+  .gaming-tip {
+    display: inline-block;
+    width: 500px;
+    text-align: center;
+    font-size: 24px;
+    color: #aaa;
+    margin-bottom: 20px;
+  }
+  .question-input {
+    box-sizing: border-box;
+    width: 500px;
+    height: 100px;
+    line-height: 100px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: #003366;
+    background-color: #fff;
+    margin-bottom: 20px;
+  }
+  .submit-btn {
+    width: 500px;
+    height: 70px;
+    line-height: 70px;
+  }
+  .question {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    height: 80px;
+    background-color: #080b36;
+    color: #fff;
+    font-family: yansong;
+    font-size: 30px;
+    border-radius: 10px;
+    margin-bottom: 40px;
+    box-sizing: border-box;
+    padding: 20px;
+  }
+  .slider-box {
+    margin-bottom: 40px;
+  }
+  .slider {
+    width: 500px;
+    height: 60px;
+    margin-bottom: 20px;
+  }
+  .guess-box {
+    display: flex;
+    width: 600px;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+    .token-box {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      .token-item {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        height: 250px;
+        &.right {
+          justify-content: flex-end;
+          .token {
+            margin-right: 0;
+            margin-left: 30px;
+          }
+          .team-box {
+            justify-content: flex-end;
+          }
+        }
+        .token {
+          box-sizing: border-box;
+          flex-shrink: 0;
+          width: 50px;
+          height: 120px;
+          margin-right: 30px;
+          background-image: url("https://cdn.renwuming.cn/static/wavelength/imgs/token.png");
+          background-position: center center;
+          background-size: contain;
+          background-repeat: no-repeat;
+          &.selected {
+            border-bottom: 6px solid #e55f3f;
+          }
+        }
+      }
+      .submit-btn {
+        width: 200px;
+      }
+    }
+  }
+
+  .history-box {
+    border-top: 1px solid #ccc;
+    margin-top: 40px;
+    padding-top: 20px;
+  }
+  .score {
+    font-family: TrebuchetMS;
+  }
+
+  // 旋转动画
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

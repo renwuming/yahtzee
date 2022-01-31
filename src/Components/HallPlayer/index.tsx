@@ -1,7 +1,7 @@
 import { View, Image, Text } from "@tarojs/components";
-import "./index.scss";
 import { navigateTo } from "@/utils";
 import { OFFLINE_DELAY } from "@/const";
+import "./index.scss";
 
 interface IProps {
   data: Player;
@@ -34,7 +34,7 @@ export default function Index({
           clickable && gotoHomePage();
         }}
       >
-        <Image className={`avatar`} src={avatarUrl}></Image>
+        <Image className="avatar" src={avatarUrl}></Image>
         {noNickName ? null : <Text className={colorType}>{nickName}</Text>}
       </View>
     </View>

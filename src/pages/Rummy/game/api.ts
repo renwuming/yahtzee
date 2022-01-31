@@ -148,7 +148,7 @@ export const BOARD_COL_LEN: number = 3;
 export const BOARD_ROW_LEN: number = 14;
 export const BOARD_SUM: number = BOARD_COL_LEN * BOARD_ROW_LEN;
 
-const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
+const RUMMY_COLORS = ["black", "blue", "red", "yellow"];
 const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
 const sameValueIndexList: number[] = new Array(12).fill(1).map((_, index) => {
@@ -370,12 +370,6 @@ export function getBoxCross(
   };
 }
 
-const COLOR_VALUE_MAP = {
-  red: 0,
-  yellow: 1,
-  blue: 2,
-  black: 3,
-};
 function cardSortStraightFn(
   a: Rummy.RummyCardData,
   b: Rummy.RummyCardData
@@ -383,7 +377,7 @@ function cardSortStraightFn(
   const { color, value } = a;
   const { color: color2, value: value2 } = b;
   if (color !== color2) {
-    return COLOR_VALUE_MAP[color] - COLOR_VALUE_MAP[color2];
+    return color >= color2 ? 1 : -1;
   } else {
     return value - value2;
   }
@@ -394,7 +388,7 @@ function cardSortFn(a: Rummy.RummyCardData, b: Rummy.RummyCardData): number {
   if (value !== value2) {
     return value - value2;
   } else {
-    return COLOR_VALUE_MAP[color] - COLOR_VALUE_MAP[color2];
+    return color >= color2 ? 1 : -1;
   }
 }
 
@@ -413,7 +407,8 @@ export function getCardIndexByID(
 }
 
 export function sortCardList(
-  cardList: Rummy.RummyCardData[]
+  cardList: Rummy.RummyCardData[],
+  straightSortFirst: boolean
 ): Rummy.RummyCardData[] {
   const setList = [];
   const IDMap = {};
@@ -427,8 +422,26 @@ export function sortCardList(
   );
   // 顺序不要变
   const jokerList = cardList.filter((item) => item.value === 0);
-  cardList = cardList.filter((item) => item.value !== 0).sort(cardSortFn);
+  cardList = cardList
+    .filter((item) => item.value !== 0)
+    .sort(straightSortFirst ? cardSortStraightFn : cardSortFn);
 
+  if (straightSortFirst) {
+    findStraightSet(cardList, jokerList, IDMap, setList);
+    findGroupSet(cardList, jokerList, IDMap, setList);
+  } else {
+    findGroupSet(cardList, jokerList, IDMap, setList);
+    findStraightSet(cardList, jokerList, IDMap, setList);
+  }
+
+  const _cardList = jokerList.concat(cardList.filter(({ id }) => !IDMap[id]));
+
+  const showCardList = handleCardList(_cardList, setList);
+
+  return showCardList.concat(inGroundCardList);
+}
+
+function findStraightSet(cardList, jokerList, IDMap, setList) {
   RUMMY_COLORS.forEach((color) => {
     const list = cardList.filter((item) => item.color === color).reverse();
     if (list.length === 0) return;
@@ -498,7 +511,9 @@ export function sortCardList(
       }
     }
   });
+}
 
+function findGroupSet(cardList, jokerList, IDMap, setList) {
   RUMMY_VALUES.concat()
     .reverse()
     .forEach((value) => {
@@ -537,29 +552,32 @@ export function sortCardList(
         }
       }
     });
-
-  const _cardList = jokerList.concat(cardList.filter(({ id }) => !IDMap[id]));
-
-  const showCardList = handleCardList(_cardList, setList);
-
-  return showCardList.concat(inGroundCardList);
 }
 
-function judgeListIsSet(list: Rummy.RummyCardData[]): boolean {
+function judgeListIsSet(list) {
   if (list.length < 3) return false;
   const noJokerList = list.filter((item) => item.value !== 0);
+  // 两张鬼牌+一张普通牌，必定符合条件
+  if (noJokerList.length === 1) return true;
+
   const colorN = new Set(noJokerList.map((item) => item.color)).size;
   const isStraight = colorN === 1;
   const isSameValue = colorN === noJokerList.length;
+
   if (isStraight) {
     const exp = new RegExp(
       list
         .map((item, index) => {
-          if (item.value === 0)
-            return list[index - 1]
-              ? list[index - 1].value + 1
-              : list[index + 1].value - 1;
-          else return item.value;
+          if (item.value === 0) {
+            if (list[index - 1] && list[index - 1].value)
+              return list[index - 1].value + 1;
+            if (list[index - 2] && list[index - 2].value)
+              return list[index - 2].value + 2;
+            if (list[index + 1] && list[index + 1].value)
+              return list[index + 1].value - 1;
+            if (list[index + 2] && list[index + 2].value)
+              return list[index + 2].value - 2;
+          } else return item.value;
         })
         .join("-")
     );

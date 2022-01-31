@@ -9,16 +9,15 @@ type AnyPlayer = Yahtzee.YahtzeePlayer &
   Set.SetPlayer &
   Rummy.RummyPlayer;
 
-interface SeasonRank {
-  name: string;
-  list: SeasonRankPlayer[];
-  desTitle: string;
-  desContent: string;
+interface SeasonRankPlayerData extends Player {
+  score: number;
+  rankImgUrl: string;
 }
-interface SeasonRankPlayer extends Player {
-  rankType: string;
-  rankLevel: number;
-  rankImgUrl?: string;
+interface BoardMessage {
+  _id: string;
+  _openid: string;
+  submitter: Player;
+  message: string;
 }
 
 interface Gift {
@@ -58,6 +57,7 @@ interface Achievement {
 interface AchievementItem {
   bestTime?: number;
   minRoundSum?: number;
+  minGroundCardSum?: number;
   highScore?: number;
   singleNum: number;
   multiNum: number;
@@ -80,9 +80,7 @@ interface Player {
   nickName: string;
   avatarUrl: string;
   openid?: string;
-  lastScoreType?: string;
   default?: boolean;
-  sumScore?: number;
   inRound?: boolean;
   timeStamp?: number;
   achievement?: Achievement;
@@ -125,7 +123,9 @@ declare namespace Yahtzee {
     otherScores?: Scores;
   }
   interface YahtzeePlayer extends Player {
+    sumScore?: number;
     scores?: Scores;
+    lastScoreType?: string;
   }
   interface YahtzeeDiceData {
     value: number;
@@ -152,7 +152,9 @@ declare namespace Yahtzee {
 }
 
 declare namespace Martian {
-  interface MartianPlayer extends Player {}
+  interface MartianPlayer extends Player {
+    sumScore?: number;
+  }
   interface MartianGameBaseData extends GameBaseData {
     players: MartianPlayer[];
     winners?: number[];
@@ -218,6 +220,7 @@ declare namespace Set {
   }
   interface SetGameData extends GameData, SetGameBaseData {}
   interface SetPlayer extends Player {
+    sumScore?: number;
     successSum?: number;
     failSum?: number;
   }
@@ -249,6 +252,7 @@ declare namespace Rummy {
     cardLibrary: RummyCardData[];
     playgroundData: RummyCardData[][];
     roundPlaygroundData: RummyCardData[][]; // 临时的 playgroundData
+    rankList?: number[];
   }
   interface RummyGameData extends GameData, RummyGameBaseData {
     playgroundCardList: RummyCardData[];
@@ -257,5 +261,59 @@ declare namespace Rummy {
   interface RummyPlayer extends Player {
     cardList?: RummyCardData[];
     icebreaking?: boolean;
+  }
+}
+
+declare namespace WaveLength {
+  type WordGroup = string[];
+  enum GameMode {
+    battle,
+    cooperation,
+  }
+  enum Stage {
+    sendWave,
+    decode,
+  }
+  interface WaveLengthGameBaseData extends GameBaseData {
+    players: Player[];
+    roundHistory?: Round[];
+    round?: Round;
+    gameMode: GameMode;
+    randomTeam: boolean;
+    winner?: number;
+    teams?: Team[];
+  }
+  interface WaveLengthGameData extends GameData, WaveLengthGameBaseData {}
+  interface Team {
+    players: number[];
+    sumScore: number;
+    nextSendPlayer: number;
+    nextDecodePlayer: number;
+    nextInterceptPlayer: number;
+  }
+  interface Round {
+    startAt: Date;
+    stage: Stage;
+    sendTeam: number;
+    sendPlayer: number;
+    decodePlayer: number;
+    interceptPlayer: number;
+    wordGroup: WordGroup[];
+    selectWordGroup: number;
+    waveLengthStr: string;
+    sendWaveTarget: number;
+    decodeTarget: number;
+    sendTeamScore: number;
+    interceptTeamScore: number;
+    otherDecodeData: decodeData[];
+    otherInterceptData: interceptData[];
+  }
+  interface decodeData {
+    decodePlayer: number;
+    decodeTarget: number;
+  }
+  interface interceptData {
+    interceptPlayer: number;
+    interceptTarget: number; // -1 左，1 右
   }
 }

@@ -3,24 +3,21 @@ import { useEffect, useState } from "react";
 import { AtDivider, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
 import PlayerItem from "@/Components/HallPlayer";
 import { PAGE_LEN, RANKING_LEN } from "@/const";
-import { CallCloudFunction, getSeasonRankData } from "@/utils";
+import { CallCloudFunction } from "@/utils";
 import "./index.scss";
+import SeasonRankList from "@/Components/SeasonRankList";
 
 interface RankItemProps {
   index: number;
-  data: Player | SeasonRankPlayerData;
-  type: "sum" | "round" | "rank";
+  data: Player;
+  type: "sum" | "card";
 }
 
 function RankItem({ index, data, type }: RankItemProps) {
-  const { achievement, score, rankImgUrl } = data as SeasonRankPlayerData;
+  const { achievement } = data;
   return (
     <View key="rank" className="rank-item">
-      {type === "rank" ? (
-        <Image className="level-img" src={rankImgUrl} mode="aspectFit"></Image>
-      ) : (
-        <Text className={"index " + (index < 3 ? "top" : "")}>{index + 1}</Text>
-      )}
+      <Text className={"index " + (index < 3 ? "top" : "")}>{index + 1}</Text>
       <View className="user-box">
         <PlayerItem data={data}></PlayerItem>
       </View>
@@ -30,16 +27,10 @@ function RankItem({ index, data, type }: RankItemProps) {
           <Text className="score">{achievement?.rummy?.multiWinSum}</Text>
         </View>
       )}
-      {type === "round" && (
+      {type === "card" && (
         <View className="column-right">
           <Text className="score-title">最少用牌</Text>
           <Text className="score">{achievement?.rummy?.minGroundCardSum}</Text>
-        </View>
-      )}
-      {type === "rank" && (
-        <View className="column-right">
-          <Text className="score-title">赛季积分</Text>
-          <Text className="score">{score}</Text>
         </View>
       )}
     </View>
@@ -57,11 +48,8 @@ export default function Index() {
   const [pageNum1, setPageNum1] = useState<number>(0);
   const [list2, setList2] = useState<Player[]>([]);
   const [pageNum2, setPageNum2] = useState<number>(0);
-  const [list3, setList3] = useState<SeasonRankPlayerData[]>([]);
-  const [pageNum3, setPageNum3] = useState<number>(0);
   const [page1End, setPage1End] = useState<boolean>(false);
   const [page2End, setPage2End] = useState<boolean>(false);
-  const [page3End, setPage3End] = useState<boolean>(false);
 
   async function updateList1() {
     if (page1End) return;
@@ -105,61 +93,17 @@ export default function Index() {
       setPage2End(true);
     }
   }
-  async function updateList3() {
-    if (page3End) return;
-    const list = await getSeasonRankData("rummy", pageNum3);
-    const newList = list3.concat(list);
-    setList3(newList);
-    setPageNum3(pageNum3 + 1);
-    if (newList.length >= RANKING_LEN || list.length < PAGE_LEN) {
-      setPage3End(true);
-    }
-  }
 
   useEffect(() => {
     updateList1();
     updateList2();
-    updateList3();
   }, []);
 
   return (
     <View className="rummy-ranking">
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
-          <ScrollView
-            className="scroll-view"
-            scrollY
-            enableBackToTop
-            onScrollToLower={() => {
-              updateList3();
-            }}
-          >
-            {list3.map((data, index) => {
-              return (
-                <RankItem
-                  key={data.openid}
-                  data={data}
-                  index={index}
-                  type="rank"
-                ></RankItem>
-              );
-            })}
-            {page3End ? (
-              <AtDivider
-                className="divider"
-                content={`只显示前${RANKING_LEN}名`}
-                fontColor="#666"
-                lineColor="#666"
-              />
-            ) : (
-              <AtIcon
-                className="loading"
-                value="loading-3"
-                size="36"
-                color="#666"
-              ></AtIcon>
-            )}
-          </ScrollView>
+          <SeasonRankList game="rummy"></SeasonRankList>
         </AtTabsPane>
         <AtTabsPane current={tabIndex} index={1}>
           <ScrollView
@@ -212,7 +156,7 @@ export default function Index() {
                   key={data.openid}
                   data={data}
                   index={index}
-                  type="round"
+                  type="card"
                 ></RankItem>
               );
             })}

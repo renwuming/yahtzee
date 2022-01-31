@@ -1,17 +1,16 @@
-import Taro from "@tarojs/taro";
-import { useShareAppMessage } from "@tarojs/taro";
+import Taro, { useShareAppMessage } from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
-import { AtButton } from "taro-ui";
-import "./index.scss";
-import { getUserProfile, navigateTo, VERSION } from "../../utils";
+import { AtButton, AtIcon } from "taro-ui";
+import { getUserProfile, navigateTo, VERSION } from "@/utils";
 import MyPlayer from "../../Components/MyPlayer";
 // @ts-ignore
 import RankIcon from "../../assets/imgs/rank.png";
 // @ts-ignore
 import WechatIcon from "../../assets/imgs/wechat.png";
 // @ts-ignore
-import RewardIcon from "../../assets/imgs/reward.png";
-import { createGame } from "../Rummy/game/api";
+// import RewardIcon from "../../assets/imgs/reward.png";
+// import { createGame } from "../Rummy/game/api";
+import "./index.scss";
 
 export default function Index() {
   // 设置分享
@@ -134,7 +133,7 @@ export default function Index() {
             <Text>加群交流</Text>
           </View>
         </AtButton>
-        <AtButton
+        {/* <AtButton
           onClick={() => {
             Taro.previewImage({
               urls: ["https://cdn.renwuming.cn/static/reward.jpg"],
@@ -144,6 +143,16 @@ export default function Index() {
           <View className="icon-btn">
             <Image mode="aspectFit" src={RewardIcon}></Image>
             <Text>打赏作者</Text>
+          </View>
+        </AtButton> */}
+        <AtButton
+          onClick={() => {
+            navigateTo("", `MessageBoard/index`);
+          }}
+        >
+          <View className="icon-btn">
+            <AtIcon value="edit" size="36" color="#4871b6"></AtIcon>
+            <Text>留言板</Text>
           </View>
         </AtButton>
       </View>

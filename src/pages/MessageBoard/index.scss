@@ -1,0 +1,44 @@
+.message-board {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 40px 20px;
+  background-color: #eef5ff;
+  .scroll-view {
+    flex: 1;
+    box-sizing: border-box;
+    padding-bottom: 40px;
+    overflow: scroll;
+  }
+  .msg-textarea {
+    margin-bottom: 20px;
+  }
+  .msg-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 1px solid #666;
+    &:first-of-type {
+      border-top: none;
+    }
+  }
+  .at-button {
+    width: 100%;
+  }
+  .divider {
+    .at-divider__content {
+      background-color: #eef5ff;
+    }
+  }
+  .notice-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    background-color: #333;
+    color: #ffea00;
+    border-radius: 10px;
+  }
+}

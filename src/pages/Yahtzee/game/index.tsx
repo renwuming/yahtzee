@@ -60,7 +60,7 @@ export default function Index() {
     };
   });
 
-  const [waiting, setWaiting] = useState<boolean>(false);
+  const waiting = useRef<boolean>(false);
   const [gameData, setGameData] = useState<Yahtzee.YahtzeeGameData>(null);
   const [pageShow, setPageShow] = useState<boolean>(true);
   const [dicing, setDicing] = useState<boolean>(false);
@@ -193,8 +193,8 @@ export default function Index() {
   };
 
   async function DiceIt() {
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     // 重置填分表
     selectScore(null, null);
     // 开始摇骰子
@@ -212,7 +212,7 @@ export default function Index() {
       }),
     ]);
     setDicing(false);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   function randomDiceList(): Yahtzee.YahtzeeDiceData[] {
@@ -246,8 +246,8 @@ export default function Index() {
   async function updateScores() {
     const { type, score } = newScore || {};
     if (!type) return;
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     const newScores = {
       ...scores,
       [type]: score,
@@ -257,7 +257,7 @@ export default function Index() {
     selectScore(null, null);
     // 更新玩家分数
     await updateGameScores(id, newScores, type);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   function clickStartBtn() {
@@ -451,15 +451,6 @@ export default function Index() {
           setShowConfirmStartModal(false);
         }}
       />
-      {/* 悬浮按钮 */}
-      <View
-        className="guide-btn"
-        onClick={() => {
-          gotoYahtzeeGuide();
-        }}
-      >
-        <AtFab size="small">帮助</AtFab>
-      </View>
     </View>
   );
 }

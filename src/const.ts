@@ -86,6 +86,7 @@ export const ANIMATION_BACKUP_LIST = new Array(ANIMATION_BACKUP_SUM).fill(0);
 export const MAX_PLAYERS = 4;
 export const PAGE_LEN = 20;
 export const RANKING_LEN = 60;
+export const SEASON_RANKING_LEN = 100;
 export const HISTORY_LEN = 100;
 
 // 快艇骰子

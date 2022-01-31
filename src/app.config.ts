@@ -4,6 +4,7 @@ export default {
     "pages/homepage/index",
     "pages/wealth/index",
     "pages/seasonRank/index",
+    "pages/MessageBoard/index",
     // 快艇骰子
     "pages/Yahtzee/game/index",
     "pages/Yahtzee/hall/index",
@@ -29,6 +30,8 @@ export default {
     "pages/Rummy/hall/index",
     "pages/Rummy/history/index",
     "pages/Rummy/ranking/index",
+    // 电波同步
+    "pages/WaveLength/game/index",
   ],
   window: {
     backgroundTextStyle: "light",

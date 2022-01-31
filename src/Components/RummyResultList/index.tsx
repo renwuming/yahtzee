@@ -1,11 +1,13 @@
-import { View, Text } from "@tarojs/components";
+import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtIcon, AtModal, AtModalContent } from "taro-ui";
 import HallPlayer from "@/Components/HallPlayer";
 import RummyCard from "@/Components/RummyCard";
-import "./index.scss";
 import { CARD_SUM, SeasonRankScoreMap } from "@/const";
 import { useState } from "react";
 import { GROUND_COL_LEN, GROUND_ROW_LEN } from "@/pages/Rummy/game/api";
+// @ts-ignore
+import FreezingIcon from "@/assets/imgs/freezing.png";
+import "./index.scss";
 
 interface IProps {
   data: Rummy.RummyGameData;
@@ -58,18 +60,25 @@ export default function Index({ data }: IProps) {
         </View>
       ) : (
         rankPlayers.map((player, rank) => {
-          const { cardList } = player;
+          const { cardList, openid, icebreaking } = player;
           const scoreChange = SeasonRankScoreMap[playerSum][rank];
           const emptyHand = cardList.length === 0;
           return (
-            <View className="result-row">
+            <View key={openid} className="result-row">
+              {!icebreaking && (
+                <Image
+                  className="freezing-icon"
+                  mode="aspectFit"
+                  src={FreezingIcon}
+                ></Image>
+              )}
               <HallPlayer data={player}></HallPlayer>
               <View className="card-box">
                 {emptyHand ? (
                   <Text>出完啦 🎉</Text>
                 ) : (
                   cardList.map((card) => (
-                    <RummyCard data={card} offset={true}></RummyCard>
+                    <RummyCard key={card.id} data={card} offset></RummyCard>
                   ))
                 )}
               </View>

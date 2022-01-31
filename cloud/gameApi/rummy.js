@@ -26,11 +26,12 @@ function getStraightIndexListByValue(value) {
   return res;
 }
 
+// color为z是为了排序时在最后
 const RUMMY_JOKERS = [
-  { color: "red", value: 0 },
-  { color: "black", value: 0 },
+  { color: "z", value: 0 },
+  { color: "z", value: 0 },
 ];
-const RUMMY_COLORS = ["red", "yellow", "blue", "black"];
+const RUMMY_COLORS = ["black", "blue", "red", "yellow"];
 const RUMMY_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 const RUMMY_CARD_LIBRARY = [0, 1]
   .reduce((list) => {
@@ -364,12 +365,18 @@ function handleEndData(players, cardLibrary, cardList) {
       }, 0);
       return {
         value: valueSum,
+        sum: cardList.length,
         index,
       };
     });
 
     const rankList = handValueSumList
-      .sort((a, b) => a.value - b.value)
+      .sort((a, b) => {
+        const { value, sum } = a;
+        const { value: value2, sum: sum2 } = b;
+        if (value === value2) return sum - sum2;
+        else return value - value2;
+      })
       .map((item) => item.index);
 
     return {
@@ -426,6 +433,8 @@ function tidyPlayground(playgroundData) {
     tempList = [];
   }
   // 重新整理
+  straightList.sort((a, b) => (a[0].color >= b[0].color ? 1 : -1));
+  samevalueList.sort((a, b) => b[0].value - a[0].value);
   const newPlayground = initPlayground();
   straightList.concat(samevalueList).forEach((list) => {
     handleSetToProperPos(list, newPlayground, rowColorMap);
@@ -434,10 +443,14 @@ function tidyPlayground(playgroundData) {
 }
 
 function tidyAddSet(list, set, isStraight) {
+  const isSet = judgeListIsSet(set);
+  if (!isSet) return;
   const type = judgeSetType(set);
   if (isStraight && type === RUMMY_SET_TYPE.straight) {
     list.push(set);
   } else if (!isStraight && type !== RUMMY_SET_TYPE.straight) {
+    // 按照颜色排列
+    set.sort((a, b) => (a.color >= b.color ? 1 : -1));
     list.push(set);
   }
 }

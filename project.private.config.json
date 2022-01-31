@@ -45,7 +45,7 @@
         {
           "name": "Set",
           "pathName": "pages/Set/game/index",
-          "query": "id=fa4fe87261a10873003fb6776b073c0b",
+          "query": "id=54ad1eea61ef622c0a8e1606698deb73",
           "scene": null
         },
         {
@@ -57,7 +57,7 @@
         {
           "name": "拉密",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=54ad1eea61c5d2f90056396746cec50f",
+          "query": "id=41ae62ef61f647a202338d286a0211ca",
           "scene": null
         },
         {
@@ -67,9 +67,15 @@
           "scene": null
         },
         {
-          "name": "拉密多人",
+          "name": "拉密2",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=bf4a0bf261c72ee0007f12e423211795",
+          "query": "id=bf4a0bf261f6a7340b66f13278cb194e",
+          "scene": null
+        },
+        {
+          "name": "留言板",
+          "pathName": "pages/MessageBoard/index",
+          "query": "",
           "scene": null
         }
       ]

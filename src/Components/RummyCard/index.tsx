@@ -1,5 +1,4 @@
 import { View, Image } from "@tarojs/components";
-import { AtButton } from "taro-ui";
 import clsx from "clsx";
 // @ts-ignore
 import JokerIcon from "@/assets/imgs/rummy-joker.png";
@@ -10,6 +9,7 @@ interface IProps {
   inGround?: boolean;
   offset?: boolean;
   isErr?: boolean;
+  noValue?: boolean;
 }
 
 export default function Index({
@@ -17,6 +17,7 @@ export default function Index({
   inGround = false,
   offset = false,
   isErr = false,
+  noValue = false,
 }: IProps) {
   const { value, color } = data;
   const isJoker = value === 0;
@@ -24,7 +25,7 @@ export default function Index({
     <View
       className={clsx("rummy-card", color, offset && "offset", isErr && "err")}
     >
-      {isJoker ? (
+      {noValue ? null : isJoker ? (
         <Image className="card-img" mode="aspectFit" src={JokerIcon}></Image>
       ) : (
         <View className="content">

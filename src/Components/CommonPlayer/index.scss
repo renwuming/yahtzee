@@ -59,7 +59,7 @@
   &.active {
     background-color: #eee !important;
   }
-  .rummy-setting {
+  .setting {
     position: absolute;
     right: -14px;
     bottom: 0;
@@ -97,5 +97,13 @@
       font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
         sans-serif;
     }
+  }
+}
+.wavelength-player {
+  .setting {
+    position: absolute;
+    right: -14px;
+    bottom: 0;
+    font-size: 28px !important;
   }
 }

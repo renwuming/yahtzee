@@ -64,6 +64,7 @@ export default function Index({
   const isMartianPlayer = initGameIndex === AchievementGameIndex.martian;
   const isSetPlayer = initGameIndex === AchievementGameIndex.set;
   const isRummyPlayer = initGameIndex === AchievementGameIndex.rummy;
+  const isWavelengthPlayer = initGameIndex === AchievementGameIndex.wavelength;
 
   return (
     <View
@@ -72,6 +73,7 @@ export default function Index({
         isMartianPlayer && "martian-player",
         isSetPlayer && "set-player",
         isRummyPlayer && "rummy-player",
+        isWavelengthPlayer && "wavelength-player",
         showActive && inRound && "active",
         activePlayer === index && "zIndexActive"
       )}
@@ -105,7 +107,7 @@ export default function Index({
         )}
         {realShowSetting && (
           <AtIcon
-            className={clsx("setting", isRummyPlayer && "rummy-setting")}
+            className="setting"
             value="settings"
             size="18"
             color={isRummyPlayer ? "#fff" : "#176999"}

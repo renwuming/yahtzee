@@ -53,7 +53,7 @@ export default function Index() {
     };
   });
 
-  const [waiting, setWaiting] = useState<boolean>(false);
+  const waiting = useRef<boolean>(false);
   const [pageShow, setPageShow] = useState<boolean>(true);
   const [canSelectDiceNum, setCanSelectDiceNum] = useState<number>(0);
   const [players, setPlayers] = useState<CantStop.CantStopPlayer[]>([]);
@@ -182,17 +182,17 @@ export default function Index() {
   }
 
   async function clickDiceIt() {
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     await diceIt(id);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   async function _updateProgress(list: number[]) {
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     await updateProgress(id, list);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   async function clickEndRound() {
@@ -201,10 +201,10 @@ export default function Index() {
     } else setShowConfirmEndModal(true);
   }
   async function endTheRound() {
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     await endRound(id);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   function clickStartBtn() {

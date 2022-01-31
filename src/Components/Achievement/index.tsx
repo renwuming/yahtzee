@@ -7,7 +7,7 @@ import {
   AtButton,
   AtIcon,
 } from "taro-ui";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { getPlayerByOpenid, isMe, navigateTo } from "@/utils";
 import "./index.scss";
 import { AchievementGameIndex, GIFT_LIST, PlayerContext } from "@/const";
@@ -34,7 +34,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
 
   const [playerData, setPlayerData] = useState<Player>(null);
   const [myData, setMyData] = useState<Player>(null);
-  const [waiting, setWaiting] = useState<boolean>(false);
+  const waiting = useRef<boolean>(false);
 
   async function initAchievement() {
     const { openid: myOpenid } = Taro.getStorageSync("userInfo");
@@ -58,12 +58,12 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
   const { gold } = wealth || {};
 
   async function sendGiftTo(gift: GiftItem) {
-    if (waiting) return;
+    if (waiting.current) return;
     const { type, price } = gift;
     const sender = players[playerIndex].openid;
     const receiver = players[index].openid;
     try {
-      setWaiting(true);
+      waiting.current = true;
       await updateGiftDeal_Database(sender, receiver, type, price, gameID);
     } catch (err) {
       Taro.showToast({
@@ -72,7 +72,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
         duration: 1500,
       });
     }
-    setWaiting(false);
+    waiting.current = false;
     initAchievement();
   }
 

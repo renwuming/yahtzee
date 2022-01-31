@@ -60,8 +60,8 @@ export default function Index() {
     useState<boolean>(false);
   const [showConfirmEndModal, setShowConfirmEndModal] =
     useState<boolean>(false);
-  const [waiting, setWaiting] = useState<boolean>(false);
   const [roundCountDown, setRoundCountDown] = useState<number | string>(100);
+  const waiting = useRef<boolean>(false);
 
   useDidHide(() => {
     setPageShow(false);
@@ -187,17 +187,17 @@ export default function Index() {
 
   async function selectTheDice({ value }) {
     if (!inRound) return;
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     await selectDice(id, value);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   async function endTheRound() {
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     await endRound(id);
-    setWaiting(false);
+    waiting.current = false;
   }
 
   function clickStartBtn() {
@@ -236,10 +236,10 @@ export default function Index() {
   }
   // 掷骰子
   async function clickDiceIt() {
-    if (waiting) return;
-    setWaiting(true);
+    if (waiting.current) return;
+    waiting.current = true;
     await diceIt(id);
-    setWaiting(false);
+    waiting.current = false;
   }
   return (
     <View className="martian-game">

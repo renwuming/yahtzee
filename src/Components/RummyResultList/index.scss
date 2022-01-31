@@ -3,7 +3,10 @@
   flex-direction: column;
   justify-content: center;
   .result-row {
+    position: relative;
     display: flex;
+    justify-content: flex-start;
+    align-items: center;
     margin-top: 20px;
     padding: 10px;
     .card-box {
@@ -27,6 +30,14 @@
       font-size: 40px;
       font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
         sans-serif;
+    }
+    .freezing-icon {
+      position: absolute;
+      display: block;
+      left: 12px;
+      margin-top: -60px;
+      width: 50px;
+      height: 50px;
     }
   }
   .bottom-box {

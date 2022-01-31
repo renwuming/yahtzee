@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.1.1";
+export const VERSION = "v5.1.2";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -264,7 +264,10 @@ export function gotoRummyGuide() {
 export async function getSeasonRankData(
   game: string,
   pageNum: number
-): Promise<SeasonRankPlayerData[]> {
+): Promise<{
+  name: string;
+  list: SeasonRankPlayerData[];
+}> {
   const _ = DB.command;
 
   const [seasonRankData] = await DB.collection("season_ranks")
@@ -277,9 +280,13 @@ export async function getSeasonRankData(
     .get()
     .then((res) => res.data);
 
-  if (!seasonRankData) return [];
+  if (!seasonRankData)
+    return {
+      name: null,
+      list: [],
+    };
 
-  const { seasonRankList } = seasonRankData;
+  const { name, seasonRankList } = seasonRankData;
   const rankList = seasonRankList.slice(
     pageNum * PAGE_LEN,
     (pageNum + 1) * PAGE_LEN
@@ -292,7 +299,7 @@ export async function getSeasonRankData(
     .get()
     .then((res) => res.data);
 
-  return rankList.map((data) => {
+  const list = rankList.map((data) => {
     const { openid, score } = data;
     const player = playerList.find((item) => item.openid === openid);
     const rankImgUrl = getRankImgUrl(score);
@@ -302,6 +309,11 @@ export async function getSeasonRankData(
       rankImgUrl,
     };
   });
+
+  return {
+    name,
+    list,
+  };
 }
 
 function getRankImgUrl(score) {

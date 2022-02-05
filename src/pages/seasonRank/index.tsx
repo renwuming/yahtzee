@@ -46,6 +46,7 @@ export default function Index() {
   const [page2End, setPage2End] = useState<boolean>(false);
 
   async function updateList2() {
+    if (page2End) return;
     const list = await getCharmRankList_Database(pageNum2 * PAGE_LEN, PAGE_LEN);
     const newList = list2.concat(list);
     setList2(newList);

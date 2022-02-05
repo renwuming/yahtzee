@@ -6,7 +6,7 @@ import {
   MovableArea,
   Image,
 } from "@tarojs/components";
-import { AtBadge, AtButton, AtIcon, AtProgress, AtToast } from "taro-ui";
+import { AtButton, AtIcon, AtProgress, AtToast } from "taro-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { flat, getUserProfile, SLEEP } from "@/utils";
@@ -21,7 +21,7 @@ import {
 } from "@/const";
 import { useGameApi } from "@/utils_api";
 // @ts-ignore
-import AddIcon from "@/assets/imgs/rummy-arrow.png";
+import PokerIcon from "@/assets/imgs/rummy-poker.png";
 // @ts-ignore
 import PerfectIcon from "@/assets/imgs/rummy-right.png";
 import RummyCard from "@/Components/RummyCard";
@@ -86,12 +86,10 @@ export default function Index() {
   // client端
   const [activePlayer, setActivePlayer] = useState<number>(0);
   const activeCardID = useRef<number>(-1);
-  const crossData = useRef<Rummy.CrossData[]>([]);
-  const cardAreaStatus = useRef<number>(RUMMY_AREA_STATUS.other);
+  const posData = useRef<Rummy.Position>(null);
   const [errList, setErrList] = useState<number[]>([]);
   const [toastText, setToastText] = useState<string>("");
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
-  const [straightSortFirst, setStraightSortFirst] = useState<boolean>(true);
   const waiting = useRef<boolean>(false);
 
   const {
@@ -109,6 +107,10 @@ export default function Index() {
   const showPlayboard = gaming && (inGame || singlePlayer);
   const groundCardSum = CARD_SUM - cardLibrary?.length;
   const gameDataLoaded = players.length >= 1;
+  // 存在手牌在公共区域
+  const handCardInGround = cardList.some(
+    (item) => item.areaStatus === RUMMY_AREA_STATUS.playground
+  );
 
   const MemoCardList = useMemo(
     () => (
@@ -156,7 +158,10 @@ export default function Index() {
     return _roundCountDown;
   }
 
-  function initFn(data: Rummy.RummyGameBaseData) {
+  function initFn(
+    data: Rummy.RummyGameBaseData,
+    resetBoardFlag: boolean = false
+  ) {
     const gameData = handleGameData(data);
     const { players, playgroundData, playgroundCardList, myCardList } =
       gameData;
@@ -165,7 +170,9 @@ export default function Index() {
     setPlaygroundData(playgroundData.concat());
     setPlaygroundCardList(playgroundCardList.concat());
     const list = updateCardList(myCardList, cardList, playgroundData);
-    resetBoard(false, playgroundData, list);
+    if (resetBoardFlag) {
+      resetBoard(false, playgroundData, list);
+    }
   }
 
   function gameDataWatchCb(data: Rummy.RummyGameBaseData, updatedFields = []) {
@@ -192,7 +199,7 @@ export default function Index() {
       // 结束回合并摸牌
       else if (boardChange) {
       }
-      initFn(data);
+      initFn(data, true);
     } else {
       const gameData = handleGameData(data);
       const { players } = gameData;
@@ -232,7 +239,6 @@ export default function Index() {
             height: cardLibrary.height,
           },
         });
-
         getGameData(id).then((data) => {
           initFn(data);
         });
@@ -269,44 +275,41 @@ export default function Index() {
   function onTouchStart(id: number) {
     activeCardID.current = id;
   }
-  function onChange(event, id: number) {
-    if (id !== activeCardID.current) return;
+  function onChange(event) {
     const {
-      detail: { x, y },
+      detail: { x, y, source },
     } = event;
+    if (!source) return;
 
-    const cardPosData = {
+    posData.current = {
       x,
       y,
     };
-
-    // 在公共面板中
-    if (judgeIn(cardPosData, RUMMY_AREA_STATUS.playground)) {
-      cardAreaStatus.current = RUMMY_AREA_STATUS.playground;
-      const _crossData = getBoxCross(cardPosData, RUMMY_AREA_STATUS.playground);
-      crossData.current[activeCardID.current] = _crossData;
-    }
-    // 在玩家面板中
-    else if (judgeIn(cardPosData, RUMMY_AREA_STATUS.playboard)) {
-      cardAreaStatus.current = RUMMY_AREA_STATUS.playboard;
-      const _crossData = getBoxCross(cardPosData, RUMMY_AREA_STATUS.playboard);
-      crossData.current[activeCardID.current] = _crossData;
-    } else {
-      cardAreaStatus.current = RUMMY_AREA_STATUS.other;
-    }
   }
   async function onTouchEnd(id: number) {
     if (id !== activeCardID.current) return;
-    if (!crossData.current[activeCardID.current]) return;
-    let pos;
     let index = getCardIndexByID(cardList, id);
     // 是否为公共牌
     const isGroundCard = index < 0;
 
-    const targetInPlayGround =
-      cardAreaStatus.current === RUMMY_AREA_STATUS.playground;
-    const targetInPlayBoard =
-      cardAreaStatus.current === RUMMY_AREA_STATUS.playboard;
+    let crossData;
+    let cardAreaStatus;
+    // 在公共面板中
+    if (judgeIn(posData.current, RUMMY_AREA_STATUS.playground)) {
+      cardAreaStatus = RUMMY_AREA_STATUS.playground;
+      crossData = getBoxCross(posData.current, RUMMY_AREA_STATUS.playground);
+    }
+    // 在玩家面板中
+    else if (judgeIn(posData.current, RUMMY_AREA_STATUS.playboard)) {
+      cardAreaStatus = RUMMY_AREA_STATUS.playboard;
+      crossData = getBoxCross(posData.current, RUMMY_AREA_STATUS.playboard);
+    } else {
+      cardAreaStatus = RUMMY_AREA_STATUS.other;
+    }
+
+    const targetInPlayGround = cardAreaStatus === RUMMY_AREA_STATUS.playground;
+    const targetInPlayBoard = cardAreaStatus === RUMMY_AREA_STATUS.playboard;
+    let pos;
 
     // 拖动公共牌
     if (isGroundCard) {
@@ -318,7 +321,7 @@ export default function Index() {
       if (targetIsValid) {
         _crossData = getNearestEmptyCross(
           RUMMY_AREA_STATUS.playground,
-          crossData.current[activeCardID.current],
+          crossData,
           id,
           playgroundData
         );
@@ -328,7 +331,7 @@ export default function Index() {
       if (targetIsValid && _crossData) {
         pos = getAreaPos(_crossData, RUMMY_AREA_STATUS.playground);
 
-        playgroundCardList[index].areaStatus = cardAreaStatus.current;
+        playgroundCardList[index].areaStatus = cardAreaStatus;
         handlePlaygroundAndPlayboard(_crossData, playgroundCardList[index]);
       }
       // 否则，返回原位置
@@ -339,7 +342,6 @@ export default function Index() {
         };
       }
       playgroundCardList[index] = updateCardPos(playgroundCardList[index], pos);
-      await SLEEP(50);
       setPlaygroundCardList(playgroundCardList.concat());
     }
     // 拖动玩家手牌
@@ -354,7 +356,7 @@ export default function Index() {
           targetInPlayGround
             ? RUMMY_AREA_STATUS.playground
             : RUMMY_AREA_STATUS.playboard,
-          crossData.current[activeCardID.current],
+          crossData,
           id,
           targetInPlayGround ? playgroundData : playboardData
         );
@@ -368,7 +370,7 @@ export default function Index() {
           pos = getAreaPos(_crossData, RUMMY_AREA_STATUS.playboard);
         }
 
-        cardList[index].areaStatus = cardAreaStatus.current;
+        cardList[index].areaStatus = cardAreaStatus;
         handlePlaygroundAndPlayboard(_crossData, cardList[index]);
       }
       // 否则，返回原位置
@@ -380,7 +382,6 @@ export default function Index() {
       }
 
       cardList[index] = updateCardPos(cardList[index], pos);
-      await SLEEP(50);
       setCardList(cardList.concat());
     }
     activeCardID.current = -1;
@@ -492,14 +493,9 @@ export default function Index() {
     waiting.current = false;
   }
 
-  async function execSortCardList() {
-    if (waiting.current) return;
-    waiting.current = true;
+  async function execSortCardList(straightSortFirst: boolean = false) {
     const showCardList = sortCardList(cardList, straightSortFirst);
     updateCardList(showCardList);
-    setStraightSortFirst(!straightSortFirst);
-    await SLEEP(1000);
-    waiting.current = false;
   }
 
   function execPlaceSetFromBoardToGround() {
@@ -568,9 +564,9 @@ export default function Index() {
   }
 
   function restartRound() {
+    resetBoard(true);
     getGameData(id).then((data) => {
       initFn(data);
-      resetBoard(true);
     });
   }
 
@@ -625,33 +621,6 @@ export default function Index() {
                   </View>
                 )}
               </View>
-              <View className={clsx("round-btn-box", !gaming && "hidden")}>
-                <AtButton
-                  className="round-ctrl-btn"
-                  onClick={() => {
-                    addCard();
-                  }}
-                  disabled={!inRound}
-                >
-                  <Text id="cardLibrary" className="library-num">
-                    {cardLibrary?.length}
-                  </Text>
-                  <Image
-                    className="add-icon"
-                    mode="aspectFit"
-                    src={AddIcon}
-                  ></Image>
-                </AtButton>
-                <AtButton
-                  className="round-ctrl-btn"
-                  onClick={() => {
-                    endRound();
-                  }}
-                  disabled={!inRound}
-                >
-                  <Image mode="aspectFit" src={PerfectIcon}></Image>
-                </AtButton>
-              </View>
             </View>
             <View id="playground" className="playground">
               {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
@@ -691,22 +660,7 @@ export default function Index() {
               )}
           </View>
           <View className={clsx("playboard-container", !gaming && "hidden")}>
-            <View className={clsx("playboard-wrapper")}>
-              <View id="playboard" className="playboard">
-                {new Array(BOARD_COL_LEN).fill(1).map((_, colIndex) => {
-                  return (
-                    <View key={colIndex} className="row">
-                      {new Array(BOARD_ROW_LEN).fill(1).map((_, rowIndex) => {
-                        return (
-                          <View key={rowIndex} className="playboard-box"></View>
-                        );
-                      })}
-                    </View>
-                  );
-                })}
-              </View>
-            </View>
-            {showPlayboard && (
+            <View className={clsx("top", showPlayboard && "show")}>
               <View className="playboard-ctrl-box">
                 <AtButton
                   className="ctrl-btn"
@@ -726,13 +680,28 @@ export default function Index() {
                 >
                   <AtIcon value="arrow-down" size="18" color="#fff"></AtIcon>
                 </AtButton>
+              </View>
+              <View className={clsx("playboard-wrapper")}>
+                <View id="playboard" className="playboard"></View>
+              </View>
+              <View className="playboard-ctrl-box">
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
                     execSortCardList();
                   }}
+                  disabled={!inGame}
                 >
-                  <AtIcon value="numbered-list" size="18" color="#fff"></AtIcon>
+                  <Text className="text-icon">777</Text>
+                </AtButton>
+                <AtButton
+                  className="ctrl-btn"
+                  onClick={() => {
+                    execSortCardList(true);
+                  }}
+                  disabled={!inGame}
+                >
+                  <Text className="text-icon">789</Text>
                 </AtButton>
 
                 <AtButton
@@ -741,12 +710,44 @@ export default function Index() {
                     restartRound();
                   }}
                 >
-                  <AtBadge value="重置回合">
-                    <AtIcon value="reload" size="18" color="#fff"></AtIcon>
-                  </AtBadge>
+                  <AtIcon value="reload" size="18" color="#fff"></AtIcon>
                 </AtButton>
               </View>
-            )}
+            </View>
+            <View className={clsx("bottom", gaming && "show")}>
+              {handCardInGround && (
+                <AtButton
+                  className="ctrl-btn round-ctrl-btn-sm"
+                  onClick={() => {
+                    restartRound();
+                  }}
+                >
+                  <AtIcon value="reload" size="18" color="#fff"></AtIcon>
+                </AtButton>
+              )}
+              <AtButton
+                className="ctrl-btn round-ctrl-btn"
+                onClick={() => {
+                  handCardInGround ? endRound() : addCard();
+                }}
+                disabled={!inRound}
+              >
+                {handCardInGround ? (
+                  <Image mode="aspectFit" src={PerfectIcon}></Image>
+                ) : (
+                  <View className="btn-box">
+                    <AtIcon value="add" size="22" color="#f8f6d1"></AtIcon>
+                    <Image
+                      id="cardLibrary"
+                      className="add-icon"
+                      mode="aspectFit"
+                      src={PokerIcon}
+                    ></Image>
+                    <Text className="library-num">{cardLibrary?.length}</Text>
+                  </View>
+                )}
+              </AtButton>
+            </View>
 
             {gameData && !start && (
               <View className="before-start-btn-box">

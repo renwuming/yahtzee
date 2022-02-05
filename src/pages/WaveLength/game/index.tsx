@@ -15,7 +15,7 @@ export default function Index() {
       title: `${nickName}邀请你来玩拉密牌！`,
       path: `/pages/Rummy/game/index?id=${id}`,
       imageUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/rummy-cover.png",
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/wavelength-cover.jpg",
     };
   });
 

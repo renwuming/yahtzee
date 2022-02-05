@@ -1,8 +1,11 @@
+import { getSeasonRankDataByOpenid } from "@/utils";
 import { View, Text } from "@tarojs/components";
+import { useEffect, useState } from "react";
 import {} from "taro-ui";
 import "./index.scss";
 
 interface IProps {
+  openid: string;
   gameName: string;
   data: AchievementItem;
   noTitle?: boolean;
@@ -27,11 +30,16 @@ const dataMap = {
   },
   rummy: {
     title: "拉密牌",
-    rows: ["minGroundCardSum", "multiWinRate", "multiNum", "singleNum"],
+    rows: ["seasonData", "minGroundCardSum", "multiWinRate", "multiNum"],
   },
 };
 
-export default function Index({ gameName, data, noTitle = false }: IProps) {
+export default function Index({
+  openid,
+  gameName,
+  data,
+  noTitle = false,
+}: IProps) {
   const {
     bestTime,
     minRoundSum,
@@ -43,10 +51,29 @@ export default function Index({ gameName, data, noTitle = false }: IProps) {
   } = data || {};
 
   const { title, rows } = dataMap[gameName];
+
+  const [rummySeasonData, setRummySeasonData] = useState<{
+    name: string;
+    score: number;
+  }>(null);
+
+  useEffect(() => {
+    getSeasonRankDataByOpenid("rummy", openid).then((data) => {
+      setRummySeasonData(data);
+    });
+  }, [openid]);
   return (
     <View className="achievement-item">
       {noTitle ? null : <Text className="title">{title}</Text>}
       <View className="at-row detail-box">
+        {rows.includes("seasonData") && (
+          <View className="detail-item">
+            <Text className="text">赛季积分</Text>
+            <Text className="value">
+              {rummySeasonData?.score ? rummySeasonData.score : "-"}
+            </Text>
+          </View>
+        )}
         {rows.includes("bestTime") && (
           <View className="detail-item">
             <Text className="text">最短时间</Text>

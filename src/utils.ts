@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.1.2";
+export const VERSION = "v5.1.3";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -269,7 +269,6 @@ export async function getSeasonRankData(
   list: SeasonRankPlayerData[];
 }> {
   const _ = DB.command;
-
   const [seasonRankData] = await DB.collection("season_ranks")
     .where({
       game,
@@ -326,4 +325,31 @@ function getRankImgUrl(score) {
   else rankValue = 5;
   const rankImgUrl = `https://cdn.renwuming.cn/static/yahtzee/imgs/level${rankValue}.jpg`;
   return rankImgUrl;
+}
+
+export async function getSeasonRankDataByOpenid(
+  game: string,
+  openid: string
+): Promise<{ name: string; score: number }> {
+  if (!openid) return null;
+
+  const _ = DB.command;
+  const [seasonRankData] = await DB.collection("season_ranks")
+    .where({
+      game,
+      start: true,
+      end: _.neq(true),
+    })
+    .orderBy("startTime", "desc")
+    .get()
+    .then((res) => res.data);
+
+  if (!seasonRankData) return null;
+  const { name, seasonRankList } = seasonRankData;
+  const { score } = seasonRankList.find((item) => item.openid === openid);
+
+  return {
+    name,
+    score,
+  };
 }

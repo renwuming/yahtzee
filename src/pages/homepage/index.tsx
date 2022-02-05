@@ -39,7 +39,14 @@ export default function Index() {
   ];
   const [userInfo, setUserInfo] = useState<Player>(null);
 
-  const { wealth, gift, avatarUrl, nickName, achievement } = userInfo || {};
+  const {
+    wealth,
+    gift,
+    avatarUrl,
+    nickName,
+    achievement,
+    openid: userOpenid,
+  } = userInfo || {};
   const { yahtzee, martian, cantstop, set, rummy } = achievement || {};
 
   const me = isMe(openid);
@@ -77,14 +84,31 @@ export default function Index() {
       </View>
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
-          <AchievementItem gameName="rummy" data={rummy}></AchievementItem>
-          <AchievementItem gameName="set" data={set}></AchievementItem>
-          <AchievementItem gameName="yahtzee" data={yahtzee}></AchievementItem>
+          <AchievementItem
+            gameName="rummy"
+            data={rummy}
+            openid={userOpenid}
+          ></AchievementItem>
+          <AchievementItem
+            gameName="set"
+            data={set}
+            openid={userOpenid}
+          ></AchievementItem>
+          <AchievementItem
+            gameName="yahtzee"
+            data={yahtzee}
+            openid={userOpenid}
+          ></AchievementItem>
           <AchievementItem
             gameName="cantstop"
             data={cantstop}
+            openid={userOpenid}
           ></AchievementItem>
-          <AchievementItem gameName="martian" data={martian}></AchievementItem>
+          <AchievementItem
+            gameName="martian"
+            data={martian}
+            openid={userOpenid}
+          ></AchievementItem>
         </AtTabsPane>
         <AtTabsPane current={tabIndex} index={1}>
           <GiftAchievementItem

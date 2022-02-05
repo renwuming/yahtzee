@@ -110,6 +110,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               gameName="yahtzee"
               data={yahtzee}
               noTitle
+              openid={openid}
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.martian && (
@@ -117,6 +118,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               gameName="martian"
               data={martian}
               noTitle
+              openid={openid}
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.cantstop && (
@@ -124,6 +126,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               gameName="cantstop"
               data={cantstop}
               noTitle
+              openid={openid}
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.set && (
@@ -131,6 +134,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               gameName="set"
               data={set}
               noTitle
+              openid={openid}
             ></AchievementItem>
           )}
           {initGameIndex === AchievementGameIndex.rummy && (
@@ -138,6 +142,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               gameName="rummy"
               data={rummy}
               noTitle
+              openid={openid}
             ></AchievementItem>
           )}
 

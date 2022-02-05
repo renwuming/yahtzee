@@ -27,6 +27,7 @@ export default function Index({}: IProps) {
       <View className="at-row top-row">
         <Player data={userInfo} colorType="black" />
         <AtButton
+          className="icon-btn"
           type="primary"
           onClick={() => {
             forceGetUserProfile(() => {

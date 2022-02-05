@@ -245,6 +245,12 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
     (action === "endRoundAddCard" && inRound) ||
     action === "endRoundByTimer"
   ) {
+    if (action === "endRoundByTimer") {
+      const { roundPlayer } = data;
+      if (roundPlayer !== oldData.roundPlayer) {
+        return;
+      }
+    }
     const { cardLibrary, roundSum } = oldData;
     const { cardList } = players[roundPlayer];
     const [newCard] = cardLibrary.splice(0, 1);

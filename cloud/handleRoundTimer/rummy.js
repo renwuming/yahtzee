@@ -25,7 +25,7 @@ async function execHandleTimerRummy(db) {
 function handleTimerRummy(game) {
   const ROUND_TIME_LIMIT = 65 * 1000;
 
-  const { _id, roundTimeStamp } = game;
+  const { _id, roundTimeStamp, roundPlayer } = game;
   const outOfTime = Date.now() - (roundTimeStamp || 0) > ROUND_TIME_LIMIT;
 
   if (outOfTime) {
@@ -37,6 +37,9 @@ function handleTimerRummy(game) {
         id: _id,
         action: "endRoundByTimer",
         gameDbName: "rummy_games",
+        data: {
+          roundPlayer,
+        },
       },
     });
   }

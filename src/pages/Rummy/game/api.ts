@@ -145,7 +145,7 @@ function groundData2List(
 export const GROUND_COL_LEN: number = 14;
 export const GROUND_ROW_LEN: number = 13;
 export const BOARD_COL_LEN: number = 3;
-export const BOARD_ROW_LEN: number = 14;
+export const BOARD_ROW_LEN: number = 12;
 export const BOARD_SUM: number = BOARD_COL_LEN * BOARD_ROW_LEN;
 
 const RUMMY_COLORS = ["black", "blue", "red", "yellow"];

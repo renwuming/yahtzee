@@ -26,40 +26,43 @@ export default function Index() {
   const gameList = [
     {
       name: "拉密牌",
-      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/rummy-cover.png",
+      imgUrl:
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/rummy-cover.jpg",
       pageType: "Rummy",
       pagePath: `hall/index`,
     },
     {
       name: "神奇形色牌",
-      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/set-cover2.png",
+      imgUrl:
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/set-cover.jpg",
       pageType: "Set",
       pagePath: `hall/index`,
     },
     {
       name: "快艇骰子",
       imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/yahtzee-cover.png",
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/yahtzee-cover.jpg",
       pageType: "Yahtzee",
       pagePath: `hall/index`,
     },
     {
       name: "欲罢不能",
       imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/cantstop-cover.png",
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/cantstop-cover.jpg",
       pageType: "CantStop",
       pagePath: `hall/index`,
     },
     {
       name: "火星骰",
       imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/martian-cover.jpg",
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/martian-cover.jpg",
       pageType: "Martian",
       pagePath: `hall/index`,
     },
     {
       name: "截码战",
-      imgUrl: "https://cdn.renwuming.cn/static/diceGames/imgs/jmz-cover.png",
+      imgUrl:
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/jmz-cover.jpg",
       navigateFn() {
         Taro.navigateToMiniProgram({
           appId: "wxfe74b714bde12b3f",
@@ -70,7 +73,7 @@ export default function Index() {
     {
       name: "电波同步",
       imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/wavelength-cover.png",
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/wavelength-cover.jpg",
       navigateFn() {
         Taro.navigateToMiniProgram({
           appId: "wxfe74b714bde12b3f",
@@ -118,7 +121,17 @@ export default function Index() {
         >
           <View className="icon-btn">
             <Image mode="aspectFit" src={RankIcon}></Image>
-            <Text>排行榜</Text>
+            <Text className="text">排行榜</Text>
+          </View>
+        </AtButton>
+        <AtButton
+          onClick={() => {
+            navigateTo("", `MessageBoard/index`);
+          }}
+        >
+          <View className="icon-btn">
+            <AtIcon value="edit" size="32" color="#4871b6"></AtIcon>
+            <Text className="text">留言板</Text>
           </View>
         </AtButton>
         <AtButton
@@ -130,7 +143,7 @@ export default function Index() {
         >
           <View className="icon-btn">
             <Image mode="aspectFit" src={WechatIcon}></Image>
-            <Text>加群交流</Text>
+            <Text className="text">加群交流</Text>
           </View>
         </AtButton>
         {/* <AtButton
@@ -142,19 +155,9 @@ export default function Index() {
         >
           <View className="icon-btn">
             <Image mode="aspectFit" src={RewardIcon}></Image>
-            <Text>打赏作者</Text>
+            <Text className="text">打赏作者</Text>
           </View>
         </AtButton> */}
-        <AtButton
-          onClick={() => {
-            navigateTo("", `MessageBoard/index`);
-          }}
-        >
-          <View className="icon-btn">
-            <AtIcon value="edit" size="36" color="#4871b6"></AtIcon>
-            <Text>留言板</Text>
-          </View>
-        </AtButton>
       </View>
     </View>
   );

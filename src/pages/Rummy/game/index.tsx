@@ -9,7 +9,7 @@ import {
 import { AtButton, AtIcon, AtProgress, AtToast } from "taro-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import { flat, getUserProfile, SLEEP } from "@/utils";
+import { flat, getUserProfile, SLEEP, useDebounce } from "@/utils";
 import {
   AchievementGameIndex,
   CARD_SUM,
@@ -30,7 +30,6 @@ import { GameGift } from "@/Components/Gifts";
 import PlayerList from "@/Components/CommonPlayerList";
 import RummyResultList from "@/Components/RummyResultList";
 import {
-  BOARD_COL_LEN,
   BOARD_ROW_LEN,
   CARD_LIBRARY,
   getAreaPos,
@@ -90,6 +89,10 @@ export default function Index() {
   const [errList, setErrList] = useState<number[]>([]);
   const [toastText, setToastText] = useState<string>("");
   const [toastIsOpen, setToastIsOpen] = useState<boolean>(false);
+  const [correctToastIsOpen, setCorrectToastIsOpen] = useState<boolean>(false);
+  const [toastStatus, setToastStatus] = useState<
+    "error" | "loading" | "success"
+  >("error");
   const waiting = useRef<boolean>(false);
 
   const {
@@ -104,7 +107,6 @@ export default function Index() {
   } = gameData || {};
   const singlePlayer = players.length === 1;
   const gaming = start && !end;
-  const showPlayboard = gaming && (inGame || singlePlayer);
   const groundCardSum = CARD_SUM - cardLibrary?.length;
   const gameDataLoaded = players.length >= 1;
   // 存在手牌在公共区域
@@ -230,8 +232,8 @@ export default function Index() {
             width: ~~playboard.width,
             height: ~~playboard.height,
           },
-          cardW: ~~(width / GROUND_ROW_LEN),
-          cardH: ~~(height / GROUND_COL_LEN),
+          cardW: width / GROUND_ROW_LEN,
+          cardH: height / GROUND_COL_LEN,
           cardLibraryPosData: {
             x: cardLibrary.left,
             y: cardLibrary.top,
@@ -386,6 +388,7 @@ export default function Index() {
     }
     activeCardID.current = -1;
     updateRoundPlaygroundData();
+    // _correctCardsPos();
   }
 
   function updateCardList(
@@ -422,10 +425,12 @@ export default function Index() {
     }
     setCardList(cardList);
     cardList.forEach((card) => {
+      // 正在被移动的卡片的位置不作处理
+      if (card.id === activeCardID.current) return;
+
       const cross = getCrossByCardPos(card);
       handlePlaygroundAndPlayboard(cross, card, _playgroundData);
     });
-
     return cardList;
   }
 
@@ -570,13 +575,26 @@ export default function Index() {
     });
   }
 
-  function showToast(text, time: number = 1500) {
+  function showToast(
+    text: string,
+    time: number = 1500,
+    status: "error" | "loading" | "success" = "error"
+  ) {
     setToastText(text);
     setToastIsOpen(true);
+    setToastStatus(status);
     setTimeout(() => {
       setToastIsOpen(false);
     }, time);
   }
+
+  // function correctCardsPos() {
+  //   // 移动卡片时，忽略纠正
+  //   if (activeCardID.current >= 0) return;
+  //   setCorrectToastIsOpen(!correctToastIsOpen);
+  // }
+
+  // const _correctCardsPos = useDebounce(correctCardsPos, 1500, []);
 
   return (
     <MovableArea>
@@ -660,7 +678,7 @@ export default function Index() {
               )}
           </View>
           <View className={clsx("playboard-container", !gaming && "hidden")}>
-            <View className={clsx("top", showPlayboard && "show")}>
+            <View className={clsx("top", gaming && "show")}>
               <View className="playboard-ctrl-box">
                 <AtButton
                   className="ctrl-btn"
@@ -680,9 +698,25 @@ export default function Index() {
                 >
                   <AtIcon value="arrow-down" size="18" color="#fff"></AtIcon>
                 </AtButton>
+                <AtButton
+                  className="ctrl-btn"
+                  onClick={() => {
+                    setCorrectToastIsOpen(true);
+                    setTimeout(() => {
+                      setCorrectToastIsOpen(false);
+                    }, 500);
+                  }}
+                  disabled={!inRound}
+                >
+                  <AtIcon value="map-pin" size="18" color="#fff"></AtIcon>
+                </AtButton>
               </View>
               <View className={clsx("playboard-wrapper")}>
-                <View id="playboard" className="playboard"></View>
+                <View id="playboard" className="playboard">
+                  {new Array(BOARD_ROW_LEN).fill(1).map((_, rowIndex) => (
+                    <View key={rowIndex} className="playboard-box"></View>
+                  ))}
+                </View>
               </View>
               <View className="playboard-ctrl-box">
                 <AtButton
@@ -715,7 +749,7 @@ export default function Index() {
               </View>
             </View>
             <View className={clsx("bottom", gaming && "show")}>
-              {handCardInGround && (
+              {handCardInGround ? (
                 <AtButton
                   className="ctrl-btn round-ctrl-btn-sm"
                   onClick={() => {
@@ -723,6 +757,16 @@ export default function Index() {
                   }}
                 >
                   <AtIcon value="reload" size="18" color="#fff"></AtIcon>
+                </AtButton>
+              ) : (
+                <AtButton
+                  className="ctrl-btn round-ctrl-btn-sm"
+                  onClick={() => {
+                    execPlaceSetFromBoardToGround();
+                  }}
+                  disabled={!inRound}
+                >
+                  <AtIcon value="arrow-up" size="18" color="#fff"></AtIcon>
                 </AtButton>
               )}
               <AtButton
@@ -794,9 +838,15 @@ export default function Index() {
           </View>
         </View>
         <AtToast
+          // className="toast-wrapper-hidden"
+          text="校准位置"
+          status="success"
+          isOpened={correctToastIsOpen}
+        ></AtToast>
+        <AtToast
           isOpened={toastIsOpen}
           text={toastText}
-          status="error"
+          status={toastStatus}
         ></AtToast>
         {MemoCardList}
       </View>

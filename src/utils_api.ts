@@ -142,8 +142,8 @@ function watchDataBase(id: string, gameDbName: string, onChange, watcherMap) {
       onError(err) {
         console.error(err);
         // 报错后重新监听
-        watcherMap.watcher?.close();
-        watchDataBase(id, gameDbName, onChange, watcherMap);
+        // watcherMap.watcher?.close();
+        // watchDataBase(id, gameDbName, onChange, watcherMap);
       },
     });
 
@@ -167,8 +167,8 @@ export function watchEvents_DataBase(id: string, onChange, watcherMap) {
       onError(err) {
         console.error(err);
         // 报错后重新监听
-        watcherMap.eventsWatcher?.close();
-        watchEvents_DataBase(id, onChange, watcherMap);
+        // watcherMap.eventsWatcher?.close();
+        // watchEvents_DataBase(id, onChange, watcherMap);
       },
     });
 

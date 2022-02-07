@@ -57,7 +57,7 @@
         {
           "name": "拉密",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=54ad1eea61feb3c80dd2707a527183b4",
+          "query": "id=617ef50c61f8c49702820dec01a58bbe",
           "scene": null
         },
         {
@@ -69,7 +69,7 @@
         {
           "name": "拉密2",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=54ad1eea61fcedb50d997ad023fc8851",
+          "query": "id=617ef50c61ff8e4b0374313c13d764f5",
           "scene": null
         },
         {

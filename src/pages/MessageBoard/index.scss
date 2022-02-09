@@ -22,6 +22,9 @@
     &:first-of-type {
       border-top: none;
     }
+    text {
+      word-break: break-all;
+    }
   }
   .at-button {
     width: 100%;

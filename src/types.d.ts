@@ -45,6 +45,14 @@ interface GiftAction {
   receiver: string;
   type: string;
 }
+interface ChatAction {
+  id?: string;
+  index?: number;
+  createdAt: Date;
+  sender: string;
+  message: string;
+  player?: Player;
+}
 interface GiftItem {
   type: string;
   icon: () => {};

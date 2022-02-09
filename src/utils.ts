@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.1.4";
+export const VERSION = "v5.2.0";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -346,10 +346,43 @@ export async function getSeasonRankDataByOpenid(
 
   if (!seasonRankData) return null;
   const { name, seasonRankList } = seasonRankData;
-  const { score } = seasonRankList.find((item) => item.openid === openid);
+  const { score } = seasonRankList.find((item) => item.openid === openid) || {};
 
   return {
     name,
     score,
   };
 }
+
+export async function handleOpenid2PlayerData(list, key) {
+  const _ = DB.command;
+
+  const openidList = list.map((data) => data[key]);
+  const playerList = await DB.collection("players")
+    .where({
+      openid: _.in(openidList),
+    })
+    .get()
+    .then((res) => res.data);
+  const _list = list.map((data) => {
+    const player = playerList.find((item) => item.openid === data[key]);
+    return {
+      ...data,
+      player,
+    };
+  });
+
+  return _list ?? [];
+}
+
+export const debounce = (fn, wait, immediate) => {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      timeout = null;
+      if (!immediate) fn.apply(this, args);
+    }, wait);
+    if (immediate && !timeout) fn.apply(this, [...args]);
+  };
+};

@@ -24,11 +24,20 @@ import { useGameApi } from "@/utils_api";
 import PokerIcon from "@/assets/imgs/rummy-poker.png";
 // @ts-ignore
 import PerfectIcon from "@/assets/imgs/rummy-right.png";
+// @ts-ignore
+import AimIcon from "@/assets/imgs/aim.png";
+// @ts-ignore
+import MsgIcon from "@/assets/imgs/msg.png";
+// @ts-ignore
+import NoticeIcon from "@/assets/imgs/notice.png";
+// @ts-ignore
+import NoNoticeIcon from "@/assets/imgs/no-notice.png";
 import RummyCard from "@/Components/RummyCard";
 import LoadPage from "@/Components/LoadPage";
 import { GameGift } from "@/Components/Gifts";
 import PlayerList from "@/Components/CommonPlayerList";
 import RummyResultList from "@/Components/RummyResultList";
+import Chat from "@/Components/Chat";
 import {
   BOARD_ROW_LEN,
   CARD_LIBRARY,
@@ -94,6 +103,8 @@ export default function Index() {
     "error" | "loading" | "success"
   >("error");
   const waiting = useRef<boolean>(false);
+  const [drawerShow, setDrawerShow] = useState<boolean>(false);
+  const [showBarrage, setShowBarrage] = useState<boolean>(true);
 
   const {
     playerIndex,
@@ -599,6 +610,12 @@ export default function Index() {
   return (
     <MovableArea>
       <LoadPage></LoadPage>
+      <Chat
+        gameID={id}
+        drawerShow={drawerShow}
+        setDrawerShow={setDrawerShow}
+        showBarrage={showBarrage}
+      ></Chat>
       <GameGift />
       <View className="rummy-game">
         <View className="rummy-game-wrapper">
@@ -708,7 +725,7 @@ export default function Index() {
                   }}
                   disabled={!inRound}
                 >
-                  <AtIcon value="map-pin" size="18" color="#fff"></AtIcon>
+                  <Image src={AimIcon} />
                 </AtButton>
               </View>
               <View className={clsx("playboard-wrapper")}>
@@ -749,6 +766,16 @@ export default function Index() {
               </View>
             </View>
             <View className={clsx("bottom", gaming && "show")}>
+              {!end && (
+                <AtButton
+                  className="icon-btn"
+                  onClick={() => {
+                    setDrawerShow(true);
+                  }}
+                >
+                  <Image src={MsgIcon} />
+                </AtButton>
+              )}
               {handCardInGround ? (
                 <AtButton
                   className="ctrl-btn round-ctrl-btn-sm"
@@ -791,6 +818,20 @@ export default function Index() {
                   </View>
                 )}
               </AtButton>
+              {!end && (
+                <AtButton
+                  className="icon-btn icon-btn2"
+                  onClick={() => {
+                    setShowBarrage(!showBarrage);
+                  }}
+                >
+                  {showBarrage ? (
+                    <Image src={NoticeIcon} />
+                  ) : (
+                    <Image src={NoNoticeIcon} />
+                  )}
+                </AtButton>
+              )}
             </View>
 
             {gameData && !start && (

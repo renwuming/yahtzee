@@ -53,9 +53,13 @@ export function useGameApi(data: GameApiData) {
   );
   const eventCb = useRef(null);
   eventCb.current = (data, updatedFields = []) => {
+    const giftActionChange = updatedFields.some((item) =>
+      /giftActionList/.test(item)
+    );
     const { giftActionList } = data || {};
-    if (!giftActionList) return;
-    execGiftActions(giftActionList, lastGiftActionExecTime, players);
+    if (giftActionChange) {
+      execGiftActions(giftActionList, lastGiftActionExecTime, players);
+    }
   };
   // 监听数据库变化
   const watcherMap = {
@@ -184,7 +188,7 @@ export function execGiftActions(
   execGiftAnimations(players, newList, lastGiftActionExecTime);
 }
 
-function uniqActionsByCreatedAt(list: GiftAction[]) {
+export function uniqActionsByCreatedAt(list) {
   const createdMap = new Map();
   const typeMap = new Map();
   list.forEach((item) => {
@@ -205,12 +209,12 @@ function uniqActionsByCreatedAt(list: GiftAction[]) {
     }, []);
 }
 
-const createTimeFilter =
+export const createTimeFilter =
   (time) =>
   ({ createdAt }) =>
     createdAt > time;
 
-export function execGiftAnimations(
+export async function execGiftAnimations(
   players: Player[],
   list: GiftAction[],
   lastGiftActionExecTime: React.MutableRefObject<Date>

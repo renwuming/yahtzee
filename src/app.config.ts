@@ -40,4 +40,5 @@ export default {
     navigationBarTextStyle: "black",
     backgroundColor: "#eef5ff",
   },
+  resizable: true,
 };

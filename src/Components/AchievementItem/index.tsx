@@ -69,9 +69,7 @@ export default function Index({
         {rows.includes("seasonData") && (
           <View className="detail-item">
             <Text className="text">赛季积分</Text>
-            <Text className="value">
-              {rummySeasonData?.score ? rummySeasonData.score : "-"}
-            </Text>
+            <Text className="value">{rummySeasonData?.score ?? "-"}</Text>
           </View>
         )}
         {rows.includes("bestTime") && (

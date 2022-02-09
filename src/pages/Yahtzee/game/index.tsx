@@ -24,12 +24,7 @@ import DiceList from "@/Components/YahtzeeDiceList";
 import RatingTable from "@/Components/YahtzeeRatingTable";
 import LoadPage from "@/Components/LoadPage";
 import { GameGift } from "@/Components/Gifts";
-import {
-  getUserProfile,
-  gotoYahtzeeGuide,
-  SLEEP,
-  watchDataBase,
-} from "@/utils";
+import { getUserProfile, SLEEP, watchDataBase } from "@/utils";
 import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
 import {
   getGameData,

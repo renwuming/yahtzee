@@ -766,16 +766,14 @@ export default function Index() {
               </View>
             </View>
             <View className={clsx("bottom", gaming && "show")}>
-              {!end && (
-                <AtButton
-                  className="icon-btn"
-                  onClick={() => {
-                    setDrawerShow(true);
-                  }}
-                >
-                  <Image src={MsgIcon} />
-                </AtButton>
-              )}
+              <AtButton
+                className="icon-btn"
+                onClick={() => {
+                  setDrawerShow(true);
+                }}
+              >
+                <Image src={MsgIcon} />
+              </AtButton>
               {handCardInGround ? (
                 <AtButton
                   className="ctrl-btn round-ctrl-btn-sm"
@@ -818,20 +816,18 @@ export default function Index() {
                   </View>
                 )}
               </AtButton>
-              {!end && (
-                <AtButton
-                  className="icon-btn icon-btn2"
-                  onClick={() => {
-                    setShowBarrage(!showBarrage);
-                  }}
-                >
-                  {showBarrage ? (
-                    <Image src={NoticeIcon} />
-                  ) : (
-                    <Image src={NoNoticeIcon} />
-                  )}
-                </AtButton>
-              )}
+              <AtButton
+                className="icon-btn icon-btn2"
+                onClick={() => {
+                  setShowBarrage(!showBarrage);
+                }}
+              >
+                {showBarrage ? (
+                  <Image src={NoticeIcon} />
+                ) : (
+                  <Image src={NoNoticeIcon} />
+                )}
+              </AtButton>
             </View>
 
             {gameData && !start && (

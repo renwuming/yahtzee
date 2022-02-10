@@ -121,18 +121,28 @@ movable-area {
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      visibility: hidden;
+      .playboard-ctrl-box,
+      .playboard-wrapper,
+      .ctrl-btn {
+        visibility: hidden;
+      }
       &.show {
-        visibility: visible;
+        .playboard-ctrl-box,
+        .playboard-wrapper,
+        .ctrl-btn {
+          visibility: visible;
+        }
       }
     }
     .top {
       width: 100%;
       justify-content: space-between;
+      &.show {
+        border-bottom: 1px solid #f8f6d16e;
+      }
     }
     .bottom {
       align-items: center;
-      border-top: 1px solid #f8f6d16e;
       padding: 20px 0;
       width: 95%;
     }
@@ -174,7 +184,6 @@ movable-area {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-top: 10px;
       padding: 2px 0;
       .ctrl-btn {
         display: flex;

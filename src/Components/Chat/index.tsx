@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { View, Text, Input, ScrollView } from "@tarojs/components";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AtButton, AtDrawer, AtIcon } from "taro-ui";
+import { AtButton, AtDrawer } from "taro-ui";
 import clsx from "clsx";
 import HallPlayer from "@/Components/HallPlayer";
 import { isMe } from "@/utils";

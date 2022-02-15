@@ -9,7 +9,7 @@ import { AtButton, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
 import "./index.scss";
 // @ts-ignore
 import GoldIcon from "../../assets/imgs/gold.png";
-import { getPlayerByOpenid, isMe, navigateTo } from "@/utils";
+import { getPlayerByOpenid, headimgHD, isMe, navigateTo } from "@/utils";
 import AchievementItem from "@/Components/AchievementItem";
 import GiftAchievementItem from "@/Components/GiftAchievementItem";
 
@@ -65,7 +65,7 @@ export default function Index() {
     <View className="homepage">
       <View className="homepage-player-info">
         <View className="top">
-          <Image className={`avatar`} src={avatarUrl}></Image>
+          <Image className="avatar" src={headimgHD(avatarUrl)}></Image>
           <Text className="nick">{nickName}</Text>
         </View>
         <View className="at-row btn-row">

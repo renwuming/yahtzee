@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.2.1";
+export const VERSION = "v5.2.2";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -354,27 +354,6 @@ export async function getSeasonRankDataByOpenid(
   };
 }
 
-export async function handleOpenid2PlayerData(list, key) {
-  const _ = DB.command;
-
-  const openidList = list.map((data) => data[key]);
-  const playerList = await DB.collection("players")
-    .where({
-      openid: _.in(openidList),
-    })
-    .get()
-    .then((res) => res.data);
-  const _list = list.map((data) => {
-    const player = playerList.find((item) => item.openid === data[key]);
-    return {
-      ...data,
-      player,
-    };
-  });
-
-  return _list ?? [];
-}
-
 export const debounce = (fn, wait, immediate) => {
   let timeout;
   return function (...args) {
@@ -386,3 +365,21 @@ export const debounce = (fn, wait, immediate) => {
     if (immediate && !timeout) fn.apply(this, [...args]);
   };
 };
+
+// 获取用户高清头像url
+export function headimgHD(url) {
+  if (!url) return url;
+  url = url.split("/"); //把头像的路径切成数组 //把大小数值为 46 || 64 || 96 || 132 的转换为0
+  const L = url.length;
+  if (
+    url[L - 1] &&
+    (url[L - 1] == 46 ||
+      url[L - 1] == 64 ||
+      url[L - 1] == 96 ||
+      url[L - 1] == 132)
+  ) {
+    url[L - 1] = 0;
+  }
+
+  return url.join("/"); //重新拼接为字符串
+}

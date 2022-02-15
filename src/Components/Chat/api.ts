@@ -1,5 +1,5 @@
 import { ACTION_DELAY } from "@/const";
-import { DB, handleOpenid2PlayerData, SLEEP } from "@/utils";
+import { DB, SLEEP } from "@/utils";
 import {
   createTimeFilter,
   uniqActionsByCreatedAt,
@@ -34,6 +34,28 @@ export async function updateChatAction_Database(
     });
 }
 
+async function handleChatList2PlayerData(list) {
+  const _ = DB.command;
+
+  const openidList = list.map((data) => data.sender);
+  const playerList = await DB.collection("players")
+    .where({
+      openid: _.in(openidList),
+    })
+    .get()
+    .then((res) => res.data);
+  const _list = list.map((data, index) => {
+    const player = playerList.find((item) => item.openid === data.sender);
+    return {
+      id: `dialogue${index}`,
+      ...data,
+      player,
+    };
+  });
+
+  return _list ?? [];
+}
+
 export async function getDialogueList_Database(gameID: string) {
   const _ = DB.command;
   const [{ chatActionList }] = await DB.collection("game_events")
@@ -66,7 +88,7 @@ export async function getDialogueList_Database(gameID: string) {
   return list ?? [];
 }
 
-export function useChatApi(id: string, updateBarrageList) {
+export function useChatApi(id: string, updateBarrageList, setDialogueList) {
   const [pageShow, setPageShow] = useState<boolean>(true);
   useDidHide(() => {
     setPageShow(false);
@@ -79,17 +101,15 @@ export function useChatApi(id: string, updateBarrageList) {
     new Date(Date.now() - ACTION_DELAY)
   );
   const eventCb = useRef(null);
-  eventCb.current = (data, updatedFields = []) => {
+  eventCb.current = async (data, updatedFields = []) => {
     const chatActionChange = updatedFields.some((item) =>
       /chatActionList/.test(item)
     );
     const { chatActionList } = data || {};
     if (chatActionChange) {
-      execChatActions(
-        chatActionList,
-        lastChatActionExecTime,
-        updateBarrageList
-      );
+      const list = await handleChatList2PlayerData(chatActionList);
+      setDialogueList(list);
+      execChatActions(list, lastChatActionExecTime, updateBarrageList);
     }
   };
   // 监听数据库变化
@@ -101,6 +121,10 @@ export function useChatApi(id: string, updateBarrageList) {
     if (!pageShow || !id) return;
     SLEEP(500).then(() => {
       watchEvents_DataBase(id, eventCb, watcherMap);
+    });
+    getDialogueList_Database(id).then((list) => {
+      setDialogueList(list);
+      execChatActions(list, lastChatActionExecTime, updateBarrageList);
     });
     return () => {
       watcherMap.eventsWatcher?.close();
@@ -119,7 +143,6 @@ async function execChatActions(
   if (list.length <= 0) return;
   lastChatActionExecTime.current = list.slice(-1)[0].createdAt;
 
-  list = await handleOpenid2PlayerData(list, "sender");
   updateBarrageList(list);
   // 同时执行动画队列
   list.forEach((action) => {

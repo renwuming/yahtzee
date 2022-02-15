@@ -17,9 +17,10 @@ async function execHandleDailyWealthRecord(db) {
       .limit(THOUSAND)
       .get()
       .then((res) => res.data);
-    list.forEach((item) => {
-      const { _id, wealthRecord } = item;
+    for (let j = 0; j < list.length; j++) {
+      const { _id, wealthRecord } = list[j];
       const updateData = {};
+      await SLEEP(50);
       for (let key in wealthRecord) {
         const { refresh } = wealthRecord[key];
         if (refresh === "day") {
@@ -27,12 +28,16 @@ async function execHandleDailyWealthRecord(db) {
         }
       }
       if (Object.keys(updateData).length > 0) {
-        db.collection("players").doc(_id).update({
+        await db.collection("players").doc(_id).update({
           data: updateData,
         });
       }
-    });
+    }
   }
+}
+
+function SLEEP(delay) {
+  return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 module.exports = {

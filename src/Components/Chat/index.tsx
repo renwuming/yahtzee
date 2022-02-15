@@ -4,13 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AtButton, AtDrawer } from "taro-ui";
 import clsx from "clsx";
 import HallPlayer from "@/Components/HallPlayer";
-import { isMe } from "@/utils";
+import { isMe, SLEEP } from "@/utils";
 import "./index.scss";
-import {
-  getDialogueList_Database,
-  updateChatAction_Database,
-  useChatApi,
-} from "./api";
+import { updateChatAction_Database, useChatApi } from "./api";
 
 interface IProps {
   gameID: string;
@@ -54,7 +50,7 @@ function Index({
   });
   const [barrageList, setBarrageList] = useState<ChatAction[]>([]);
 
-  useChatApi(gameID, updateBarrageList);
+  useChatApi(gameID, updateBarrageList, setList);
 
   function updateBarrageList(list) {
     const newList = barrageList.concat(list);
@@ -76,7 +72,6 @@ function Index({
       await updateChatAction_Database(openid, gameID, formData.message);
       formData.message = "";
       setFormData(formData);
-      updateDialogueList();
     } catch (err) {
       Taro.showToast({
         title: "提交失败",
@@ -87,16 +82,10 @@ function Index({
     waiting.current = false;
   }
 
-  async function updateDialogueList(scrollToBottom: boolean = true) {
-    const list = await getDialogueList_Database(gameID);
-    setList(list);
-
-    scrollToBottom && list.length > 0 && setBottomID(list[list.length - 1].id);
+  function scrollToBottom() {
+    setBottomID("");
+    list.length > 0 && setBottomID(list[list.length - 1].id);
   }
-
-  useEffect(() => {
-    updateDialogueList(false);
-  }, []);
 
   const onInput = ({ detail: { value } }) => {
     formData.message = value;
@@ -106,12 +95,15 @@ function Index({
 
   useEffect(() => {
     if (drawerShow) {
-      updateDialogueList();
-    } else {
-      setBottomID("");
+      SLEEP(100).then((_) => {
+        scrollToBottom();
+      });
     }
   }, [drawerShow]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [list]);
   return (
     <View className="chat-container">
       <AtDrawer

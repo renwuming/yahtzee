@@ -92,6 +92,7 @@ export default function Index() {
     Rummy.RummyCardData[]
   >([]);
   // client端
+  const [resetWatchersFlag, setResetWatchersFlag] = useState<boolean>(false);
   const [activePlayer, setActivePlayer] = useState<number>(0);
   const activeCardID = useRef<number>(-1);
   const posData = useRef<Rummy.Position>(null);
@@ -158,6 +159,7 @@ export default function Index() {
     gameData,
     setRoundCountDown,
     getCountDown,
+    resetWatchersFlag,
   });
 
   function getCountDown(data: Rummy.RummyGameBaseData) {
@@ -581,6 +583,7 @@ export default function Index() {
 
   function restartRound() {
     resetBoard(true);
+    setResetWatchersFlag(!resetWatchersFlag);
     getGameData(id).then((data) => {
       initFn(data);
     });
@@ -606,6 +609,13 @@ export default function Index() {
   // }
 
   // const _correctCardsPos = useDebounce(correctCardsPos, 1500, []);
+
+  function correctCardsPos() {
+    setCorrectToastIsOpen(true);
+    setTimeout(() => {
+      setCorrectToastIsOpen(false);
+    }, 500);
+  }
 
   return (
     <MovableArea>
@@ -657,7 +667,13 @@ export default function Index() {
                 )}
               </View>
             </View>
-            <View id="playground" className="playground">
+            <View
+              id="playground"
+              className="playground"
+              onLongPress={() => {
+                correctCardsPos();
+              }}
+            >
               {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
                 const show4 = colIndex <= 5 && colIndex % 3 === 0;
                 const showN = colIndex > 5 && (colIndex - 8) % 3 === 0;
@@ -694,34 +710,26 @@ export default function Index() {
                 />
               )}
           </View>
-          <View className={clsx("playboard-container", !gaming && "hidden")}>
+          <View
+            className={clsx("playboard-container", !gaming && "hidden")}
+            onLongPress={() => {
+              correctCardsPos();
+            }}
+          >
             <View className={clsx("top", gaming && "show")}>
               <View className="playboard-ctrl-box">
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
-                    execPlaceSetFromBoardToGround();
+                    restartRound();
                   }}
-                  disabled={!inRound}
                 >
-                  <AtIcon value="arrow-up" size="18" color="#fff"></AtIcon>
+                  <AtIcon value="reload" size="18" color="#fff"></AtIcon>
                 </AtButton>
                 <AtButton
                   className="ctrl-btn"
                   onClick={() => {
-                    resetBoard(true);
-                  }}
-                  disabled={!inRound}
-                >
-                  <AtIcon value="arrow-down" size="18" color="#fff"></AtIcon>
-                </AtButton>
-                <AtButton
-                  className="ctrl-btn"
-                  onClick={() => {
-                    setCorrectToastIsOpen(true);
-                    setTimeout(() => {
-                      setCorrectToastIsOpen(false);
-                    }, 500);
+                    correctCardsPos();
                   }}
                   disabled={!inRound}
                 >
@@ -753,15 +761,6 @@ export default function Index() {
                   disabled={!inGame}
                 >
                   <Text className="text-icon">789</Text>
-                </AtButton>
-
-                <AtButton
-                  className="ctrl-btn"
-                  onClick={() => {
-                    restartRound();
-                  }}
-                >
-                  <AtIcon value="reload" size="18" color="#fff"></AtIcon>
                 </AtButton>
               </View>
             </View>

@@ -17,6 +17,7 @@ interface GameApiData {
   gameData: AnyGameData;
   setRoundCountDown: any;
   getCountDown: any;
+  resetWatchersFlag?: boolean;
 }
 
 export function useGameApi(data: GameApiData) {
@@ -29,6 +30,7 @@ export function useGameApi(data: GameApiData) {
     gameData,
     setRoundCountDown,
     getCountDown,
+    resetWatchersFlag = false,
   } = data;
   const { players, end } = gameData || {};
 
@@ -45,6 +47,15 @@ export function useGameApi(data: GameApiData) {
     });
     setPageShow(true);
   });
+
+  useEffect(() => {
+    if (players && players.length > 0) {
+      getGiftActionList(id).then((list) => {
+        execGiftActions(list, lastGiftActionExecTime, players);
+      });
+    }
+  }, [players?.length]);
+
   const cb = useRef(null);
   cb.current = gameDataWatchCb;
 
@@ -77,7 +88,7 @@ export function useGameApi(data: GameApiData) {
       watcherMap.watcher?.close();
       watcherMap.eventsWatcher?.close();
     };
-  }, [pageShow]);
+  }, [pageShow, resetWatchersFlag]);
 
   // 游戏未结束时，一直更新在线状态和回合倒计时
   useEffect(() => {
@@ -114,6 +125,18 @@ export function useGameApi(data: GameApiData) {
       // clearInterval(watcherTimer);
     };
   }, [end, pageShow, gameData]);
+}
+
+async function getGiftActionList(id) {
+  const [{ giftActionList }] = (await DB.collection("game_events")
+    .where({
+      gameID: id,
+    })
+    .limit(1)
+    .get()
+    .then((res) => res.data)) as any;
+
+  return giftActionList ?? [];
 }
 
 async function updatePlayerOnline_Database(game: GameData, gameDbName: string) {

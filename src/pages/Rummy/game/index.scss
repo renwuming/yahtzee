@@ -45,25 +45,69 @@ movable-area {
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      .round-sum {
+    }
+    .round-sum {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 90px;
+      height: 70px;
+      padding: 10px 0;
+      margin-top: 60px;
+      color: #eee;
+      font-family: "yansong";
+      font-size: 26px;
+      border-radius: 12px;
+      background-color: rgba(90, 90, 90, 0.5);
+      .number {
+        font-size: 34px;
+        margin-top: 10px;
+        font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
+          Arial, sans-serif;
+      }
+    }
+    .action-box {
+      .at-button {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
+        width: 100px;
+        height: 106px;
+        padding: 0;
+        margin: 0;
+        border: none;
         align-items: center;
-        width: 90px;
-        height: 70px;
-        padding: 10px 0;
-        margin-top: 60px;
-        color: #eee;
-        font-family: "yansong";
-        font-size: 26px;
-        border-radius: 12px;
-        background-color: rgba(90, 90, 90, 0.5);
-        .number {
-          font-size: 34px;
-          margin-top: 10px;
-          font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
-            Arial, sans-serif;
+        justify-content: center;
+        font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow",
+          Arial, sans-serif;
+        font-size: 30px;
+        font-weight: bold;
+        .at-button__text {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          width: 100px;
+          height: 106px;
+        }
+        image {
+          width: 60px;
+          height: 60px;
+        }
+        .bottom {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 40px;
+          line-height: 40px;
+          font-size: 22px;
+          color: #fff;
+          text {
+            margin-left: 6px;
+          }
+        }
+        .icon {
+          width: 30px;
+          height: 30px;
         }
       }
     }
@@ -371,9 +415,6 @@ movable-area {
     .at-progress__outer-inner-background {
       height: 10px;
     }
-  }
-  .toast-wrapper-hidden {
-    display: none;
   }
 }
 // 游戏结果

@@ -45,9 +45,7 @@ function Index({
   const waiting = useRef<boolean>(false);
   const [bottomID, setBottomID] = useState<string>("");
   const [list, setList] = useState<ChatAction[]>([]);
-  const [formData, setFormData] = useState<{ message: string }>({
-    message: "",
-  });
+  const [message, setMessage] = useState<string>("");
   const [barrageList, setBarrageList] = useState<ChatAction[]>([]);
 
   useChatApi(gameID, updateBarrageList, setList);
@@ -59,7 +57,7 @@ function Index({
 
   async function submit() {
     if (waiting.current) return;
-    if (formData.message === "") {
+    if (message === "") {
       Taro.showToast({
         title: "请填写内容",
         icon: "none",
@@ -69,9 +67,8 @@ function Index({
     }
     try {
       waiting.current = true;
-      await updateChatAction_Database(openid, gameID, formData.message);
-      formData.message = "";
-      setFormData(formData);
+      await updateChatAction_Database(openid, gameID, message);
+      setMessage("");
     } catch (err) {
       Taro.showToast({
         title: "提交失败",
@@ -88,8 +85,7 @@ function Index({
   }
 
   const onInput = ({ detail: { value } }) => {
-    formData.message = value;
-    setFormData(formData);
+    setMessage(value);
     return value;
   };
 
@@ -104,6 +100,7 @@ function Index({
   useEffect(() => {
     scrollToBottom();
   }, [list]);
+
   return (
     <View className="chat-container">
       <AtDrawer
@@ -128,6 +125,9 @@ function Index({
                   id={id}
                   player={player}
                   text={message}
+                  onClick={() => {
+                    setMessage(message);
+                  }}
                 ></Dialogue>
               ))}
             </View>
@@ -138,7 +138,7 @@ function Index({
               type="text"
               maxlength={100}
               cursorSpacing={50}
-              value={formData.message}
+              value={message}
               onInput={onInput}
             />
             <AtButton
@@ -160,8 +160,9 @@ interface DialogueProps {
   id: string;
   player: Player;
   text: string;
+  onClick: any;
 }
-function Dialogue({ id, player, text }: DialogueProps) {
+function Dialogue({ id, player, text, onClick }: DialogueProps) {
   const { nickName, openid } = player;
   const me = isMe(openid);
   return (
@@ -170,7 +171,9 @@ function Dialogue({ id, player, text }: DialogueProps) {
       <View className="text-box">
         <HallPlayer data={player} noNickName></HallPlayer>
         <View className="arrow"></View>
-        <Text className="text">{text}</Text>
+        <Text className="text" onClick={onClick}>
+          {text}
+        </Text>
       </View>
     </View>
   );

@@ -1,6 +1,8 @@
-import { ScrollView, View, Text } from "@tarojs/components";
+import { ScrollView, View, Text, Image } from "@tarojs/components";
 import { useEffect, useState } from "react";
 import { AtBadge, AtDivider, AtFab, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
+// @ts-ignore
+import RankIcon from "@/assets/imgs/rank2.png";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
 import GameItem from "../../../Components/GameItemForMorePlayers";
@@ -71,8 +73,8 @@ export default function Index() {
         <AtTabsPane current={tabIndex} index={0}>
           <ScrollView
             className="scroll-view"
-            scrollY={true}
-            enableBackToTop={true}
+            scrollY
+            enableBackToTop
             onScrollToLower={() => {
               updateHallGameList();
             }}
@@ -106,8 +108,8 @@ export default function Index() {
         <AtTabsPane current={tabIndex} index={1}>
           <ScrollView
             className="scroll-view"
-            scrollY={true}
-            enableBackToTop={true}
+            scrollY
+            enableBackToTop
             onScrollToLower={() => {
               updateMyGameList();
             }}
@@ -147,7 +149,7 @@ export default function Index() {
             createGame();
           }}
         >
-          <AtBadge className="shake" value={"点我开始"}>
+          <AtBadge className="shake" value="点我开始">
             <Text className="at-fab__icon at-icon at-icon-add"></Text>
           </AtBadge>
         </AtFab>
@@ -167,7 +169,7 @@ export default function Index() {
             gotoCantStopGuide();
           }}
         >
-          <AtBadge className="shake" value={"不会玩点我"}>
+          <AtBadge className="shake" value="不会玩点我">
             <Text className="at-fab__icon at-icon at-icon-help"></Text>
           </AtBadge>
         </AtFab>
@@ -178,7 +180,7 @@ export default function Index() {
             navigateTo("CantStop", `ranking/index`);
           }}
         >
-          <Text className="at-fab__icon at-icon at-icon-numbered-list"></Text>
+          <Image mode="aspectFit" src={RankIcon}></Image>
         </AtFab>
       </View>
       <View className="fab-btn history">

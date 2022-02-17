@@ -89,6 +89,8 @@ export const RANKING_LEN = 60;
 export const SEASON_RANKING_LEN = 100;
 export const HISTORY_LEN = 100;
 
+export const EXTRA_ROUND_TIME = 60;
+
 // 快艇骰子
 export const ROUND_TIME_LIMIT = 65;
 export const SHOW_ROUND_TIME_LIMIT = 60;
@@ -166,4 +168,12 @@ export enum RUMMY_SET_TYPE {
   straight,
   samevalue,
   all, // 可能是任何一种
+}
+
+const extraRoundTimePriceMap = [100, 200, 500, 1000];
+export function getExtraRoundTimePrice(player: Player) {
+  const times = (player?.actionRecord?.extraRoundTime ?? 0) + 1;
+  const L = extraRoundTimePriceMap.length;
+  if (times <= L) return extraRoundTimePriceMap[times - 1];
+  else return extraRoundTimePriceMap[L - 1];
 }

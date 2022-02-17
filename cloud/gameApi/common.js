@@ -220,3 +220,78 @@ exports.shuffle = function (arr) {
 const flat = (arr) =>
   arr.reduce((a, b) => a.concat(Array.isArray(b) ? flat(b) : b), []);
 exports.flat = flat;
+
+// 使用金币增加回合时间
+const extraRoundTimePriceMap = [100, 200, 500, 1000];
+exports.increaseRoundTime = async function (gameID, gameDbName) {
+  const db = cloud.database();
+  const _ = db.command;
+  const { OPENID } = cloud.getWXContext();
+  try {
+    const data = await db
+      .collection(gameDbName)
+      .doc(gameID)
+      .get()
+      .then((res) => res.data);
+    const { players, start, end, roundSum, roundPlayer, extraRoundTime } = data;
+    // 如果已经额外增加过时间，则忽略
+    if ((extraRoundTime || {})[roundSum]) {
+      throw new Error("400-每回合只可以延长时间一次");
+    }
+    const playerIndex = players.map((item) => item.openid).indexOf(OPENID);
+    const inRound = roundPlayer === playerIndex;
+    const singlePlayer = players.length === 1;
+    if (!start || end || !inRound || singlePlayer) {
+      throw new Error("400-不是你的回合，操作失败");
+    }
+    // 计算价格
+    let times =
+      ((players[playerIndex].actionRecord || {}).extraRoundTime || 0) + 1;
+    let price = extraRoundTimePriceMap[times - 1];
+    if (!price) {
+      price = extraRoundTimePriceMap[extraRoundTimePriceMap.length - 1];
+    }
+
+    // 玩家金币是否充足
+    const [player] = await db
+      .collection("players")
+      .where({
+        openid: OPENID,
+      })
+      .get()
+      .then((res) => res.data);
+    const {
+      wealth: { gold },
+    } = player;
+    if (!gold || gold < price) {
+      throw new Error("400-金币不足");
+    }
+
+    // 更新游戏数据和玩家数据
+    db.collection(gameDbName)
+      .doc(gameID)
+      .update({
+        data: {
+          [`extraRoundTime.${roundSum}`]: true,
+          [`players.${playerIndex}.actionRecord.extraRoundTime`]: times,
+        },
+      });
+    db.collection("players")
+      .where({
+        openid: OPENID,
+      })
+      .update({
+        data: {
+          "wealth.gold": _.inc(-price),
+        },
+      });
+  } catch (err) {
+    const [errCode, errMsg] = err.message.split("-");
+    if (+errCode === 400) {
+      return {
+        errCode: +errCode,
+        errMsg,
+      };
+    }
+  }
+};

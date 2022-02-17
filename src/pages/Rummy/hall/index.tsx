@@ -1,7 +1,9 @@
-import { ScrollView, View, Text } from "@tarojs/components";
+import { ScrollView, View, Text, Image } from "@tarojs/components";
 import { useEffect, useState } from "react";
 import { AtBadge, AtDivider, AtFab, AtIcon, AtTabs, AtTabsPane } from "taro-ui";
 import { gotoRummyGuide, navigateTo } from "@/utils";
+// @ts-ignore
+import RankIcon from "@/assets/imgs/rank2.png";
 import "./index.scss";
 import { getHallGames, getMyGames } from "./hallApi";
 import GameItem from "../../../Components/GameItemForMorePlayers";
@@ -168,7 +170,7 @@ export default function Index() {
             navigateTo("Rummy", `ranking/index`);
           }}
         >
-          <Text className="at-fab__icon at-icon at-icon-numbered-list"></Text>
+          <Image mode="aspectFit" src={RankIcon}></Image>
         </AtFab>
       </View>
       <View className="fab-btn history">

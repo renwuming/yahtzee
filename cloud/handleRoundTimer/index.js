@@ -40,4 +40,26 @@ exports.main = async (event) => {
   // Rummy
   execHandleTimerRummy(db);
   execHandleExceptionRummy(db);
+
+  // 广告弹幕
+  execHandleGamePublicity(db);
 };
+
+async function execHandleGamePublicity(db) {
+  const _ = db.command;
+  const gamePublicitySlogan = {
+    createdAt: new Date(),
+    message:
+      "感谢使用小程序，欢迎添加作者微信 ren-wuming，加入玩家群，组局交流~",
+    sender: "oqWgm5fO6WmeIflXZZJusUBmWPB0",
+  };
+  db.collection("game_events")
+    .where({
+      "chatActionList.0": _.exists(0),
+    })
+    .update({
+      data: {
+        chatActionList: _.push(gamePublicitySlogan),
+      },
+    });
+}

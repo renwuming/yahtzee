@@ -656,6 +656,10 @@ function judgePlaygroundPerfect(playgroundData) {
 function judgeListIsSet(list) {
   if (list.length < 3) return false;
   const noJokerList = list.filter((item) => item.value !== 0);
+  // 没有小丑，则自动排序
+  if (noJokerList.length === list.length) {
+    list.sort((a, b) => a.value - b.value);
+  }
   // 两张鬼牌+一张普通牌，必定符合条件
   if (noJokerList.length === 1) return true;
 

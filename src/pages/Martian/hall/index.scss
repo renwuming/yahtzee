@@ -43,6 +43,10 @@ page {
     right: 50px;
     bottom: 100px;
     z-index: 900;
+    image {
+      width: 48rpx;
+      height: 48rpx;
+    }
     &.reload {
       bottom: 100px;
     }

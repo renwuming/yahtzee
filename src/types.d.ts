@@ -95,6 +95,7 @@ interface Player {
   gift?: Gift;
   wealth?: any;
   wealthRecord?: any;
+  actionRecord?: any;
 }
 interface GameBaseData {
   _id: string;
@@ -107,6 +108,9 @@ interface GameBaseData {
   roundPlayer?: number;
   startPlayer?: number;
   roundSum?: number;
+  extraRoundTime?: {
+    number: boolean;
+  };
 
   _createTime: Date;
   _updateTime: Date;

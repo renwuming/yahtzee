@@ -69,12 +69,18 @@
         {
           "name": "拉密2",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=17e3426e62066d2b0d463c151d0be81a",
+          "query": "id=41ae62ef620e7a6406ff1feb3aec3d4a",
           "scene": null
         },
         {
           "name": "留言板",
           "pathName": "pages/MessageBoard/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "拉密大厅",
+          "pathName": "pages/Rummy/hall/index",
           "query": "",
           "scene": null
         }

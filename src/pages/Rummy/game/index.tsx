@@ -9,10 +9,12 @@ import {
 import { AtButton, AtIcon, AtProgress, AtToast } from "taro-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import { flat, getUserProfile, SLEEP, useDebounce } from "@/utils";
+import { flat, getUserProfile, SLEEP } from "@/utils";
 import {
   AchievementGameIndex,
   CARD_SUM,
+  EXTRA_ROUND_TIME,
+  getExtraRoundTimePrice,
   MAX_PLAYERS,
   PlayerContext,
   RUMMY_AREA_STATUS,
@@ -32,6 +34,10 @@ import MsgIcon from "@/assets/imgs/msg.png";
 import NoticeIcon from "@/assets/imgs/notice.png";
 // @ts-ignore
 import NoNoticeIcon from "@/assets/imgs/no-notice.png";
+// @ts-ignore
+import SandClockIcon from "@/assets/imgs/sandClock.png";
+// @ts-ignore
+import GoldIcon from "@/assets/imgs/gold.png";
 import RummyCard from "@/Components/RummyCard";
 import LoadPage from "@/Components/LoadPage";
 import { GameGift } from "@/Components/Gifts";
@@ -58,7 +64,6 @@ import {
   judgePlaygroundPerfect,
   placeSetFromBoardToGround,
   sortCardList,
-  // tidyPlayground,
   updateCardPos,
 } from "./api";
 import "./index.scss";
@@ -79,9 +84,8 @@ export default function Index() {
   // cloud端
   const [players, setPlayers] = useState<Rummy.RummyPlayer[]>([]);
   const [gameData, setGameData] = useState<Rummy.RummyGameData>(null);
-  const [roundCountDown, setRoundCountDown] = useState<number | string>(
-    Infinity
-  );
+  const [roundCountDown, setRoundCountDown] = useState<number>(Infinity);
+  const [extraRoundFlag, setExtraRoundFlag] = useState<boolean>(false);
   const [cardList, setCardList] = useState<Rummy.RummyCardData[]>([]);
   const [playgroundData, setPlaygroundData] =
     useState<Rummy.RummyCardData[][]>(null);
@@ -116,11 +120,19 @@ export default function Index() {
     canJoin,
     inRound,
     cardLibrary,
+    extraRoundTime,
+    roundSum,
   } = gameData || {};
   const singlePlayer = players.length === 1;
   const gaming = start && !end;
   const groundCardSum = CARD_SUM - cardLibrary?.length;
   const gameDataLoaded = players.length >= 1;
+  // 回合时间相关
+  const hasExtraTime = extraRoundTime?.[roundSum];
+  const extraTime = extraRoundFlag ? EXTRA_ROUND_TIME : 0;
+  const showRoundTimeLimit = RUMMY_SHOW_ROUND_TIME_LIMIT + extraTime;
+  const canBuyExtraRoundTime =
+    gaming && !singlePlayer && inRound && !hasExtraTime && +roundCountDown >= 1;
   // 存在手牌在公共区域
   const handCardInGround = cardList.some(
     (item) => item.areaStatus === RUMMY_AREA_STATUS.playground
@@ -162,12 +174,16 @@ export default function Index() {
     resetWatchersFlag,
   });
 
-  function getCountDown(data: Rummy.RummyGameBaseData) {
-    const { roundTimeStamp } = data || {};
+  function getCountDown(data: Rummy.RummyGameBaseData): number {
+    const { roundTimeStamp, extraRoundTime, roundSum } = data || {};
     if (!roundTimeStamp) return Infinity;
+    const extraRoundFlag = extraRoundTime?.[roundSum];
+    setExtraRoundFlag(extraRoundFlag);
+    const extraTime = extraRoundFlag ? EXTRA_ROUND_TIME : 0;
+    const roundTimeLimit = RUMMY_ROUND_TIME_LIMIT + extraTime;
     const timeStamp = Date.now();
     const _roundCountDown = ~~(
-      RUMMY_ROUND_TIME_LIMIT -
+      roundTimeLimit -
       (timeStamp - +new Date(roundTimeStamp)) / 1000
     );
     return _roundCountDown;
@@ -401,7 +417,6 @@ export default function Index() {
     }
     activeCardID.current = -1;
     updateRoundPlaygroundData();
-    // _correctCardsPos();
   }
 
   function updateCardList(
@@ -602,14 +617,6 @@ export default function Index() {
     }, time);
   }
 
-  // function correctCardsPos() {
-  //   // 移动卡片时，忽略纠正
-  //   if (activeCardID.current >= 0) return;
-  //   setCorrectToastIsOpen(!correctToastIsOpen);
-  // }
-
-  // const _correctCardsPos = useDebounce(correctCardsPos, 1500, []);
-
   function correctCardsPos() {
     setCorrectToastIsOpen(true);
     setTimeout(() => {
@@ -659,13 +666,40 @@ export default function Index() {
                 >
                   <PlayerList players={players}></PlayerList>
                 </PlayerContext.Provider>
-                {singlePlayer && gaming && (
+                {gaming && singlePlayer && (
                   <View className="round-sum">
                     用牌数
                     <Text className="number">{groundCardSum}</Text>
                   </View>
                 )}
               </View>
+              {gaming && !singlePlayer && inGame && (
+                <View className="action-box">
+                  <AtButton
+                    className="extra-time-btn"
+                    onClick={async () => {
+                      if (waiting.current) return;
+                      waiting.current = true;
+                      await handleGameAction(
+                        id,
+                        "increaseRoundTime",
+                        {},
+                        showToast
+                      );
+                      waiting.current = false;
+                    }}
+                    disabled={!canBuyExtraRoundTime}
+                  >
+                    <Image src={SandClockIcon} mode="aspectFit" />
+                    <View className="bottom">
+                      <Image className="icon" src={GoldIcon} mode="aspectFit" />
+                      <Text>
+                        {getExtraRoundTimePrice(players[playerIndex])}
+                      </Text>
+                    </View>
+                  </AtButton>
+                </View>
+              )}
             </View>
             <View
               id="playground"
@@ -703,9 +737,9 @@ export default function Index() {
           <View className={clsx("count-down-box", inRound && "my-count-down")}>
             {gaming &&
               !singlePlayer &&
-              roundCountDown <= RUMMY_SHOW_ROUND_TIME_LIMIT && (
+              +roundCountDown <= showRoundTimeLimit && (
                 <AtProgress
-                  percent={(+roundCountDown / 60) * 100}
+                  percent={(+roundCountDown / showRoundTimeLimit) * 100}
                   status="error"
                 />
               )}
@@ -733,7 +767,7 @@ export default function Index() {
                   }}
                   disabled={!inRound}
                 >
-                  <Image src={AimIcon} />
+                  <Image src={AimIcon} mode="aspectFit" />
                 </AtButton>
               </View>
               <View className={clsx("playboard-wrapper")}>
@@ -771,7 +805,7 @@ export default function Index() {
                   setDrawerShow(true);
                 }}
               >
-                <Image src={MsgIcon} />
+                <Image src={MsgIcon} mode="aspectFit" />
               </AtButton>
               {handCardInGround ? (
                 <AtButton
@@ -801,7 +835,7 @@ export default function Index() {
                 disabled={!inRound}
               >
                 {handCardInGround ? (
-                  <Image mode="aspectFit" src={PerfectIcon}></Image>
+                  <Image src={PerfectIcon} mode="aspectFit"></Image>
                 ) : (
                   <View className="btn-box">
                     <AtIcon value="add" size="22" color="#f8f6d1"></AtIcon>
@@ -822,9 +856,9 @@ export default function Index() {
                 }}
               >
                 {showBarrage ? (
-                  <Image src={NoticeIcon} />
+                  <Image src={NoticeIcon} mode="aspectFit" />
                 ) : (
-                  <Image src={NoNoticeIcon} />
+                  <Image src={NoNoticeIcon} mode="aspectFit" />
                 )}
               </AtButton>
             </View>
@@ -874,7 +908,6 @@ export default function Index() {
           </View>
         </View>
         <AtToast
-          // className="toast-wrapper-hidden"
           text="校准位置"
           status="success"
           isOpened={correctToastIsOpen}

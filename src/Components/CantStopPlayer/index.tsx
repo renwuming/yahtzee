@@ -1,13 +1,13 @@
-import { View, Image, Text } from "@tarojs/components";
-import "./index.scss";
-import Achievement from "../../Components/Achievement";
 import { useContext, useState } from "react";
 import { AtActionSheet, AtActionSheetItem, AtIcon } from "taro-ui";
+import { View, Image, Text } from "@tarojs/components";
+import Achievement from "@/Components/Achievement";
 import {
   CANTSTOP_SHOW_ROUND_TIME_LIMIT,
   OFFLINE_DELAY,
   PlayerContext,
-} from "../../const";
+} from "@/const";
+import "./index.scss";
 
 interface IProps {
   data: CantStop.CantStopPlayer;
@@ -47,9 +47,10 @@ export default function Index({
         }}
       >
         <Image
-          className={`avatar`}
+          className="avatar"
           id={`player-${index}-avatar`}
           src={avatarUrl}
+          mode="aspectFit"
         ></Image>
         <Text className={colorType}>{nickName}</Text>
       </View>

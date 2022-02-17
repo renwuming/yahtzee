@@ -9,9 +9,7 @@ import "./index.scss";
 
 export default function Index() {
   const waiting = useRef<boolean>(false);
-  const [formData, setFormData] = useState<{ message: string }>({
-    message: "",
-  });
+  const [message, setMessage] = useState<string>("");
   const [list, setList] = useState<BoardMessage[]>([]);
   const [pageNum, setPageNum] = useState<number>(0);
   const [pageEnd, setPageEnd] = useState<boolean>(false);
@@ -37,7 +35,7 @@ export default function Index() {
 
   async function submit() {
     if (waiting.current) return;
-    if (formData.message === "") {
+    if (message === "") {
       Taro.showToast({
         title: "请填写留言内容",
         icon: "none",
@@ -47,9 +45,8 @@ export default function Index() {
     }
     try {
       waiting.current = true;
-      await submitBoardMessage(formData.message);
-      formData.message = "";
-      setFormData(formData);
+      await submitBoardMessage(message);
+      setMessage("");
       Taro.showToast({
         title: "提交成功",
         icon: "success",
@@ -77,8 +74,7 @@ export default function Index() {
   }
 
   const onChange = (msg) => {
-    formData.message = msg;
-    setFormData(formData);
+    setMessage(msg);
     return msg;
   };
   return (
@@ -121,7 +117,7 @@ export default function Index() {
       </ScrollView>
       <AtTextarea
         className="msg-textarea"
-        value={formData.message}
+        value={message}
         onChange={onChange}
         maxLength={200}
         placeholder="您的建议/问题是..."

@@ -55,3 +55,12 @@ export const GameGift = function Index() {
     </View>
   );
 };
+
+const sendGiftMsgMap = {
+  rose: "一支 🌹",
+  bomb: "一颗 💣",
+  praise: "一个 👍🏻",
+};
+export function getSendGiftMsg(giftType: string) {
+  return sendGiftMsgMap[giftType];
+}

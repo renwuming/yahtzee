@@ -52,6 +52,7 @@ async function execHandleGamePublicity(db) {
     message:
       "感谢使用小程序，欢迎添加作者微信 ren-wuming，加入玩家群，组局交流~",
     sender: "oqWgm5fO6WmeIflXZZJusUBmWPB0",
+    type: 1,
   };
   db.collection("game_events")
     .where({

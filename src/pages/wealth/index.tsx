@@ -1,4 +1,4 @@
-import Taro, { useReady } from "@tarojs/taro";
+import Taro from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
 import { AtButton, AtIcon } from "taro-ui";
 import "./index.scss";
@@ -6,25 +6,18 @@ import "./index.scss";
 import GoldIcon from "../../assets/imgs/gold.png";
 import { getWealthList_Database, gainWealth_Database } from "./wealthApi";
 import { useEffect, useRef, useState } from "react";
-import { getVedio30, useThrottle } from "../../utils";
 import LoadPage from "../../Components/LoadPage";
+import Ad from "@/Components/Ad";
 
 export default function Index() {
   const [userInfo, setUserInfo] = useState<Player>(
     Taro.getStorageSync("userInfo")
   );
   const [wealthList, setWealthList] = useState<Wealth[]>([]);
-  const showVideoAd = useRef<Function>(() => {});
-  const videoAd = useRef(null);
+  const [showAdFlag, setShowAdFlag] = useState<boolean>(false);
+  const wealthID = useRef<string>(null);
 
   const { openid, wealthRecord } = userInfo;
-
-  useReady(() => {
-    getVedio30((_videoAd, _showVideoAd) => {
-      videoAd.current = _videoAd;
-      showVideoAd.current = _showVideoAd;
-    });
-  });
 
   useEffect(() => {
     getWealthList_Database().then((list) => {
@@ -33,32 +26,9 @@ export default function Index() {
     });
   }, [userInfo]);
 
-  const _GainWealth = useThrottle(gainWealth, 3500);
-
   // 获取福利
-  async function gainWealth(id: string, needVideo: boolean) {
-    if (needVideo) {
-      // 播放视频广告
-      showVideoAd.current();
-      videoAd.current?.onClose(async ({ isEnded }) => {
-        if (isEnded) {
-          await realGainWealth(id);
-        } else {
-          Taro.showToast({
-            title: "需要完整看完广告才能领取奖励",
-            icon: "none",
-            duration: 1500,
-          });
-        }
-        videoAd.current?.offClose();
-      });
-    } else {
-      await realGainWealth(id);
-    }
-  }
-
-  async function realGainWealth(id: string) {
-    const userInfo = await gainWealth_Database(id, openid);
+  async function realGainWealth() {
+    const userInfo = await gainWealth_Database(wealthID.current, openid);
     Taro.setStorageSync("userInfo", userInfo);
     setUserInfo(userInfo);
     Taro.showToast({
@@ -87,6 +57,7 @@ export default function Index() {
   return (
     <View className="wealth at-row at-row__align--center">
       <LoadPage setUserInfo={setUserInfo}></LoadPage>
+      <Ad showAdFlag={showAdFlag} afterAd={realGainWealth} />
       {wealthList.map((item) => {
         const { _id, type, amount, intro, needVideo, remainingTimes } = item;
         return (
@@ -102,13 +73,19 @@ export default function Index() {
               <View className="bottom">
                 <AtButton
                   onClick={() => {
-                    _GainWealth(_id, needVideo);
+                    wealthID.current = _id;
+                    if (needVideo) {
+                      setShowAdFlag(!showAdFlag);
+                    } else {
+                      realGainWealth();
+                    }
                   }}
                   disabled={remainingTimes <= 0}
                 >
                   {needVideo && (
                     <AtIcon value="video" size="16" color="#fff"></AtIcon>
-                  )}{" "}
+                  )}
+                  {needVideo && " "}
                   领取
                 </AtButton>
               </View>

@@ -59,6 +59,7 @@ import {
   GROUND_ROW_LEN,
   handleGameAction,
   handleGameData,
+  increaseRoundTime,
   initPlayboard,
   judgeIn,
   judgePlaygroundPerfect,
@@ -219,18 +220,23 @@ export default function Index() {
     }
     const gameDataChange = updatedFields.length > 0;
     if (gameDataChange) {
-      const cardListPattern = new RegExp(`^players\.${playerIndex}\.cardList`);
-      const boardChange = updatedFields.some((key) =>
-        cardListPattern.test(key)
+      // 只有回合时间相关更新
+      const OnlyRoundTimeChange = updatedFields.every(
+        (key) =>
+          /^players\.\d+\.actionRecord/.test(key) ||
+          /^extraRoundTime\.\d+/.test(key)
       );
-      const groundChange = updatedFields.includes("playgroundData");
-      // 结束回合不摸牌
-      if (groundChange && boardChange) {
+      if (OnlyRoundTimeChange) {
+        const _gameData = handleGameData(data);
+        const { players, extraRoundTime } = _gameData;
+        setPlayers(players);
+        setGameData({
+          ...gameData,
+          extraRoundTime,
+        });
+      } else {
+        initFn(data, true);
       }
-      // 结束回合并摸牌
-      else if (boardChange) {
-      }
-      initFn(data, true);
     } else {
       const gameData = handleGameData(data);
       const { players } = gameData;
@@ -680,11 +686,10 @@ export default function Index() {
                     onClick={async () => {
                       if (waiting.current) return;
                       waiting.current = true;
-                      await handleGameAction(
+                      await increaseRoundTime(
                         id,
-                        "increaseRoundTime",
-                        {},
-                        showToast
+                        showToast,
+                        getExtraRoundTimePrice(players[playerIndex])
                       );
                       waiting.current = false;
                     }}
@@ -705,7 +710,7 @@ export default function Index() {
               id="playground"
               className="playground"
               onLongPress={() => {
-                correctCardsPos();
+                gaming && correctCardsPos();
               }}
             >
               {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
@@ -747,7 +752,7 @@ export default function Index() {
           <View
             className={clsx("playboard-container", !gaming && "hidden")}
             onLongPress={() => {
-              correctCardsPos();
+              gaming && correctCardsPos();
             }}
           >
             <View className={clsx("top", gaming && "show")}>

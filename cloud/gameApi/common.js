@@ -1,8 +1,39 @@
 const cloud = require("wx-server-sdk");
 
+exports.showAdForScore = async function (gameID, gameDbName) {
+  const db = cloud.database();
+  const _ = db.command;
+  const { OPENID } = cloud.getWXContext();
+
+  const { players, rankList, adScorePlayerList } = await db
+    .collection(gameDbName)
+    .doc(gameID)
+    .get()
+    .then((res) => res.data);
+
+  const openidList = players.map((item) => item.openid);
+  const playerIndex = openidList.indexOf(OPENID);
+  const hasAdScore = (adScorePlayerList || []).includes(playerIndex);
+  if (playerIndex < 0 || hasAdScore) return;
+  const playerSum = players.length;
+  const rank = rankList.indexOf(playerIndex);
+  // 补齐扣掉的分数
+  const scoreChange = -SeasonRankScoreMap[playerSum][rank];
+  if (scoreChange > 0) {
+    db.collection(gameDbName)
+      .doc(gameID)
+      .update({
+        data: {
+          adScorePlayerList: _.push(playerIndex),
+        },
+      });
+    handleSeasonRankData([players[playerIndex]], null, [scoreChange]);
+  }
+};
+
 exports.updatePlayer = function (players, gameName, rankList) {
   // 按照游戏名次，更新赛季积分数据
-  if (rankList) {
+  if (rankList && players.length >= 2) {
     handleSeasonRankData(players, rankList);
   }
 
@@ -50,11 +81,10 @@ const SeasonRankScoreMap = {
     3: -25,
   },
 };
-async function handleSeasonRankData(players, rankList) {
-  const playerSum = players.length;
-  if (playerSum < 2) return;
+async function handleSeasonRankData(players, rankList, scoreList = null) {
   const db = cloud.database();
   const _ = db.command;
+  const playerSum = players.length;
 
   const [seasonRankData] = await db
     .collection("season_ranks")
@@ -70,19 +100,35 @@ async function handleSeasonRankData(players, rankList) {
   if (!seasonRankData) return;
 
   const { seasonRankList, _id } = seasonRankData;
-  rankList.forEach((playerIndex, rank) => {
-    const { openid } = players[playerIndex];
-    const data = seasonRankList.find((item) => item.openid === openid);
-    const scoreChange = SeasonRankScoreMap[playerSum][rank];
-    if (data) {
-      data.score += scoreChange;
-    } else {
-      seasonRankList.push({
-        openid,
-        score: scoreChange,
-      });
-    }
-  });
+  if (rankList) {
+    rankList.forEach((playerIndex, rank) => {
+      const { openid } = players[playerIndex];
+      const data = seasonRankList.find((item) => item.openid === openid);
+      const scoreChange = SeasonRankScoreMap[playerSum][rank];
+      if (data) {
+        data.score += scoreChange;
+      } else {
+        seasonRankList.push({
+          openid,
+          score: scoreChange,
+        });
+      }
+    });
+  } else if (scoreList) {
+    players.forEach((player, index) => {
+      const { openid } = player;
+      const data = seasonRankList.find((item) => item.openid === openid);
+      const scoreChange = scoreList[index];
+      if (data) {
+        data.score += scoreChange;
+      } else {
+        seasonRankList.push({
+          openid,
+          score: scoreChange,
+        });
+      }
+    });
+  }
 
   seasonRankList.sort((a, b) => b.score - a.score);
 

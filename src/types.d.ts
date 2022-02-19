@@ -52,6 +52,7 @@ interface ChatAction {
   sender: string;
   message: string;
   player?: Player;
+  type: number;
 }
 interface GiftItem {
   type: string;
@@ -265,6 +266,7 @@ declare namespace Rummy {
     playgroundData: RummyCardData[][];
     roundPlaygroundData: RummyCardData[][]; // 临时的 playgroundData
     rankList?: number[];
+    adScorePlayerList?: number[];
   }
   interface RummyGameData extends GameData, RummyGameBaseData {
     playgroundCardList: RummyCardData[];

@@ -9,12 +9,12 @@ import {
 } from "taro-ui";
 import { useContext, useEffect, useRef, useState } from "react";
 import { getPlayerByOpenid, isMe, navigateTo } from "@/utils";
-import "./index.scss";
 import { AchievementGameIndex, GIFT_LIST, PlayerContext } from "@/const";
 // @ts-ignore
 import GoldIcon from "@/assets/imgs/gold.png";
-import { updateGiftDeal_Database } from "./giftApi";
 import AchievementItem from "@/Components/AchievementItem";
+import { updateGiftDeal_Database } from "./giftApi";
+import "./index.scss";
 
 interface IProps {
   data: Player;
@@ -60,8 +60,8 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
   async function sendGiftTo(gift: GiftItem) {
     if (waiting.current) return;
     const { type, price } = gift;
-    const sender = players[playerIndex].openid;
-    const receiver = players[index].openid;
+    const sender = players[playerIndex];
+    const receiver = players[index];
     try {
       waiting.current = true;
       await updateGiftDeal_Database(sender, receiver, type, price, gameID);
@@ -86,7 +86,7 @@ export default function Index({ data, index = -1, isOpened, onClose }: IProps) {
               navigateTo("", `homepage/index?openid=${openid}`);
             }}
           >
-            <Image className={`avatar`} src={avatarUrl}></Image>
+            <Image className="avatar" src={avatarUrl}></Image>
             <Text>{nickName}</Text>
           </View>
           {me && (

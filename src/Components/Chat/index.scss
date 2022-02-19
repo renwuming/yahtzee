@@ -73,6 +73,15 @@
       margin-left: -2px;
     }
   }
+  &.system {
+    .text {
+      color: #1a1c23;
+      background-color: #505d6d;
+    }
+    .arrow {
+      border-left-color: #505d6d;
+    }
+  }
   .text-box {
     display: flex;
     align-items: flex-start;
@@ -115,6 +124,10 @@
     color: #f0f2fc;
     background-color: rgba(164, 103, 37, 0.8);
     word-break: break-all;
+    &.system {
+      color: #232730;
+      background-color: rgba(216, 211, 211, 0.8);
+    }
   }
   &.top-0 {
     top: 170px;

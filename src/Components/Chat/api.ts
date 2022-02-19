@@ -1,17 +1,20 @@
 import { ACTION_DELAY } from "@/const";
 import { DB, SLEEP } from "@/utils";
-import {
-  createTimeFilter,
-  uniqActionsByCreatedAt,
-  watchEvents_DataBase,
-} from "@/utils_api";
+import { createTimeFilter, watchEvents_DataBase } from "@/utils_api";
 import { Current, useDidHide, useDidShow } from "@tarojs/taro";
 import { useEffect, useRef, useState } from "react";
+
+export enum ChatType {
+  chat,
+  system,
+  gift,
+}
 
 export async function updateChatAction_Database(
   sender: string,
   gameID: string,
-  message: string
+  message: string,
+  type: ChatType = ChatType.chat
 ) {
   if (!sender || !gameID || !message) {
     throw new Error("参数不合法");
@@ -29,6 +32,7 @@ export async function updateChatAction_Database(
           createdAt: new Date(),
           sender,
           message,
+          type,
         }),
       },
     });
@@ -137,12 +141,13 @@ async function execChatActions(
   lastChatActionExecTime: React.MutableRefObject<Date>,
   updateBarrageList
 ) {
-  list = uniqActionsByCreatedAt(list);
   const filterFn = createTimeFilter(lastChatActionExecTime.current);
-  list = list.filter(filterFn).sort((a, b) => +a.createdAt - +b.createdAt);
+  list = list
+    .map((item, index) => ({ index, ...item }))
+    .filter(filterFn)
+    .sort((a, b) => +a.createdAt - +b.createdAt);
   if (list.length <= 0) return;
   lastChatActionExecTime.current = list.slice(-1)[0].createdAt;
-
   updateBarrageList(list);
   // 同时执行动画队列
   list.forEach((action) => {

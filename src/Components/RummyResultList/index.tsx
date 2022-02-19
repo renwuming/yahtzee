@@ -1,13 +1,18 @@
+import Taro from "@tarojs/taro";
 import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtIcon, AtModal, AtModalContent } from "taro-ui";
 import HallPlayer from "@/Components/HallPlayer";
 import RummyCard from "@/Components/RummyCard";
 import { CARD_SUM, SeasonRankScoreMap } from "@/const";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GROUND_COL_LEN, GROUND_ROW_LEN } from "@/pages/Rummy/game/api";
 // @ts-ignore
 import FreezingIcon from "@/assets/imgs/freezing.png";
+// @ts-ignore
+import DetailIcon from "@/assets/imgs/detail.png";
 import "./index.scss";
+import Ad from "../Ad";
+import { showAdForScore } from "./api";
 
 interface IProps {
   data: Rummy.RummyGameData;
@@ -15,16 +20,67 @@ interface IProps {
 
 export default function Index({ data }: IProps) {
   const [isOpened, setIsOpened] = useState<boolean>(false);
+  const [showAdFlag, setShowAdFlag] = useState<boolean>(false);
+  const [hideAdBtn, setHideAdBtn] = useState<boolean>(false);
 
-  const { players, rankList, winner, playgroundData, cardLibrary } = data;
+  const {
+    _id,
+    players,
+    rankList,
+    winner,
+    playgroundData,
+    cardLibrary,
+    playerIndex,
+    endTime,
+    adScorePlayerList,
+  } = data;
 
-  const rankPlayers = rankList.map((rank) => players[rank]);
+  const rankPlayers = rankList.map((index) => ({
+    ...players[index],
+    index,
+  }));
   const playerSum = players.length;
   const singlePlayer = playerSum === 1;
   const groundCardSum = CARD_SUM - cardLibrary.length;
 
+  // 是否展示广告逻辑
+  const hasAdScore = adScorePlayerList?.includes(playerIndex);
+  const myScoreChange =
+    playerIndex >= 0
+      ? SeasonRankScoreMap[playerSum][rankList.indexOf(playerIndex)]
+      : 0;
+  const THIRTY_MINUTES = 30 * 60 * 1000;
+  const showAds =
+    Date.now() - +new Date(endTime) < THIRTY_MINUTES &&
+    myScoreChange < 0 &&
+    !hasAdScore;
+  function selectIfShowAd() {
+    Taro.showModal({
+      title: "看一段广告，免去扣分",
+      success: function (res) {
+        if (res.confirm) {
+          setShowAdFlag(!showAdFlag);
+        }
+      },
+    });
+  }
+  useEffect(() => {
+    if (showAds) {
+      setTimeout(() => {
+        selectIfShowAd();
+      }, 3000);
+    }
+  }, [showAds]);
+
   return (
     <View className="rummy-result-list">
+      <Ad
+        showAdFlag={showAdFlag}
+        afterAd={() => {
+          setHideAdBtn(true);
+          showAdForScore(_id);
+        }}
+      />
       {singlePlayer ? (
         <View className="playground">
           {new Array(GROUND_COL_LEN).fill(1).map((_, colIndex) => {
@@ -60,9 +116,11 @@ export default function Index({ data }: IProps) {
         </View>
       ) : (
         rankPlayers.map((player, rank) => {
-          const { cardList, openid, icebreaking } = player;
+          const { cardList, openid, icebreaking, index } = player;
           const scoreChange = SeasonRankScoreMap[playerSum][rank];
           const emptyHand = cardList.length === 0;
+          const isMe = index === playerIndex;
+          const hasAdScore = adScorePlayerList?.includes(index);
           return (
             <View key={openid} className="result-row">
               {!icebreaking && (
@@ -83,7 +141,24 @@ export default function Index({ data }: IProps) {
                 )}
               </View>
               <View className="score">
-                {scoreChange >= 0 ? `+${scoreChange}` : scoreChange}
+                <Text>
+                  {scoreChange >= 0
+                    ? `+${scoreChange}`
+                    : hasAdScore || (isMe && hideAdBtn)
+                    ? "-0"
+                    : scoreChange}
+                </Text>
+                {!hideAdBtn && isMe && showAds && (
+                  <AtButton
+                    className="btn"
+                    onClick={() => {
+                      selectIfShowAd();
+                    }}
+                    disabled={hideAdBtn}
+                  >
+                    <AtIcon value="video" size="18" color="#fff"></AtIcon>
+                  </AtButton>
+                )}
               </View>
             </View>
           );
@@ -106,7 +181,8 @@ export default function Index({ data }: IProps) {
               setIsOpened(true);
             }}
           >
-            <AtIcon value="image" size="14" color="#fff"></AtIcon>
+            <Image mode="aspectFit" src={DetailIcon}></Image>
+            <Text className="info">公共牌</Text>
           </AtButton>
         </View>
       )}

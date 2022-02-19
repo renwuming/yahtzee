@@ -6,17 +6,32 @@ import {
   RUMMY_SET_TYPE,
 } from "@/const";
 import { CallCloudFunction, flat, navigateTo } from "@/utils";
+import { ChatType, updateChatAction_Database } from "@/Components/Chat/api";
 
 export const CARD_LIBRARY: number[] = new Array(CARD_SUM)
   .fill(1)
   .map((_, id) => id);
+
+export async function increaseRoundTime(id, showToast, price) {
+  const success = await handleGameAction(
+    id,
+    "increaseRoundTime",
+    {},
+    showToast
+  );
+  if (success) {
+    const { openid, nickName } = Taro.getStorageSync("userInfo");
+    const message = `${nickName} 延长了回合时间，花费 ${price} 金币`;
+    updateChatAction_Database(openid, id, message, ChatType.system);
+  }
+}
 
 export async function handleGameAction(
   id: string,
   action: string,
   data: any = {},
   showToast: any = () => {}
-) {
+): Promise<boolean> {
   const res = await CallCloudFunction({
     name: "gameApi",
     data: {
@@ -31,7 +46,9 @@ export async function handleGameAction(
     if (errCode === 400) {
       showToast(errMsg, 3000);
     }
+    return false;
   }
+  return true;
 }
 
 export async function createGame() {

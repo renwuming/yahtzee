@@ -6,7 +6,7 @@ import clsx from "clsx";
 import HallPlayer from "@/Components/HallPlayer";
 import { isMe, SLEEP } from "@/utils";
 import "./index.scss";
-import { updateChatAction_Database, useChatApi } from "./api";
+import { ChatType, updateChatAction_Database, useChatApi } from "./api";
 
 interface IProps {
   gameID: string;
@@ -119,17 +119,22 @@ function Index({
             className="dialogue-box"
           >
             <View className="list-box">
-              {list.map(({ player, message, id }) => (
-                <Dialogue
-                  key={id}
-                  id={id}
-                  player={player}
-                  text={message}
-                  onClick={() => {
-                    setMessage(message);
-                  }}
-                ></Dialogue>
-              ))}
+              {list.map(({ player, message, id, type }) => {
+                const isGiftOrSystem =
+                  type === ChatType.gift || type === ChatType.system;
+                return (
+                  <Dialogue
+                    key={id}
+                    id={id}
+                    player={player}
+                    text={message}
+                    isSystem={isGiftOrSystem}
+                    onClick={() => {
+                      setMessage(message);
+                    }}
+                  ></Dialogue>
+                );
+              })}
             </View>
           </ScrollView>
           <View className="input-box">
@@ -161,12 +166,16 @@ interface DialogueProps {
   player: Player;
   text: string;
   onClick: any;
+  isSystem: boolean;
 }
-function Dialogue({ id, player, text, onClick }: DialogueProps) {
+function Dialogue({ id, player, text, onClick, isSystem }: DialogueProps) {
   const { nickName, openid } = player;
   const me = isMe(openid);
   return (
-    <View id={id} className={clsx("dialogue-item", me && "r-l")}>
+    <View
+      id={id}
+      className={clsx("dialogue-item", me && "r-l", isSystem && "system")}
+    >
       <Text className="nick">{nickName}</Text>
       <View className="text-box">
         <HallPlayer data={player} noNickName></HallPlayer>
@@ -190,15 +199,19 @@ function BarrageList({ data }: BarrageListProps) {
           player: { nickName },
           message,
           index,
+          type,
         } = item;
         const topIndex = _index % 5;
+        const isGiftOrSystem =
+          type === ChatType.gift || type === ChatType.system;
         return (
           <View
             key={index}
             className={`barrage barrage-${index} top-${topIndex}`}
           >
-            <Text>
-              {nickName}：{message}
+            <Text className={clsx(isGiftOrSystem && "system")}>
+              {isGiftOrSystem ? "系统消息：" : `${nickName}：`}
+              {message}
             </Text>
           </View>
         );

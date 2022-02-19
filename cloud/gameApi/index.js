@@ -1,7 +1,12 @@
 // 云函数入口文件
 const cloud = require("wx-server-sdk");
 
-const { findOne, find, increaseRoundTime } = require("./common");
+const {
+  findOne,
+  find,
+  increaseRoundTime,
+  showAdForScore,
+} = require("./common");
 const setHandleFn = require("./set");
 const rummyHandleFn = require("./rummy");
 const handleFnMap = {
@@ -29,6 +34,8 @@ exports.main = async (event) => {
     return await handleFnMap[gameDbName].create(gameDbName);
   } else if (action === "increaseRoundTime") {
     return await increaseRoundTime(id, gameDbName);
+  } else if (action === "showAdForScore") {
+    return await showAdForScore(id, gameDbName);
   } else {
     return await handleFnMap[gameDbName].handleGame(
       id,

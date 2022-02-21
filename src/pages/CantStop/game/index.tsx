@@ -6,14 +6,23 @@ import Taro, {
 } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { AtButton, AtModal } from "taro-ui";
-import "./index.scss";
 import { useEffect, useRef, useState } from "react";
-import PlayerList from "../../../Components/CantStopPlayerList";
+import PlayerList from "@/Components/CantStopPlayerList";
 import Player from "@/Components/HallPlayer";
 import { getUserProfile } from "@/utils";
 import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
-import Board from "../../../Components/CantStopBoard";
-import DiceResult from "../../../Components/CantStopDiceResult";
+import Board from "@/Components/CantStopBoard";
+import DiceResult from "@/Components/CantStopDiceResult";
+import {
+  AchievementGameIndex,
+  ACTION_DELAY,
+  CantStopStage,
+  CANTSTOP_ROUND_TIME_LIMIT,
+  PlayerContext,
+} from "@/const";
+import { GameGift } from "@/Components/Gifts";
+import LoadPage from "@/Components/LoadPage";
+import Chat from "@/Components/Chat";
 import {
   diceIt,
   endRound,
@@ -27,15 +36,7 @@ import {
   updateProgress,
   watchDataBase,
 } from "./gameApi";
-import {
-  AchievementGameIndex,
-  ACTION_DELAY,
-  CantStopStage,
-  CANTSTOP_ROUND_TIME_LIMIT,
-  PlayerContext,
-} from "../../../const";
-import { GameGift } from "../../../Components/Gifts";
-import LoadPage from "../../../Components/LoadPage";
+import "./index.scss";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -226,6 +227,7 @@ export default function Index() {
   return (
     <View className="cantstop-game">
       <LoadPage></LoadPage>
+      <Chat gameID={id} />
       <GameGift />
       <View className="player-list-box">
         <PlayerContext.Provider

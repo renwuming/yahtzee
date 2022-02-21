@@ -210,6 +210,16 @@ async function findHallGames(gameDbName, data) {
     .get()
     .then((res) => res.data);
 
+  // 将玩家所在的房间排在前面
+  const { OPENID } = cloud.getWXContext();
+  list.sort((a, b) => {
+    const { players } = a;
+    const { players: players2 } = b;
+    const inGame = players.map((e) => e.openid).includes(OPENID);
+    const inGame2 = players2.map((e) => e.openid).includes(OPENID);
+    if (inGame) return -1;
+    else if (inGame2) return 1;
+  });
   return list;
 }
 

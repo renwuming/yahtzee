@@ -8,7 +8,7 @@ interface IProps {
   afterAd: any;
 }
 
-export default function Index({ showAdFlag, afterAd }) {
+export default function Index({ showAdFlag, afterAd }: IProps) {
   const showVideoAd = useRef<Function>(() => {});
   const videoAd = useRef(null);
 

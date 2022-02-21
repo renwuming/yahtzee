@@ -6,6 +6,10 @@ import { View, Image, Text } from "@tarojs/components";
 import Taro, { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
 import { useState } from "react";
 import { AtButton } from "taro-ui";
+import { getUserProfile } from "@/utils";
+import { GameGift } from "@/Components/Gifts";
+import LoadPage from "@/Components/LoadPage";
+import Chat from "@/Components/Chat";
 import {
   getGameData,
   getIndexof,
@@ -16,9 +20,6 @@ import {
   submitSetCloud,
 } from "./gameApi";
 import "./index.scss";
-import { getUserProfile } from "@/utils";
-import { GameGift } from "@/Components/Gifts";
-import LoadPage from "@/Components/LoadPage";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -172,6 +173,7 @@ export default function Index() {
   return (
     <View className="set-game">
       <LoadPage></LoadPage>
+      <Chat gameID={id} />
       <GameGift />
       <PlayerContext.Provider
         value={{
@@ -267,7 +269,7 @@ export default function Index() {
                 const { color, shape, fill, n } = item;
                 const nlist = new Array(n).fill(0);
                 return (
-                  <View className={`card-item`}>
+                  <View className="card-item">
                     <AtButton
                       onClick={() => {
                         if (end) return;

@@ -26,6 +26,7 @@ import LoadPage from "@/Components/LoadPage";
 import { GameGift } from "@/Components/Gifts";
 import { getUserProfile, SLEEP, watchDataBase } from "@/utils";
 import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
+import Chat from "@/Components/Chat";
 import {
   getGameData,
   handleGameData,
@@ -288,6 +289,7 @@ export default function Index() {
   return (
     <View className="game">
       <LoadPage></LoadPage>
+      <Chat gameID={id} />
       <GameGift />
       <PlayerContext.Provider
         value={{

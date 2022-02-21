@@ -30,8 +30,8 @@ export default {
     "pages/Rummy/hall/index",
     "pages/Rummy/history/index",
     "pages/Rummy/ranking/index",
-    // 电波同步
-    "pages/WaveLength/game/index",
+    // // 电波同步
+    // "pages/WaveLength/game/index",
   ],
   window: {
     backgroundTextStyle: "light",

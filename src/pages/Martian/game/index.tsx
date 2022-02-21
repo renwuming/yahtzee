@@ -6,8 +6,7 @@ import Taro, {
 } from "@tarojs/taro";
 import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtModal } from "taro-ui";
-import "./index.scss";
-import Dice from "../../../Components/MartianDice";
+import Dice from "@/Components/MartianDice";
 import {
   AchievementGameIndex,
   ACTION_DELAY,
@@ -15,8 +14,15 @@ import {
   MARTIAN_ROUND_TIME_LIMIT,
   MARTIAN_SHOW_ROUND_TIME_LIMIT,
   PlayerContext,
-} from "../../../const";
+} from "@/const";
 import { useEffect, useRef, useState } from "react";
+import PlayerList from "@/Components/CommonPlayerList";
+import Player from "@/Components/HallPlayer";
+import { execGiftActions, watchEvents_DataBase } from "@/utils_api";
+import { getUserProfile } from "@/utils";
+import LoadPage from "@/Components/LoadPage";
+import { GameGift } from "@/Components/Gifts";
+import Chat from "@/Components/Chat";
 import {
   diceIt,
   endRound,
@@ -30,12 +36,7 @@ import {
   updatePlayerOnline_Database,
   watchDataBase,
 } from "./gameApi";
-import PlayerList from "../../../Components/CommonPlayerList";
-import Player from "@/Components/HallPlayer";
-import { execGiftActions, watchEvents_DataBase } from "../../../utils_api";
-import { getUserProfile } from "@/utils";
-import LoadPage from "../../../Components/LoadPage";
-import { GameGift } from "../../../Components/Gifts";
+import "./index.scss";
 
 export default function Index() {
   const id = getCurrentInstance()?.router?.params?.id;
@@ -244,6 +245,7 @@ export default function Index() {
   return (
     <View className="martian-game">
       <LoadPage></LoadPage>
+      <Chat gameID={id} />
       <GameGift />
       <Image
         className="bk-img"

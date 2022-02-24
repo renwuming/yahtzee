@@ -11,7 +11,10 @@ type AnyPlayer = Yahtzee.YahtzeePlayer &
 
 interface SeasonRankPlayerData extends Player {
   score: number;
+  rankValue: number;
+  levelValue: number;
   rankImgUrl: string;
+  level: string;
 }
 interface BoardMessage {
   _id: string;

@@ -1,5 +1,18 @@
 const cloud = require("wx-server-sdk");
 
+async function getScoreConfig() {
+  const db = cloud.database();
+  const [scoreConfig] = await db
+    .collection("season_ranks")
+    .where({
+      type: "scoreConfig",
+    })
+    .get()
+    .then((res) => res.data);
+
+  return scoreConfig ? scoreConfig.data : null;
+}
+
 exports.showAdForScore = async function (gameID, gameDbName) {
   const db = cloud.database();
   const _ = db.command;
@@ -18,7 +31,8 @@ exports.showAdForScore = async function (gameID, gameDbName) {
   const playerSum = players.length;
   const rank = rankList.indexOf(playerIndex);
   // 补齐扣掉的分数
-  const scoreChange = -SeasonRankScoreMap[playerSum][rank];
+  const scoreConfig = await getScoreConfig();
+  const scoreChange = -scoreConfig[playerSum][rank];
   if (scoreChange > 0) {
     db.collection(gameDbName)
       .doc(gameID)
@@ -64,23 +78,6 @@ exports.updatePlayer = function (players, gameName, rankList) {
   });
 };
 
-const SeasonRankScoreMap = {
-  2: {
-    0: 20,
-    1: -15,
-  },
-  3: {
-    0: 25,
-    1: 10,
-    2: -20,
-  },
-  4: {
-    0: 30,
-    1: 15,
-    2: 0,
-    3: -25,
-  },
-};
 async function handleSeasonRankData(players, rankList, scoreList = null) {
   const db = cloud.database();
   const _ = db.command;
@@ -101,10 +98,11 @@ async function handleSeasonRankData(players, rankList, scoreList = null) {
 
   const { seasonRankList, _id } = seasonRankData;
   if (rankList) {
+    const scoreConfig = await getScoreConfig();
     rankList.forEach((playerIndex, rank) => {
       const { openid } = players[playerIndex];
       const data = seasonRankList.find((item) => item.openid === openid);
-      const scoreChange = SeasonRankScoreMap[playerSum][rank];
+      const scoreChange = scoreConfig[playerSum][rank];
       if (data) {
         data.score += scoreChange;
       } else {

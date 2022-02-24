@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
 import { View, Text, Input, ScrollView } from "@tarojs/components";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Component, useEffect, useMemo, useRef, useState } from "react";
 import { AtButton, AtDrawer } from "taro-ui";
 import clsx from "clsx";
 import HallPlayer from "@/Components/HallPlayer";
@@ -41,7 +41,6 @@ function Index({
   setDrawerShow = () => {},
 }: IProps) {
   const { openid } = Taro.getStorageSync("userInfo");
-
   const waiting = useRef<boolean>(false);
   const [bottomID, setBottomID] = useState<string>("");
   const [list, setList] = useState<ChatAction[]>([]);
@@ -138,13 +137,12 @@ function Index({
             </View>
           </ScrollView>
           <View className="input-box">
-            <Input
-              name="input"
-              type="text"
-              maxlength={100}
-              cursorSpacing={50}
+            <MyInput
               value={message}
               onInput={onInput}
+              onConfirm={() => {
+                submit();
+              }}
             />
             <AtButton
               onClick={() => {
@@ -218,4 +216,27 @@ function BarrageList({ data }: BarrageListProps) {
       })}
     </View>
   );
+}
+
+interface MyInputProps {
+  value: string;
+  onInput: any;
+  onConfirm?: any;
+}
+export class MyInput extends Component<MyInputProps, any> {
+  render() {
+    const { value, onInput, onConfirm } = this.props;
+    return (
+      <Input
+        name="input"
+        type="text"
+        maxlength={100}
+        cursorSpacing={50}
+        confirmType="send"
+        value={value}
+        onInput={onInput}
+        onConfirm={onConfirm || null}
+      />
+    );
+  }
 }

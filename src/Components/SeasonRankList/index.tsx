@@ -12,10 +12,13 @@ interface RankItemProps {
 }
 
 function RankItem({ data }: RankItemProps) {
-  const { score, rankImgUrl } = data;
+  const { score, rankImgUrl, level } = data;
   return (
     <View key="rank" className="rank-item">
-      <Image className="level-img" src={rankImgUrl} mode="aspectFit"></Image>
+      <View className="rank-box">
+        <Image className="level-img" src={rankImgUrl} mode="aspectFit"></Image>
+        {level && <Text>{level}</Text>}
+      </View>
       <View className="user-box">
         <PlayerItem data={data}></PlayerItem>
       </View>
@@ -61,7 +64,7 @@ export default function Index({ game }: IProps) {
   return (
     <View className="season-ranking">
       <View className="rank-item rank-title">
-        <Text className="score-title">
+        <Text className="season-title">
           {rankName}赛季 · {gameName}
         </Text>
       </View>

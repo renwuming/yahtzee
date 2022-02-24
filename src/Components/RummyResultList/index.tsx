@@ -3,9 +3,10 @@ import { View, Text, Image } from "@tarojs/components";
 import { AtButton, AtIcon, AtModal, AtModalContent } from "taro-ui";
 import HallPlayer from "@/Components/HallPlayer";
 import RummyCard from "@/Components/RummyCard";
-import { CARD_SUM, SeasonRankScoreMap } from "@/const";
+import { CARD_SUM } from "@/const";
 import { useEffect, useState } from "react";
 import { GROUND_COL_LEN, GROUND_ROW_LEN } from "@/pages/Rummy/game/api";
+import { getSeasonRankScoreConfig } from "@/utils";
 // @ts-ignore
 import FreezingIcon from "@/assets/imgs/freezing.png";
 // @ts-ignore
@@ -22,6 +23,7 @@ export default function Index({ data }: IProps) {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [showAdFlag, setShowAdFlag] = useState<boolean>(false);
   const [hideAdBtn, setHideAdBtn] = useState<boolean>(false);
+  const [seasonRankScoreMap, setSeasonRankScoreMap] = useState(null);
 
   const {
     _id,
@@ -46,8 +48,8 @@ export default function Index({ data }: IProps) {
   // 是否展示广告逻辑
   const hasAdScore = adScorePlayerList?.includes(playerIndex);
   const myScoreChange =
-    playerIndex >= 0
-      ? SeasonRankScoreMap[playerSum][rankList.indexOf(playerIndex)]
+    playerIndex >= 0 && seasonRankScoreMap
+      ? seasonRankScoreMap[playerSum][rankList.indexOf(playerIndex)]
       : 0;
   const THIRTY_MINUTES = 30 * 60 * 1000;
   const showAds =
@@ -71,6 +73,12 @@ export default function Index({ data }: IProps) {
       }, 3000);
     }
   }, [showAds]);
+
+  useEffect(() => {
+    getSeasonRankScoreConfig().then((scoreConfig) => {
+      setSeasonRankScoreMap(scoreConfig);
+    });
+  }, []);
 
   return (
     <View className="rummy-result-list">
@@ -117,7 +125,7 @@ export default function Index({ data }: IProps) {
       ) : (
         rankPlayers.map((player, rank) => {
           const { cardList, openid, icebreaking, index } = player;
-          const scoreChange = SeasonRankScoreMap[playerSum][rank];
+          const scoreChange = seasonRankScoreMap?.[playerSum]?.[rank];
           const emptyHand = cardList.length === 0;
           const isMe = index === playerIndex;
           const hasAdScore = adScorePlayerList?.includes(index);
@@ -141,13 +149,15 @@ export default function Index({ data }: IProps) {
                 )}
               </View>
               <View className="score">
-                <Text>
-                  {scoreChange >= 0
-                    ? `+${scoreChange}`
-                    : hasAdScore || (isMe && hideAdBtn)
-                    ? "-0"
-                    : scoreChange}
-                </Text>
+                {scoreChange && (
+                  <Text>
+                    {scoreChange >= 0
+                      ? `+${scoreChange}`
+                      : hasAdScore || (isMe && hideAdBtn)
+                      ? "-0"
+                      : scoreChange}
+                  </Text>
+                )}
                 {!hideAdBtn && isMe && showAds && (
                   <AtButton
                     className="btn"
@@ -182,7 +192,6 @@ export default function Index({ data }: IProps) {
             }}
           >
             <Image mode="aspectFit" src={DetailIcon}></Image>
-            <Text className="info">公共牌</Text>
           </AtButton>
         </View>
       )}

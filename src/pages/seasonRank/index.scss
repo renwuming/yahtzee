@@ -1,7 +1,7 @@
 page {
   background-color: #eef5ff;
 }
-.season-ranking {
+.home-season-ranking {
   height: 100%;
   background-color: #eef5ff;
   & > .at-tabs > .at-tabs__header {
@@ -52,70 +52,6 @@ page {
     }
     &.des-btn {
       bottom: 240px;
-    }
-  }
-}
-
-.rank-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 20px;
-  background-color: #aaa;
-  &:nth-child(odd) {
-    background-color: #000;
-  }
-  &:first-child {
-    border-top: 0;
-  }
-  .level-img {
-    position: absolute;
-    left: 20px;
-    display: block;
-    width: 160px;
-    height: 110px;
-    border-radius: 10px;
-    background-color: #000;
-  }
-  .index {
-    position: absolute;
-    left: 20px;
-    display: block;
-    width: 60px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    background-color: #000;
-    color: #fff;
-    &.top {
-      background-color: #ffcc00;
-    }
-  }
-  .user-box {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-  }
-  .column-right {
-    position: absolute;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 130px;
-    .score-title,
-    .score {
-      color: #ffea00;
-      font-family: yansong;
-    }
-    .score {
-      font-size: 40px;
-      font-family: TrebuchetMS, "Franklin Gothic Medium", "Arial Narrow", Arial,
-        sans-serif;
     }
   }
 }

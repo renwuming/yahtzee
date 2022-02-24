@@ -1,24 +1,6 @@
 import { Context, createContext } from "react";
 import { Bomb, Praise, Rose } from "@/Components/Gifts";
 
-export const SeasonRankScoreMap = {
-  2: {
-    0: 20,
-    1: -15,
-  },
-  3: {
-    0: 25,
-    1: 10,
-    2: -20,
-  },
-  4: {
-    0: 30,
-    1: 15,
-    2: 0,
-    3: -25,
-  },
-};
-
 export const PlayerContext: Context<{
   gameID?: string;
   players?: Player[];

@@ -47,15 +47,6 @@ page {
   justify-content: center;
   padding: 20px 20px;
   background-color: #aaa;
-  .level-img {
-    position: absolute;
-    left: 20px;
-    display: block;
-    width: 160px;
-    height: 110px;
-    border-radius: 10px;
-    background-color: #000;
-  }
   &:nth-child(odd) {
     background-color: #333;
   }

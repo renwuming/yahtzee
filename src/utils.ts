@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.2.4";
+export const VERSION = "v5.2.5";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -285,7 +285,7 @@ export async function getSeasonRankData(
       list: [],
     };
 
-  const { name, seasonRankList } = seasonRankData;
+  const { name, seasonRankList, rankConfig } = seasonRankData;
   const rankList = seasonRankList.slice(
     pageNum * PAGE_LEN,
     (pageNum + 1) * PAGE_LEN
@@ -301,11 +301,11 @@ export async function getSeasonRankData(
   const list = rankList.map((data) => {
     const { openid, score } = data;
     const player = playerList.find((item) => item.openid === openid);
-    const rankImgUrl = getRankImgUrl(score);
+    const rankData = getRankData(score, rankConfig);
     return {
       ...data,
       ...player,
-      rankImgUrl,
+      ...rankData,
     };
   });
 
@@ -315,16 +315,50 @@ export async function getSeasonRankData(
   };
 }
 
-function getRankImgUrl(score) {
+export async function getSeasonRankScoreConfig(): Promise<any> {
+  const _ = DB.command;
+  const [scoreConfig] = await DB.collection("season_ranks")
+    .where({
+      type: "scoreConfig",
+    })
+    .get()
+    .then((res) => res.data);
+
+  return scoreConfig ? scoreConfig.data : null;
+}
+
+const levelStrMap = [
+  null,
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII",
+  "IX",
+  "X",
+];
+function getRankData(score, rankConfig) {
   let rankValue = 0;
-  if (score < 50) rankValue = 0;
-  else if (score < 100) rankValue = 1;
-  else if (score < 300) rankValue = 2;
-  else if (score < 600) rankValue = 3;
-  else if (score < 1000) rankValue = 4;
-  else rankValue = 5;
-  const rankImgUrl = `https://cdn.renwuming.cn/static/yahtzee/imgs/level${rankValue}.jpg`;
-  return rankImgUrl;
+  let levelValue = 0;
+  for (let i = 0; i < rankConfig.length; i++) {
+    const { rank, level, score: rankScore } = rankConfig[i];
+    if (score < rankScore) {
+      break;
+    } else {
+      rankValue = rank;
+      levelValue = level;
+    }
+  }
+  const rankImgUrl = `https://cdn.renwuming.cn/static/yahtzee/imgs/level${rankValue}.png`;
+  return {
+    rankValue,
+    levelValue,
+    rankImgUrl,
+    level: levelStrMap[levelValue],
+  };
 }
 
 export async function getSeasonRankDataByOpenid(

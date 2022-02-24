@@ -61,7 +61,7 @@ export default function Index() {
   }, []);
 
   return (
-    <View className="season-ranking">
+    <View className="home-season-ranking">
       <AtTabs current={tabIndex} tabList={tabList} onClick={setTabIndex}>
         <AtTabsPane current={tabIndex} index={0}>
           <SeasonRankList game="rummy"></SeasonRankList>

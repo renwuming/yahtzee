@@ -245,7 +245,8 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
     (action === "endRoundAddCard" && inRound) ||
     action === "endRoundByTimer"
   ) {
-    if (action === "endRoundByTimer") {
+    const timeoutFlag = action === "endRoundByTimer";
+    if (timeoutFlag) {
       const { roundPlayer } = data;
       if (roundPlayer !== oldData.roundPlayer) {
         return;
@@ -258,15 +259,34 @@ async function handleUpdateData(action, oldData, data, id, gameDbName, openid) {
 
     const newRoundData = newRound(roundPlayer, players, roundSum);
     const endData = handleEndData(players, cardLibrary, null);
+    const timeoutData = handleTimeoutData(timeoutFlag, oldData);
     return {
       [`players.${roundPlayer}.cardList`]: cardList,
       cardLibrary,
       ...newRoundData,
       ...endData,
+      ...timeoutData,
     };
   }
 
   return null;
+}
+
+function handleTimeoutData(timeoutFlag, gameData) {
+  // 如果不是超时
+  if (!timeoutFlag) return null;
+  const { timeoutPlayers, roundPlayer, players } = gameData;
+  const { timeStamp } = players[roundPlayer];
+  const offline = Date.now() - timeStamp > 5000;
+  // 如果玩家没有离线
+  if (!offline) return null;
+
+  // 如果超时且玩家离线，标记玩家，未来回合时间会缩短
+  const newTimeoutPlayers = timeoutPlayers || [];
+  if (!newTimeoutPlayers.includes(roundPlayer)) {
+    newTimeoutPlayers.push(roundPlayer);
+  }
+  return { timeoutPlayers: newTimeoutPlayers };
 }
 
 function handleEndRoundPerfect(
@@ -439,7 +459,22 @@ function tidyPlayground(playgroundData) {
     tempList = [];
   }
   // 重新整理
-  straightList.sort((a, b) => (a[0].color >= b[0].color ? 1 : -1));
+  straightList.sort((a, b) => {
+    let colorA, colorB;
+    for (let i = 0; i < a.length; i++) {
+      const item = a[i];
+      if (item.value !== 0) {
+        colorA = item.color;
+      }
+    }
+    for (let i = 0; i < b.length; i++) {
+      const item = b[i];
+      if (item.value !== 0) {
+        colorB = item.color;
+      }
+    }
+    return colorA >= colorB ? 1 : -1;
+  });
   samevalueList.sort((a, b) => b[0].value - a[0].value);
   const newPlayground = initPlayground();
   straightList.concat(samevalueList).forEach((list) => {
@@ -653,43 +688,173 @@ function judgePlaygroundPerfect(playgroundData) {
   return true;
 }
 
+function findStraightSet(cardList, jokerList, IDMap, setList) {
+  RUMMY_COLORS.forEach((color) => {
+    const list = cardList.filter((item) => item.color === color).reverse();
+    if (list.length === 0) return;
+    let loopFlag = true;
+    while (loopFlag) {
+      let tempList = [];
+      for (let i = 0; i < list.length; i++) {
+        if (i === list.length - 1) {
+          loopFlag = false;
+        }
+        const item = list[i];
+        const l = tempList.length;
+        const needJokers = tempList[l - 1]
+          ? tempList[l - 1].value - item.value - 1
+          : Infinity;
+        if (IDMap[item.id] || (tempList[l - 1] || {}).value === item.value) {
+          continue;
+        } else if (
+          tempList.length === 0 ||
+          (tempList[l - 1] || {}).value === item.value + 1
+        ) {
+          tempList.push(item);
+        } else if (jokerList.length >= needJokers) {
+          const jokers = jokerList.splice(0, needJokers);
+          tempList.push(...jokers, item);
+        } else {
+          if (tempList.length >= 3) {
+            setList.push(tempList.reverse());
+            tempList.forEach(({ id }) => {
+              IDMap[id] = true;
+            });
+            tempList = [];
+            break;
+          } else {
+            const needJokers = 3 - tempList.length;
+            if (jokerList.length >= needJokers) {
+              const jokers = jokerList.splice(0, needJokers);
+              if (tempList[0].value === 13) {
+                tempList.push(...jokers);
+              } else {
+                tempList.unshift(...jokers);
+              }
+              setList.push(tempList.reverse());
+              tempList.forEach(({ id }) => {
+                IDMap[id] = true;
+              });
+              tempList = [];
+              break;
+            }
+          }
+          tempList = [item];
+        }
+      }
+      if (tempList.length >= 3) {
+        setList.push(tempList.reverse());
+        tempList.forEach(({ id }) => {
+          IDMap[id] = true;
+        });
+      } else {
+        const needJokers = 3 - tempList.length;
+        if (jokerList.length >= needJokers) {
+          const jokers = jokerList.splice(0, needJokers);
+          if (tempList[0].value === 13) {
+            tempList.push(...jokers);
+          } else {
+            tempList.unshift(...jokers);
+          }
+          setList.push(tempList.reverse());
+          tempList.forEach(({ id }) => {
+            IDMap[id] = true;
+          });
+        }
+      }
+    }
+  });
+}
+
+function findGroupSet(cardList, jokerList, IDMap, setList) {
+  RUMMY_VALUES.concat()
+    .reverse()
+    .forEach((value) => {
+      const list = cardList.filter((item) => item.value === value);
+      if (list.length === 0) return;
+      let loopFlag = true;
+      while (loopFlag) {
+        let tempList = [];
+        for (let i = 0; i < list.length; i++) {
+          if (i === list.length - 1) {
+            loopFlag = false;
+          }
+          const item = list[i];
+          const l = tempList.length;
+          if (IDMap[item.id] || (tempList[l - 1] || {}).color === item.color) {
+            continue;
+          } else if (
+            tempList.length === 0 ||
+            (tempList[l - 1] || {}).color !== item.color
+          ) {
+            tempList.push(item);
+          }
+        }
+        if (tempList.length >= 3) {
+          setList.push(tempList);
+          tempList.forEach(({ id }) => {
+            IDMap[id] = true;
+          });
+        } else if (jokerList.length > 0 && tempList.length === 2) {
+          const [joker] = jokerList.splice(0, 1);
+          tempList.push(joker);
+          setList.push(tempList);
+          tempList.forEach(({ id }) => {
+            IDMap[id] = true;
+          });
+        }
+      }
+    });
+}
+
 function judgeListIsSet(list) {
   if (list.length < 3) return false;
+  const IDMap = {};
+  const setList = [];
+  const jokerList = list.filter((item) => item.value === 0);
   const noJokerList = list.filter((item) => item.value !== 0);
-  // 没有小丑，则自动排序
-  if (noJokerList.length === list.length) {
-    list.sort((a, b) => a.value - b.value);
-  }
-  // 两张鬼牌+一张普通牌，必定符合条件
-  if (noJokerList.length === 1) return true;
+  noJokerList.sort((a, b) => a.value - b.value);
+  const isGroup = judgeSetType(noJokerList) === RUMMY_SET_TYPE.samevalue;
 
-  const colorN = new Set(noJokerList.map((item) => item.color)).size;
-  const isStraight = colorN === 1;
-  const isSameValue = colorN === noJokerList.length;
-
-  if (isStraight) {
-    const exp = new RegExp(
-      list
-        .map((item, index) => {
-          if (item.value === 0) {
-            if (list[index - 1] && list[index - 1].value)
-              return list[index - 1].value + 1;
-            if (list[index - 2] && list[index - 2].value)
-              return list[index - 2].value + 2;
-            if (list[index + 1] && list[index + 1].value)
-              return list[index + 1].value - 1;
-            if (list[index + 2] && list[index + 2].value)
-              return list[index + 2].value - 2;
-          } else return item.value;
-        })
-        .join("-")
-    );
-    return exp.test("1-2-3-4-5-6-7-8-9-10-11-12-13");
-  } else if (isSameValue) {
+  if (isGroup) {
+    // 群组长度不能大于4
     if (list.length > 4) return false;
-    return new Set(noJokerList.map((item) => item.value)).size === 1;
+    findGroupSet(noJokerList, jokerList, IDMap, setList);
+  } else {
+    findStraightSet(noJokerList, jokerList, IDMap, setList);
   }
-  return false;
+
+  const extraList = list.filter(({ id }) => !IDMap[id]);
+
+  const isSet =
+    setList.length === 1 && extraList.every(({ value }) => value === 0);
+
+  if (isSet) {
+    const [resultList] = setList;
+    if (extraList.length >= 1) {
+      if (isGroup) {
+        resultList.push(...extraList);
+      } else {
+        const tail = resultList[resultList.length - 1];
+        if (tail.value === 13) {
+          resultList.unshift(...extraList);
+        } else if (tail.value === 12) {
+          if (extraList.length === 1) {
+            resultList.push(...extraList);
+          } else {
+            resultList.push(extraList[0]);
+            resultList.unshift(...extraList.slice(1));
+          }
+        } else {
+          resultList.push(...extraList);
+        }
+      }
+    }
+    for (let i = 0; i < list.length; i++) {
+      list[i] = resultList[i];
+    }
+  }
+  return isSet;
 }
 
 function getListValueSum(list) {

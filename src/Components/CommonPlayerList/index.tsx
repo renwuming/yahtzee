@@ -1,4 +1,3 @@
-import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";
 import clsx from "clsx";
 import { useContext } from "react";

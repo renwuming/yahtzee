@@ -19,13 +19,22 @@ async function execHandleTimerRummy(db) {
 
   list.forEach((item) => {
     handleTimerRummy(item);
+    handleClearTimeoutRummy(item, db);
   });
 }
 
 function handleTimerRummy(game) {
-  const { _id, roundTimeStamp, roundPlayer, extraRoundTime, roundSum } = game;
+  const {
+    _id,
+    roundTimeStamp,
+    roundPlayer,
+    extraRoundTime,
+    roundSum,
+    timeoutPlayers,
+  } = game;
+  const shortTime = (timeoutPlayers || []).includes(roundPlayer);
   const extraTime = (extraRoundTime || {})[roundSum];
-  const ROUND_TIME_LIMIT = (extraTime ? 125 : 65) * 1000;
+  const ROUND_TIME_LIMIT = (shortTime ? 10 : extraTime ? 125 : 65) * 1000;
 
   const outOfTime = Date.now() - (roundTimeStamp || 0) > ROUND_TIME_LIMIT;
 
@@ -44,6 +53,23 @@ function handleTimerRummy(game) {
       },
     });
   }
+}
+
+function handleClearTimeoutRummy(game, db) {
+  let { _id, timeoutPlayers, players } = game;
+  timeoutPlayers = timeoutPlayers || [];
+  players.forEach((player, index) => {
+    const { timeStamp } = player;
+    const online = Date.now() - timeStamp < 5000;
+    if (online) {
+      timeoutPlayers = timeoutPlayers.filter((item) => item !== index);
+    }
+  });
+  db.collection("rummy_games").doc(_id).update({
+    data: {
+      timeoutPlayers,
+    },
+  });
 }
 
 async function execHandleExceptionRummy(db) {

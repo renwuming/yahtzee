@@ -139,6 +139,7 @@ export const SET_TIME_LIMIT = 5 * 60;
 
 // 拉密
 export const CARD_SUM = 106;
+export const RUMMY_SHORT_ROUND_TIME_LIMIT = 10;
 export const RUMMY_ROUND_TIME_LIMIT = 65;
 export const RUMMY_SHOW_ROUND_TIME_LIMIT = 60;
 export enum RUMMY_AREA_STATUS {

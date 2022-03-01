@@ -19,6 +19,7 @@ import {
   PlayerContext,
   RUMMY_AREA_STATUS,
   RUMMY_ROUND_TIME_LIMIT,
+  RUMMY_SHORT_ROUND_TIME_LIMIT,
   RUMMY_SHOW_ROUND_TIME_LIMIT,
 } from "@/const";
 import { useGameApi } from "@/utils_api";
@@ -123,22 +124,26 @@ export default function Index() {
     cardLibrary,
     extraRoundTime,
     roundSum,
+    roundPlayer,
+    timeoutPlayers,
   } = gameData || {};
   const singlePlayer = players.length === 1;
   const gaming = start && !end;
   const groundCardSum = CARD_SUM - cardLibrary?.length;
   const gameDataLoaded = players.length >= 1;
   // 回合时间相关
+  const shortTime = (timeoutPlayers || []).includes(roundPlayer);
   const hasExtraTime = extraRoundTime?.[roundSum];
   const extraTime = extraRoundFlag ? EXTRA_ROUND_TIME : 0;
-  const showRoundTimeLimit = RUMMY_SHOW_ROUND_TIME_LIMIT + extraTime;
+  const showRoundTimeLimit = shortTime
+    ? RUMMY_SHORT_ROUND_TIME_LIMIT
+    : RUMMY_SHOW_ROUND_TIME_LIMIT + extraTime;
   const canBuyExtraRoundTime =
     gaming && !singlePlayer && inRound && !hasExtraTime && +roundCountDown >= 1;
   // 存在手牌在公共区域
   const handCardInGround = cardList.some(
     (item) => item.areaStatus === RUMMY_AREA_STATUS.playground
   );
-
   const MemoCardList = useMemo(
     () => (
       <CardList
@@ -176,12 +181,21 @@ export default function Index() {
   });
 
   function getCountDown(data: Rummy.RummyGameBaseData): number {
-    const { roundTimeStamp, extraRoundTime, roundSum } = data || {};
+    const {
+      roundTimeStamp,
+      extraRoundTime,
+      roundSum,
+      roundPlayer,
+      timeoutPlayers,
+    } = data || {};
     if (!roundTimeStamp) return Infinity;
     const extraRoundFlag = extraRoundTime?.[roundSum];
     setExtraRoundFlag(extraRoundFlag);
+    const shortTime = (timeoutPlayers || []).includes(roundPlayer);
     const extraTime = extraRoundFlag ? EXTRA_ROUND_TIME : 0;
-    const roundTimeLimit = RUMMY_ROUND_TIME_LIMIT + extraTime;
+    const roundTimeLimit = shortTime
+      ? RUMMY_SHORT_ROUND_TIME_LIMIT
+      : RUMMY_ROUND_TIME_LIMIT + extraTime;
     const timeStamp = Date.now();
     const _roundCountDown = ~~(
       roundTimeLimit -
@@ -311,6 +325,7 @@ export default function Index() {
 
   function onTouchStart(id: number) {
     activeCardID.current = id;
+    posData.current = null;
   }
   function onChange(event) {
     const {
@@ -324,11 +339,10 @@ export default function Index() {
     };
   }
   async function onTouchEnd(id: number) {
-    if (id !== activeCardID.current) return;
+    if (id !== activeCardID.current || !posData.current) return;
     let index = getCardIndexByID(cardList, id);
     // 是否为公共牌
     const isGroundCard = index < 0;
-
     let crossData;
     let cardAreaStatus;
     // 在公共面板中

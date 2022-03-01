@@ -115,6 +115,7 @@ interface GameBaseData {
   extraRoundTime?: {
     number: boolean;
   };
+  timeoutPlayers?: number[];
 
   _createTime: Date;
   _updateTime: Date;

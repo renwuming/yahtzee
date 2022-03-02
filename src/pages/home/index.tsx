@@ -32,6 +32,13 @@ export default function Index() {
       pagePath: `hall/index`,
     },
     {
+      name: "欲罢不能",
+      imgUrl:
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/cantstop-cover.jpg",
+      pageType: "CantStop",
+      pagePath: `hall/index`,
+    },
+    {
       name: "神奇形色牌",
       imgUrl:
         "https://cdn.renwuming.cn/static/diceGames/imgs/covers/set-cover.jpg",
@@ -43,13 +50,6 @@ export default function Index() {
       imgUrl:
         "https://cdn.renwuming.cn/static/diceGames/imgs/covers/yahtzee-cover.jpg",
       pageType: "Yahtzee",
-      pagePath: `hall/index`,
-    },
-    {
-      name: "欲罢不能",
-      imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/cantstop-cover.jpg",
-      pageType: "CantStop",
       pagePath: `hall/index`,
     },
     {

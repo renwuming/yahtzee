@@ -4,11 +4,14 @@ import { useEffect, useRef } from "react";
 import "./index.scss";
 
 interface IProps {
-  showAdFlag: boolean;
-  afterAd: any;
+  showAdFlag?: boolean;
+  afterAd?: any;
 }
 
-export default function Index({ showAdFlag, afterAd }: IProps) {
+export default function Index({
+  showAdFlag = false,
+  afterAd = () => {},
+}: IProps) {
   const showVideoAd = useRef<Function>(() => {});
   const videoAd = useRef(null);
 

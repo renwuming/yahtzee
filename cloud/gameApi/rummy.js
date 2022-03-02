@@ -333,11 +333,11 @@ function handleEndRoundPerfect(
       newPlaygroundData,
       oldPlaygroundDataIDList
     );
+    const allSet = newSetList.every((list) => judgeListIsSet(list));
     const newListValueSum = newSetList.reduce(
       (sum, set) => sum + getListValueSum(set),
       0
     );
-    const allSet = newSetList.every((list) => judgeListIsSet(list));
     if (!allSet || newListValueSum < 30) {
       throw new Error(
         "400-破冰失败。第一次出牌要求点数之和不小于30，且不能与公共牌进行组合。"

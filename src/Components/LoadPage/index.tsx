@@ -4,6 +4,7 @@ import { AtToast } from "taro-ui";
 import "./index.scss";
 import { initUserInfo, SLEEP } from "../../utils";
 import { useEffect, useState } from "react";
+import Ad from "../Ad";
 
 interface IProps {
   setUserInfo?: (userInfo: Player) => void;
@@ -38,6 +39,7 @@ export default function Index({ setUserInfo = () => {} }: IProps) {
 
   return (
     <View className="load-page">
+      <Ad />
       <AtToast isOpened={isOpened} text="加载中..." status="loading"></AtToast>
     </View>
   );

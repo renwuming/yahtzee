@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { PAGE_LEN } from "./const";
 
-export const VERSION = "v5.2.6";
+export const VERSION = "v5.2.7";
 
 export const CLOUD_BASE_URL =
   "cloud://prod-0gjpxr644f6d941d.7072-prod-0gjpxr644f6d941d-1306328214";
@@ -177,11 +177,15 @@ function getVedio(adUnitId, cb) {
 const adUnitId30 = "adunit-111b066b402c31d0";
 const adUnitId15 = "adunit-262b83d77c8a752a";
 
+let _vedio30 = null;
+let _vedio15 = null;
 export function getVedio30(cb) {
-  return getVedio(adUnitId30, cb);
+  _vedio30 = _vedio30 || getVedio(adUnitId30, cb);
+  return _vedio30;
 }
 export function getVedio15(cb) {
-  return getVedio(adUnitId15, cb);
+  _vedio15 = _vedio15 || getVedio(adUnitId15, cb);
+  return _vedio15;
 }
 
 function showVedioErrToast() {

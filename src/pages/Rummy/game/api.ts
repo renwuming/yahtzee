@@ -645,7 +645,6 @@ function handleSetToProperPos(
 ) {
   const L = list.length;
   const type = judgeSetType(list);
-  console.log(list, type);
   if (type === RUMMY_SET_TYPE.straight) {
     let firstCardValue, firstCardColor;
     list.forEach((card, index) => {

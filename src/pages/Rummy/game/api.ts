@@ -584,7 +584,6 @@ function judgeListIsSet(list) {
   const noJokerList = list.filter((item) => item.value !== 0);
   noJokerList.sort((a, b) => a.value - b.value);
   const isGroup = judgeSetType(noJokerList) === RUMMY_SET_TYPE.samevalue;
-
   if (isGroup) {
     // 群组长度不能大于4
     if (list.length > 4) return false;
@@ -604,10 +603,19 @@ function judgeListIsSet(list) {
       if (isGroup) {
         resultList.push(...extraList);
       } else {
-        const tail = resultList[resultList.length - 1];
-        if (tail.value === 13) {
+        let tailValue = 0;
+        for (let i = resultList.length - 1; i >= 0; i--) {
+          const { value } = resultList[i];
+          if (value === 0) {
+            tailValue++;
+          } else {
+            tailValue += value;
+            break;
+          }
+        }
+        if (tailValue === 13) {
           resultList.unshift(...extraList);
-        } else if (tail.value === 12) {
+        } else if (tailValue === 12) {
           if (extraList.length === 1) {
             resultList.push(...extraList);
           } else {
@@ -623,6 +631,7 @@ function judgeListIsSet(list) {
       list[i] = resultList[i];
     }
   }
+
   return isSet;
 }
 

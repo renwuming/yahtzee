@@ -439,7 +439,6 @@ function tidyPlayground(playgroundData) {
     tidyAddSet(straightList, tempList, true);
     tempList = [];
   }
-
   // 筛选所有 samevalue
   for (let i = 0; i < GROUND_COL_LEN; i++) {
     for (let j = 0; j < GROUND_ROW_LEN; j++) {
@@ -499,28 +498,7 @@ function tidyAddSet(list, set, isStraight) {
 function handleSetToProperPos(list, playgroundData, rowColorMap) {
   const L = list.length;
   const type = judgeSetType(list);
-  if (type === RUMMY_SET_TYPE.samevalue) {
-    // 放到预设位置
-    for (let i = 0; i < sameValueIndexList.length; i++) {
-      const index = sameValueIndexList[i];
-      if (index < 0) break;
-      const { rowIndex, colIndex } = getGroundCrossByIndex(index);
-      const hasPlace = new Array(L).fill(1).every((_, index) => {
-        const card = playgroundData[colIndex][rowIndex + index];
-        if (!card) return true;
-        return getCardIndexByID(list, card.id) >= 0;
-      });
-      if (hasPlace) {
-        placeSetToGroundByIndex(list, index, playgroundData);
-        return;
-      }
-    }
-    // 如果没有预设位置，则找一个空位即可
-    const index = findGroundEmptyPlace(list, playgroundData);
-    if (index >= 0) {
-      placeSetToGroundByIndex(list, index, playgroundData);
-    }
-  } else {
+  if (type === RUMMY_SET_TYPE.straight) {
     let firstCardValue, firstCardColor;
     list.forEach((card, index) => {
       if (card.value === 0) return;
@@ -542,6 +520,27 @@ function handleSetToProperPos(list, playgroundData, rowColorMap) {
       const sameColor = !rowColor || firstCardColor === rowColor;
 
       if (sameColor && hasPlace) {
+        placeSetToGroundByIndex(list, index, playgroundData);
+        return;
+      }
+    }
+    // 如果没有预设位置，则找一个空位即可
+    const index = findGroundEmptyPlace(list, playgroundData);
+    if (index >= 0) {
+      placeSetToGroundByIndex(list, index, playgroundData);
+    }
+  } else {
+    // 放到预设位置
+    for (let i = 0; i < sameValueIndexList.length; i++) {
+      const index = sameValueIndexList[i];
+      if (index < 0) break;
+      const { rowIndex, colIndex } = getGroundCrossByIndex(index);
+      const hasPlace = new Array(L).fill(1).every((_, index) => {
+        const card = playgroundData[colIndex][rowIndex + index];
+        if (!card) return true;
+        return getCardIndexByID(list, card.id) >= 0;
+      });
+      if (hasPlace) {
         placeSetToGroundByIndex(list, index, playgroundData);
         return;
       }
@@ -815,7 +814,6 @@ function judgeListIsSet(list) {
   const noJokerList = list.filter((item) => item.value !== 0);
   noJokerList.sort((a, b) => a.value - b.value);
   const isGroup = judgeSetType(noJokerList) === RUMMY_SET_TYPE.samevalue;
-
   if (isGroup) {
     // 群组长度不能大于4
     if (list.length > 4) return false;
@@ -835,10 +833,19 @@ function judgeListIsSet(list) {
       if (isGroup) {
         resultList.push(...extraList);
       } else {
-        const tail = resultList[resultList.length - 1];
-        if (tail.value === 13) {
+        let tailValue = 0;
+        for (let i = resultList.length - 1; i >= 0; i--) {
+          const { value } = resultList[i];
+          if (value === 0) {
+            tailValue++;
+          } else {
+            tailValue += value;
+            break;
+          }
+        }
+        if (tailValue === 13) {
           resultList.unshift(...extraList);
-        } else if (tail.value === 12) {
+        } else if (tailValue === 12) {
           if (extraList.length === 1) {
             resultList.push(...extraList);
           } else {
@@ -854,6 +861,7 @@ function judgeListIsSet(list) {
       list[i] = resultList[i];
     }
   }
+
   return isSet;
 }
 

@@ -93,8 +93,9 @@
         {
           "name": "拉密3",
           "pathName": "pages/Rummy/game/index",
-          "query": "id=17e3426e621b8fbb10fa2a7c53d29912",
-          "scene": null
+          "query": "id=17e3426e622f82cb137f1b4b4f38379f",
+          "scene": null,
+          "launchMode": "default"
         }
       ]
     }

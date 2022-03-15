@@ -645,18 +645,29 @@ function handleSetToProperPos(
 ) {
   const L = list.length;
   const type = judgeSetType(list);
-  if (type === RUMMY_SET_TYPE.samevalue) {
+  console.log(list, type);
+  if (type === RUMMY_SET_TYPE.straight) {
+    let firstCardValue, firstCardColor;
+    list.forEach((card, index) => {
+      if (card.value === 0) return;
+      firstCardValue = card.value - index;
+      firstCardColor = card.color;
+    });
+    const straightIndexList = getStraightIndexListByValue(firstCardValue);
     // 放到预设位置
-    for (let i = 0; i < sameValueIndexList.length; i++) {
-      const index = sameValueIndexList[i];
-      if (index < 0) break;
+    for (let i = 0; i < straightIndexList.length; i++) {
+      const index = straightIndexList[i];
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
       const hasPlace = new Array(L).fill(1).every((_, index) => {
         const card = playgroundData[colIndex][rowIndex + index];
         if (!card) return true;
         return getCardIndexByID(list, card.id) >= 0;
       });
-      if (hasPlace) {
+      const rowColor = rowColorMap[colIndex];
+      if (!rowColor) rowColorMap[colIndex] = firstCardColor;
+      const sameColor = !rowColor || firstCardColor === rowColor;
+
+      if (sameColor && hasPlace) {
         placeSetToGroundByIndex(
           list,
           index,
@@ -681,27 +692,17 @@ function handleSetToProperPos(
       );
     }
   } else {
-    let firstCardValue, firstCardColor;
-    list.forEach((card, index) => {
-      if (card.value === 0) return;
-      firstCardValue = card.value - index;
-      firstCardColor = card.color;
-    });
-    const straightIndexList = getStraightIndexListByValue(firstCardValue);
     // 放到预设位置
-    for (let i = 0; i < straightIndexList.length; i++) {
-      const index = straightIndexList[i];
+    for (let i = 0; i < sameValueIndexList.length; i++) {
+      const index = sameValueIndexList[i];
+      if (index < 0) break;
       const { rowIndex, colIndex } = getGroundCrossByIndex(index);
       const hasPlace = new Array(L).fill(1).every((_, index) => {
         const card = playgroundData[colIndex][rowIndex + index];
         if (!card) return true;
         return getCardIndexByID(list, card.id) >= 0;
       });
-      const rowColor = rowColorMap[colIndex];
-      if (!rowColor) rowColorMap[colIndex] = firstCardColor;
-      const sameColor = !rowColor || firstCardColor === rowColor;
-
-      if (sameColor && hasPlace) {
+      if (hasPlace) {
         placeSetToGroundByIndex(
           list,
           index,

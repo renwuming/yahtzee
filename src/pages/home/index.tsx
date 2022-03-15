@@ -124,7 +124,7 @@ export default function Index() {
             <Text className="text">排行榜</Text>
           </View>
         </AtButton>
-        <AtButton
+        {/* <AtButton
           onClick={() => {
             navigateTo("", `MessageBoard/index`);
           }}
@@ -133,7 +133,7 @@ export default function Index() {
             <AtIcon value="edit" size="32" color="#4871b6"></AtIcon>
             <Text className="text">留言板</Text>
           </View>
-        </AtButton>
+        </AtButton> */}
         <AtButton
           onClick={() => {
             Taro.previewImage({

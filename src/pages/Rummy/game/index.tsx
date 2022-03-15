@@ -1037,6 +1037,7 @@ function CardList({
                     : id === activeCardID.current && "active",
                   isLibrary && "hidden"
                 )}
+                outOfBounds={true}
                 direction="all"
                 onChange={(event) => {
                   onChange(event, id);

@@ -43,6 +43,7 @@ exports.main = async (event) => {
 
   // 广告弹幕
   execHandleGamePublicity(db);
+  execHandleHideMessageBoard(db);
 };
 
 async function execHandleGamePublicity(db) {
@@ -61,6 +62,20 @@ async function execHandleGamePublicity(db) {
     .update({
       data: {
         chatActionList: _.push(gamePublicitySlogan),
+      },
+    });
+}
+
+async function execHandleHideMessageBoard(db) {
+  const _ = db.command;
+  db.collection("board_messages")
+    .where({
+      _openid: _.neq("oqWgm5fO6WmeIflXZZJusUBmWPB0"),
+      type: "message",
+    })
+    .update({
+      data: {
+        type: "hide",
       },
     });
 }

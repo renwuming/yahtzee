@@ -104,8 +104,8 @@ export default function Index() {
   ];
   return (
     <View className="home">
-      <Text className="version">{VERSION}</Text>
-      <MyPlayer></MyPlayer>
+      {/* <Text className="version">{VERSION}</Text> */}
+      {/* <MyPlayer></MyPlayer> */}
       <View className="game-list at-row at-row__align--center">
         <AtButton
           className="tool-btn"

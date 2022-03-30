@@ -2,7 +2,7 @@
   "miniprogramRoot": "dist/",
   "projectname": "yahtzee",
   "description": "yahtzee!dice!",
-  "appid": "wx47c8f6c7d0e54303",
+  "appid": "wx78bc21b55d1cc0c5",
   "cloudfunctionRoot": "cloud/",
   "setting": {
     "urlCheck": true,
@@ -31,7 +31,8 @@
       "disablePlugins": [],
       "outputPath": ""
     },
-    "useIsolateContext": true,
+    "enableEngineNative": false,
+    "useIsolateContext": false,
     "userConfirmedBundleSwitch": false,
     "packNpmManually": false,
     "packNpmRelationList": [],
@@ -39,8 +40,7 @@
     "disableUseStrict": false,
     "minifyWXML": true,
     "showES6CompileOption": false,
-    "useCompilerPlugins": false,
-    "ignoreUploadUnusedFiles": true
+    "useCompilerPlugins": false
   },
   "compileType": "miniprogram",
   "simulatorType": "wechat",

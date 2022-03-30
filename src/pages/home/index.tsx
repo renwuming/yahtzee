@@ -34,16 +34,16 @@ export default function Index() {
   });
 
   const gameList = [
-    {
-      name: "拉密数字棋",
-      imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/rummy-cover.jpg",
-      navigateFn() {
-        Taro.navigateToMiniProgram({
-          appId: "wx12825b7bafc3db6e",
-        });
-      },
-    },
+    // {
+    //   name: "拉密数字棋",
+    //   imgUrl:
+    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/rummy-cover.jpg",
+    //   navigateFn() {
+    //     Taro.navigateToMiniProgram({
+    //       appId: "wx12825b7bafc3db6e",
+    //     });
+    //   },
+    // },
     // {
     //   name: "拉密牌",
     //   imgUrl:
@@ -79,42 +79,61 @@ export default function Index() {
     //   pageType: "Martian",
     //   pagePath: `hall/index`,
     // },
-    {
-      name: "截码战",
-      imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/jmz-cover.jpg",
-      navigateFn() {
-        Taro.navigateToMiniProgram({
-          appId: "wxfe74b714bde12b3f",
-          path: "pages/hall/index",
-        });
-      },
-    },
-    {
-      name: "电波同步",
-      imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/wavelength-cover.jpg",
-      navigateFn() {
-        Taro.navigateToMiniProgram({
-          appId: "wxfe74b714bde12b3f",
-          path: "pages/WaveLength/hall/index",
-        });
-      },
-    },
+    // {
+    //   name: "截码战",
+    //   imgUrl:
+    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/jmz-cover.jpg",
+    //   navigateFn() {
+    //     Taro.navigateToMiniProgram({
+    //       appId: "wxfe74b714bde12b3f",
+    //       path: "pages/hall/index",
+    //     });
+    //   },
+    // },
+    // {
+    //   name: "电波同步",
+    //   imgUrl:
+    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/wavelength-cover.jpg",
+    //   navigateFn() {
+    //     Taro.navigateToMiniProgram({
+    //       appId: "wxfe74b714bde12b3f",
+    //       path: "pages/WaveLength/hall/index",
+    //     });
+    //   },
+    // },
   ];
   return (
     <View className="home">
       <Text className="version">{VERSION}</Text>
       <MyPlayer></MyPlayer>
       <View className="game-list at-row at-row__align--center">
+        <AtButton
+          className="tool-btn"
+          onClick={() => {
+            navigateTo("Tool", "index");
+          }}
+        >
+          <View className="item">
+            <View className="top">
+              <Image
+                mode="aspectFit"
+                src="https://cdn.renwuming.cn/static/yahtzee/imgs/cover.jpg"
+              ></Image>
+            </View>
+            <View className="bottom">
+              <Text>骰子工具</Text>
+            </View>
+          </View>
+        </AtButton>
         {gameList.map((item) => {
-          const { name, imgUrl, pageType, pagePath, navigateFn } = item;
+          const { name, imgUrl, navigateFn } = item;
           return (
             <View key={null} className="item-box at-col at-col-4">
               <AtButton
                 onClick={() => {
                   getUserProfile(() => {
-                    navigateFn ? navigateFn() : navigateTo(pageType, pagePath);
+                    navigateFn();
+                    // navigateFn ? navigateFn() : navigateTo(pageType, pagePath);
                   });
                 }}
               >
@@ -142,7 +161,7 @@ export default function Index() {
             <Text className="text">公告</Text>
           </View>
         </AtButton>
-        <AtButton
+        {/* <AtButton
           onClick={() => {
             getUserProfile(() => {
               navigateTo("", `seasonRank/index`);
@@ -153,7 +172,7 @@ export default function Index() {
             <Image mode="aspectFit" src={RankIcon}></Image>
             <Text className="text">排行榜</Text>
           </View>
-        </AtButton>
+        </AtButton> */}
         {/* <AtButton
           onClick={() => {
             navigateTo("", `MessageBoard/index`);
@@ -174,6 +193,18 @@ export default function Index() {
           <View className="icon-btn">
             <Image mode="aspectFit" src={WechatIcon}></Image>
             <Text className="text">加群交流</Text>
+          </View>
+        </AtButton>
+        <AtButton
+          onClick={() => {
+            Taro.navigateToMiniProgram({
+              appId: "wx12825b7bafc3db6e",
+            });
+          }}
+        >
+          <View className="icon-btn">
+            <AtIcon value="star-2" size="32" color="#4871b6"></AtIcon>
+            <Text className="text">新版拉密</Text>
           </View>
         </AtButton>
         {/* <AtButton

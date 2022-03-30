@@ -94,8 +94,13 @@
           "name": "拉密3",
           "pathName": "pages/Rummy/game/index",
           "query": "id=17e3426e622f82cb137f1b4b4f38379f",
-          "scene": null,
-          "launchMode": "default"
+          "scene": null
+        },
+        {
+          "name": "骰子工具",
+          "pathName": "pages/Tool/index",
+          "query": "",
+          "scene": null
         }
       ]
     }

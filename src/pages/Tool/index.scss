@@ -1,0 +1,17 @@
+.dice-tool {
+  min-height: 100%;
+  background-color: #eef5ff;
+  padding-top: 30px;
+  .btn-list {
+    .at-button {
+      margin-bottom: 30px;
+      width: 50%;
+    }
+  }
+  .dice-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 100px;
+  }
+}

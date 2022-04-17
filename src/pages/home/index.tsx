@@ -29,21 +29,37 @@ export default function Index() {
 
   const [showModal, setShowModal] = useState<boolean>(true);
 
-  useDidShow(() => {
-    setShowModal(true);
-  });
+  // useDidShow(() => {
+  //   setShowModal(true);
+  // });
 
   const gameList = [
-    // {
-    //   name: "拉密数字棋",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/rummy-cover.jpg",
-    //   navigateFn() {
-    //     Taro.navigateToMiniProgram({
-    //       appId: "wx12825b7bafc3db6e",
-    //     });
-    //   },
-    // },
+    {
+      name: "拉密数字棋",
+      imgUrl: "https://cdn.renwuming.cn/static/rummy/imgs/rummy-cover.jpg",
+      navigateFn() {
+        Taro.navigateToMiniProgram({
+          appId: "wx12825b7bafc3db6e",
+        });
+      },
+    },
+    {
+      name: "截码战",
+      imgUrl:
+        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/jmz-cover.jpg",
+      navigateFn() {
+        Taro.navigateToMiniProgram({
+          appId: "wxfe74b714bde12b3f",
+          path: "pages/hall/index",
+        });
+      },
+    },
+    {
+      name: "骰子工具",
+      imgUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/cover.jpg",
+      pageType: "Tool",
+      pagePath: "index",
+    },
     // {
     //   name: "拉密牌",
     //   imgUrl:
@@ -80,17 +96,6 @@ export default function Index() {
     //   pagePath: `hall/index`,
     // },
     // {
-    //   name: "截码战",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/jmz-cover.jpg",
-    //   navigateFn() {
-    //     Taro.navigateToMiniProgram({
-    //       appId: "wxfe74b714bde12b3f",
-    //       path: "pages/hall/index",
-    //     });
-    //   },
-    // },
-    // {
     //   name: "电波同步",
     //   imgUrl:
     //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/wavelength-cover.jpg",
@@ -107,7 +112,7 @@ export default function Index() {
       <Text className="version">{VERSION}</Text>
       <MyPlayer></MyPlayer>
       <View className="game-list at-row at-row__align--center">
-        <AtButton
+        {/* <AtButton
           className="tool-btn"
           onClick={() => {
             navigateTo("Tool", "index");
@@ -124,16 +129,15 @@ export default function Index() {
               <Text>骰子工具</Text>
             </View>
           </View>
-        </AtButton>
+        </AtButton> */}
         {gameList.map((item) => {
-          const { name, imgUrl, navigateFn } = item;
+          const { name, imgUrl, navigateFn, pageType, pagePath } = item;
           return (
             <View key={null} className="item-box at-col at-col-4">
               <AtButton
                 onClick={() => {
                   getUserProfile(() => {
-                    navigateFn();
-                    // navigateFn ? navigateFn() : navigateTo(pageType, pagePath);
+                    navigateFn ? navigateFn() : navigateTo(pageType, pagePath);
                   });
                 }}
               >
@@ -186,7 +190,9 @@ export default function Index() {
         <AtButton
           onClick={() => {
             Taro.previewImage({
-              urls: ["https://cdn.renwuming.cn/static/jmz/group.jpg"],
+              urls: [
+                `https://cdn.renwuming.cn/static/jmz/group.jpg?v=${Date.now()}`,
+              ],
             });
           }}
         >
@@ -195,7 +201,7 @@ export default function Index() {
             <Text className="text">加群交流</Text>
           </View>
         </AtButton>
-        <AtButton
+        {/* <AtButton
           onClick={() => {
             Taro.navigateToMiniProgram({
               appId: "wx12825b7bafc3db6e",
@@ -206,7 +212,7 @@ export default function Index() {
             <AtIcon value="star-2" size="32" color="#4871b6"></AtIcon>
             <Text className="text">新版拉密</Text>
           </View>
-        </AtButton>
+        </AtButton> */}
         {/* <AtButton
           onClick={() => {
             Taro.previewImage({
@@ -235,7 +241,7 @@ export default function Index() {
             <Text>由于微信审核的原因，本小程序大部分内容已经停运。</Text>
             <Text>不要担心，我们会将内容陆续迁移到新的小游戏。</Text>
             <Text>
-              截止目前，【拉密数字棋】小游戏已经上线了一个单机版本，欢迎大家试玩，完整功能预计在“五一”之前完成。
+              截止目前，【拉密数字棋】小游戏已经上线了一个全新的版本，欢迎大家试玩！。
             </Text>
             <Text>最后感谢大家对任同学小程序的支持，欢迎加群交流，谢谢！</Text>
           </View>

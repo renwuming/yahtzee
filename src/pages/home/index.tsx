@@ -1,5 +1,5 @@
 import Taro, { useDidShow, useShareAppMessage } from "@tarojs/taro";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Image, Text } from "@tarojs/components";
 import {
   AtButton,
@@ -15,6 +15,7 @@ import RankIcon from "../../assets/imgs/rank.png";
 // @ts-ignore
 import WechatIcon from "../../assets/imgs/wechat.png";
 import "./index.scss";
+import { getGameList } from "./api";
 
 export default function Index() {
   // 设置分享
@@ -28,117 +29,48 @@ export default function Index() {
   });
 
   const [showModal, setShowModal] = useState<boolean>(true);
+  const [gameList, setGameList] = useState([]);
 
   // useDidShow(() => {
   //   setShowModal(true);
   // });
 
-  const gameList = [
-    {
-      name: "拉密数字棋",
-      imgUrl: "https://cdn.renwuming.cn/static/rummy/imgs/rummy-cover.jpg",
-      navigateFn() {
-        Taro.navigateToMiniProgram({
-          appId: "wx12825b7bafc3db6e",
+  useEffect(() => {
+    getGameList().then((list) => {
+      list = list.filter((item) => item.online);
+      setGameList(list);
+    });
+  }, []);
+
+  function openPage(data) {
+    const { appId, path } = data;
+
+    if (appId) {
+      Taro.navigateToMiniProgram({
+        appId,
+        path,
+      });
+    } else {
+      getUserProfile(() => {
+        Taro.navigateTo({
+          url: path,
         });
-      },
-    },
-    {
-      name: "截码战",
-      imgUrl:
-        "https://cdn.renwuming.cn/static/diceGames/imgs/covers/jmz-cover.jpg",
-      navigateFn() {
-        Taro.navigateToMiniProgram({
-          appId: "wxfe74b714bde12b3f",
-          path: "pages/hall/index",
-        });
-      },
-    },
-    {
-      name: "骰子工具",
-      imgUrl: "https://cdn.renwuming.cn/static/yahtzee/imgs/cover.jpg",
-      pageType: "Tool",
-      pagePath: "index",
-    },
-    // {
-    //   name: "拉密牌",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/rummy-cover.jpg",
-    //   pageType: "Rummy",
-    //   pagePath: `hall/index`,
-    // },
-    // {
-    //   name: "欲罢不能",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/cantstop-cover.jpg",
-    //   pageType: "CantStop",
-    //   pagePath: `hall/index`,
-    // },
-    // {
-    //   name: "神奇形色牌",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/set-cover.jpg",
-    //   pageType: "Set",
-    //   pagePath: `hall/index`,
-    // },
-    // {
-    //   name: "快艇骰子",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/yahtzee-cover.jpg",
-    //   pageType: "Yahtzee",
-    //   pagePath: `hall/index`,
-    // },
-    // {
-    //   name: "火星骰",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/martian-cover.jpg",
-    //   pageType: "Martian",
-    //   pagePath: `hall/index`,
-    // },
-    // {
-    //   name: "电波同步",
-    //   imgUrl:
-    //     "https://cdn.renwuming.cn/static/diceGames/imgs/covers/wavelength-cover.jpg",
-    //   navigateFn() {
-    //     Taro.navigateToMiniProgram({
-    //       appId: "wxfe74b714bde12b3f",
-    //       path: "pages/WaveLength/hall/index",
-    //     });
-    //   },
-    // },
-  ];
+      });
+    }
+  }
+
   return (
     <View className="home">
       <Text className="version">{VERSION}</Text>
       <MyPlayer></MyPlayer>
       <View className="game-list at-row at-row__align--center">
-        {/* <AtButton
-          className="tool-btn"
-          onClick={() => {
-            navigateTo("Tool", "index");
-          }}
-        >
-          <View className="item">
-            <View className="top">
-              <Image
-                mode="aspectFit"
-                src="https://cdn.renwuming.cn/static/yahtzee/imgs/cover.jpg"
-              ></Image>
-            </View>
-            <View className="bottom">
-              <Text>骰子工具</Text>
-            </View>
-          </View>
-        </AtButton> */}
         {gameList.map((item) => {
-          const { name, imgUrl, navigateFn, pageType, pagePath } = item;
+          const { name, imgUrl } = item;
           return (
             <View key={null} className="item-box at-col at-col-4">
               <AtButton
                 onClick={() => {
-                  getUserProfile(() => {
-                    navigateFn ? navigateFn() : navigateTo(pageType, pagePath);
-                  });
+                  openPage(item);
                 }}
               >
                 <View className="item">
